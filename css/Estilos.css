@@ -1,0 +1,28 @@
+.registro{
+	width: 350px;/*largo*/
+	background: #f5f5f5;
+	padding: 30px;/*altura en su interior*/
+	/*margin: auto;/*dejar en al medio*/
+	border-radius: 4px;/*Curvatura de su vertices*/
+	font-family:'calibri';
+	color: rgb(0, 0, 0);
+	/*box-shadow: 7px 13px 37px #000;*/
+}
+
+.registro h3{
+    margin-left: 30px;
+}
+
+.cesta{
+	background-color: #f5f5f5;
+	padding: 10px;
+	border-radius: 4px;
+}
+.alinear-central{
+	text-align: center;
+	position: relative;
+	top: 50%;
+}
+.bg-colorPrincipal{
+	background-color: #435d7d;
+}

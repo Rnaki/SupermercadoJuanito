@@ -1,0 +1,217 @@
+.body-carrito {
+  background-color: rgb(212, 212, 212);
+}
+.registro {
+  width: 350px; /*largo*/
+  background: #f5f5f5;
+  padding: 30px; /*altura en su interior*/
+  /*margin: auto;/*dejar en al medio*/
+  border-radius: 4px; /*Curvatura de su vertices*/
+  font-family: "calibri";
+  color: rgb(0, 0, 0);
+  /*box-shadow: 7px 13px 37px #000;*/
+}
+
+.registro h3 {
+  margin-left: 30px;
+}
+.breadcrumb {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.cesta {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+/*CSS de InfoBodega*/
+.body-infoB {
+  background: #f5f5f5;
+}
+
+.table-title .col .b{
+	font-size: 28px;
+}
+
+header .letrah2 {
+  color: #566787;
+  font-family: "Varela Round", sans-serif;
+}
+
+.table-responsive {
+  margin: 30px 0;
+}
+
+.table-title {
+  padding-bottom: 15px;
+  background: #435d7d;
+  color: #fff;
+  padding: 16px 30px;
+  min-width: 100%;
+  margin: -20px -25px 10px;
+  border-radius: 3px 3px 0 0;
+}
+
+.table-wrapper {
+  background: #fff;
+  padding: 20px 25px;
+  border-radius: 3px;
+  min-width: 1000px;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+}
+
+.container-xl .table-striped {
+  font-size: 15px;
+}
+
+.hint-text {
+  float: left;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.pagination {
+  float: right;
+  margin: 0 0 5px;
+}
+
+.pagination li a {
+  border: none;
+  font-size: 13px;
+  min-width: 30px;
+  min-height: 30px;
+  color: #999;
+  margin: 0 2px;
+  line-height: 30px;
+  border-radius: 2px !important;
+  text-align: center;
+  padding: 0 6px;
+}
+
+.pagination li a:hover {
+  color: #666;
+}
+
+.pagination li.active a,
+.pagination li.active a.page-link {
+  background: #03a9f4;
+}
+
+.pagination li.active a:hover {
+  background: #0397d6;
+}
+
+.pagination li.disabled i {
+  color: #ccc;
+}
+
+.pagination li i {
+  font-size: 16px;
+  padding-top: 6px;
+}
+
+table.table td a.edit {
+  color: #ffc107;
+}
+
+table.table td a.delete {
+  color: #f44336;
+}
+
+/*CSS de InfoBodega Modal*/
+.modal .modal-dialog {
+  max-width: 400px;
+}
+
+.modal .modal-header,
+.modal .modal-body,
+.modal .modal-footer {
+  padding: 20px 30px;
+}
+
+.modal .modal-content {
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.modal .modal-footer {
+  background: #ecf0f1;
+  border-radius: 0 0 3px 3px;
+}
+
+.modal .modal-title {
+  display: inline-block;
+}
+
+.modal .form-control {
+  border-radius: 2px;
+  box-shadow: none;
+  border-color: #dddddd;
+}
+
+.modal textarea.form-control {
+  resize: vertical;
+}
+
+.modal .btn {
+  border-radius: 2px;
+  min-width: 100px;
+}
+
+.modal form label {
+  font-weight: normal;
+}
+
+.modal .modal-body .form-group{
+	font-size: 15px;
+}
+
+.modal .cread {
+  background-color: rgb(24, 139, 22);
+}
+
+.modal .modal-title {
+  color: rgb(255, 255, 255);
+}
+
+.modal .modal-footer .cread {
+  background-color: rgb(24, 139, 22);
+}
+
+.modal .edi {
+  background-color: gold;
+}
+
+.container-xl tbody .bi {
+  margin-left: 7px;
+}
+
+.modal .modal-footer .btn-warning {
+  background-color: rgb(223, 226, 15);
+  color: rgb(255, 255, 255);
+}
+
+.modal .modal-content .modal-body .form-group {
+  margin-top: 20px;
+}
+
+.modal .eli {
+  background-color: rgb(202, 15, 15);
+}
+
+.modal .modal-footer .btn-danger {
+  background-color: rgb(202, 15, 15);
+}
+
+.container-xl .col-sm-6 .form-control{
+	width: 36%;
+	display: inline;
+}
+
+/*Proveedor*/
+body{
+	background: #f5f5f5;
+}
