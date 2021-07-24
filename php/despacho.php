@@ -1,3 +1,22 @@
+<?php
+
+include("conexion.php");
+$gbd = conectar();
+
+//$sql = "SELECT my_function();";
+$sql = "SELECT * FROM despacho";
+//$data = $conn->query($sql)->fetchAll();
+$gsent = $gbd->prepare($sql);
+$gsent->execute();
+
+/* Obtener todas las filas restantes del conjunto de resultados */
+//print("Obtener todas las filas restantes del conjunto de resultados:\n");
+$resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
+//var_dump($resultado);
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,6 +31,7 @@
     <script src="../jquery/jquery.min.v3.6.0.js"></script>
     <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
     <script src="../popper/popper.min.js"></script>
+    <script src="../js/funciones.js"></script>
     <style>
         .table-title .col .form-control {
             width: 33%;
@@ -131,7 +151,7 @@
 <body>
     <header class="site-header sticky-top py-1">
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
-            <a class="py-2 d-none d-md-inline-block" href="../Menu trabajador.html">Volver</a>
+            <a class="py-2 d-none d-md-inline-block" href="Menu trabajador.html">Volver</a>
             <h2 class="letrah2">INFORMACIÓN DE DESPACHO</h2>
             <a class="py-2 d-none d-md-inline-block" href="index.php">Cerrar sesión</a>
         </nav>
@@ -225,86 +245,53 @@
                         <tr>
                             <th></th>
                             <th>ID Despacho</th>
-                            <th>Estado</th>
-                            <th>Fecha Entrega</th>
+                            <th>ID Sucursal</th>
+                            <th>Patente</th>
+                            <th>Información de envío</th>
                             <th>Fecha Limite</th>
-                            <th>Acciones</th>
+                            <th>Fecha Entrega</th>
+                            <th>Proceso despacho</th>
                             <!--Que productos tiene cada, la cantidad, almacenamiento-->
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td>DT14<a href="" data-bs-toggle="modal" data-bs-target="#infoDespachoEmployeeModal"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-                                    </svg></a></td>
-                            <td>En curso</td>
-                            <td>17-06-2021</td>
-                            <td>19-06-2021</td>
-                            <td>
-                                <a href="" class="edit" data-bs-toggle="modal" data-bs-target="#edicionexampleModal"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z" />
-                                    </svg></a>
-                                <a href="" class="delete" data-bs-toggle="modal" data-bs-target="#eliminarexampleModal"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
-                                    </svg></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td>DR32<a href=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-                                    </svg></a></td>
-                            <td>Recibido</td>
-                            <td>20-05-2021</td>
-                            <td>24-05-2021</td>
-                            <td>
-                                <a href="" class="edit" data-bs-toggle="modal" data-bs-target="#edicionexampleModal"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z" />
-                                    </svg></a>
-                                <a href="" class="delete" data-bs-toggle="modal" data-bs-target="#eliminarexampleModal"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
-                                    </svg></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td>TR18<a href=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-                                    </svg></a></td>
-                            <td>Preparación</td>
-                            <td>01-04-2021</td>
-                            <td>04-04-2021</td>
-                            <td>
-                                <a href="" class="edit" data-bs-toggle="modal" data-bs-target="#edicionexampleModal"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z" />
-                                    </svg></a>
-                                <a href="" class="delete" data-bs-toggle="modal" data-bs-target="#eliminarexampleModal"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
-                                    </svg></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td>TR13<a href=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-                                    </svg></a></td>
-                            <td>En curso</td>
-                            <td>18-05-2021</td>
-                            <td>20-05-2021</td>
-                            <td>
-                                <a href="" class="edit" data-bs-toggle="modal" data-bs-target="#edicionexampleModal"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-                                        <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z" />
-                                    </svg></a>
-                                <a href="" class="delete" data-bs-toggle="modal" data-bs-target="#eliminarexampleModal"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
-                                    </svg></a>
-                            </td>
-                        </tr>
+                        <?php
+                            foreach ($resultado as $row){
+                            echo '<tr>';
+                            echo '<td>'.$row["id_despacho"].'<a href="crearDespacho.php"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                <path
+                                    d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                <path
+                                    d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                            </svg></a></td>';
+                            echo  '<td>'.$row["id_despacho"].'</td>';
+                            echo  '<td>'.$row["id_sucursal"].'</td>';
+                            echo  '<td>'.$row["patente"].'</td>';
+                            echo  '<td>'.$row["informacion_envio"].'</td>';
+                            echo  '<td>'.$row["fecha_limite"].'</td>';
+                            echo  '<td>'.$row["fecha_entrega"].'</td>';
+                            echo  '<td>'.$row["proceso_despacho"].'</td>';
+
+
+                            echo "<td>
+                            <a href='' onclick='mostrarUpdateDespacho(\"".$row['id_despacho']."\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><svg
+                                    xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
+                                    class='bi bi-pencil-fill' viewBox='0 0 16 16'>
+                                    <path
+                                        d='M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z' />
+                                </svg></a>";
+                            echo "<a href='' onclick='EliminarDespacho(\"".$row['id_despacho']."\")' class='delete' data-bs-toggle='modal' ><svg
+                                    xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor'
+                                    class='bi bi-trash-fill' viewBox='0 0 16 16'>
+                                    <path
+                                        d='M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z' />
+                                </svg></a>
+
+                            </td>";
+                            echo "<tr>";
+                            }
+                        ?>  
                     </tbody>
                 </table>
                 <div class="clearfix">
@@ -433,19 +420,27 @@
                         <label>ID Despacho: </label>
                         <input type="text" class="form-control" required>
                         <div class="form-group">
-                            <label>Estado: </label>
+                            <label>ID Sucursal: </label>
                             <input type="text" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Tipo: </label>
+                            <label>Patente: </label>
                             <input type="text" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Marca: </label>
+                            <label>Información de envio: </label>
                             <input type="text" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Fono: </label>
+                            <label>Fecha limite: </label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha entrega: </label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Proceso de despacho: </label>
                             <input type="text" class="form-control" required>
                         </div>
                     </div>
@@ -467,24 +462,32 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
+                <div class="form-group">
                         <label>ID Despacho: </label>
-                        <input type="text" class="form-control" required>
+                        <input type="text" id="updateIdDespacho" class="form-control" disabled>
                         <div class="form-group">
-                            <label>Estado: </label>
-                            <input type="text" class="form-control" required>
+                            <label>ID Sucursal: </label>
+                            <input type="text" id="updateIdSucursal" class="form-control" disabled>
                         </div>
                         <div class="form-group">
-                            <label>Tipo: </label>
-                            <input type="text" class="form-control" required>
+                            <label>Patente: </label>
+                            <input type="text" id="updatePatente" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Marca: </label>
-                            <input type="text" class="form-control" required>
+                            <label>Información de envio: </label>
+                            <input type="text" id="updateInformacion" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Fono: </label>
-                            <input type="text" class="form-control" required>
+                            <label>Fecha limite: </label>
+                            <input type="text" id="updateFechaLimite" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha entrega: </label>
+                            <input type="text" id="updateFechaEntrega" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Proceso de despacho: </label>
+                            <input type="text" id="IdProcesoDespacho" class="form-control" required>
                         </div>
                     </div>
                 </div>
@@ -506,7 +509,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>¿Estas seguro que quieres eliminar a este proveedor?</label>
+                        <label>¿Estas seguro que quieres archivar el despacho?</label>
                         <div style="height:16px"></div>
                     </div>
                 </div>
