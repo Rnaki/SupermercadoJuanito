@@ -42,7 +42,7 @@
   <body class="text-center">
     
 <main class="form-signin">
-  <form action="verifacion.php" method="POST">
+  <form action="/php/verifacion.php" method="POST">
     <h1 class="h3 mb-3 fw-normal">¡Bienvenido a SuperMercado Juanito!</h1>
     <img class="mb-4" src="imagenes/logo manzana.jfif" alt="" width="300" height="300">
     <h1 class="h3 mb-3 fw-normal">Ingrese sus datos</h1>
@@ -63,7 +63,7 @@
     </div>
 
     <input class="w-100 btn btn-lg btn-primary" type="submit" value="Entrar"></input>
-    <div><a href="Registro.php" class="h6 mb-3 fw-normal">Registrarse</a></div>
+    <div><a href="php/Registro.php" class="h6 mb-3 fw-normal">Registrarse</a></div>
     <p class="mt-5 mb-3 text-muted">&copy; 2021</p>
   </form>
 </main>

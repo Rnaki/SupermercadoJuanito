@@ -4,7 +4,7 @@ $conn=conectar();
 
 $rut = $_POST["rut"];
 $contraseña =  $_POST["contraseña"];
-$sql= "SELECT rut from cliente where rut = '$rut' and contraseña = '$contraseña'";
+$sql= "SELECT rut_persona from persona where rut_persona = '$rut' and contrasena = '$contraseña'";
 $gsent = $conn->prepare($sql);
 $data = $conn->query($sql)->fetchAll();
 $cuenta_col = 0;
