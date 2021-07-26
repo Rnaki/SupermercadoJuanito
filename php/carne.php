@@ -1,32 +1,17 @@
-<?php include("conexion.php");
-$gbd=conectar();
+<?php
+include("conexion.php");
+$gbd = conectar();
 
-$sql = "SELECT * FROM categoria ";
+//$data = $conn->query($sql)->fetchAll();
+$sql = "SELECT * FROM producto where id_categoria = 63";
 $gsent = $gbd->prepare($sql);
 $cuenta_col = $gsent->columnCount();
 $data = $gbd->query($sql)->fetchAll();
-
-$sql2 = "SELECT * FROM producto";
-  $gsent = $gbd->prepare($sql2);
-  $data2 = $gbd->query($sql2)->fetchAll();
-
-if(isset($_GET["idCategoria"])){
-  $idCategoria = $_GET["idCategoria"];
-  $sql2 = "SELECT * FROM producto where id_categoria = '".$idCategoria."' ";
-  $gsent = $gbd->prepare($sql2);
-  $data2 = $gbd->query($sql2)->fetchAll();
-
-}
-
-
-
 
 ?>
 
 <!doctype html>
 <html lang="en">
-
-
 
 
 <head>
@@ -35,11 +20,11 @@ if(isset($_GET["idCategoria"])){
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Enlazando el CSS de Bootstrap -->
-  <link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
-  <script src="../js/funciones.js"></script>
+  <link rel="stylesheet" href="bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
+  <script src="js/funciones.js"></script>
   <!-- JS BOOTSTRAP -->
-  <script src="../jquery/jquery.min.v3.6.0.js"></script>
-  <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
+  <script src="jquery/jquery.min.v3.6.0.js"></script>
+  <script src="bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
 
   <title> Ventas Juanito </title>
 </head>
@@ -58,8 +43,8 @@ if(isset($_GET["idCategoria"])){
   <main>
     <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
       <div class="col-md-5 p-lg-5 mx-auto my-5">
-        <h1 class="display-4 fw-normal">¡Bienvenido al Supermecado online de Juanito!</h1>
-        <p class="lead fw-normal"> Ofrecemos los mejores productos del mercado y te lo enviamos lo más pronto posible </p>
+        <h1 class="display-4 fw-normal">Categoria</h1>
+        <p class="lead fw-normal"> Carne </p>
       </div>
     </div>
 
@@ -72,18 +57,11 @@ if(isset($_GET["idCategoria"])){
 
           <h1 class="my-4">Categorias</h1>
           <div class="list-group">
-         <?php foreach ($data as $row){
-              echo "<form method='GET' action='lobby.php'>";
-
-              echo "<input type='hidden' name='idCategoria' value=".$row["id_categoria"].">";
-              echo "<div class='d-grid gap-2'>";
-              echo "<button class='btn btn-dark' type='submit' id=".$row["id_categoria"].">".$row["nombre_categoria"]."</button>";
-              echo "</div>";
-              echo "</form>";
-          }
-         ?>
-
-
+          <a href="/comida.php" class="list-group-item">Carne</a>
+            <a href="#" class="list-group-item">Pescado</a>
+            <a href="#" class="list-group-item">Frutas</a>
+            <a href="#" class="list-group-item">Verduras</a>
+            <a href="#" class="list-group-item">Congelados</a>
           </div>
 
         </div>
@@ -120,7 +98,7 @@ if(isset($_GET["idCategoria"])){
 
           <div class="row">
           <?php
-                  foreach ($data2 as $row) {
+                  foreach ($data as $row) {
                       ?>
             <div class="col-lg-4 col-md-6 mb-4">
               <div class="card h-100">
@@ -128,7 +106,7 @@ if(isset($_GET["idCategoria"])){
                 <div class="card-body">
                   <h4 class="card-title">
                    
-                    <a href=""><td><?php echo $row['nombre_producto'] ?></td></a>
+                    <a href="/<?php echo $row['nombre_producto'] ?>.html"><td><?php echo $row['nombre_producto'] ?></td></a>
                   
                   </h4>
                   <h5><td>$<?php echo $row['precio'] ?></h5>
