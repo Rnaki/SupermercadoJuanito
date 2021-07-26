@@ -201,15 +201,16 @@ function mostrarUpdateDespacho(idDespacho){
       success:function(info){
           datos = JSON.parse(info)
           $('#updateIdDespacho').val(datos[0])
+          $('#idUpdateDespacho').val(datos[0])
           $('#updateIdSucursal').val(datos[1]);
           $('#updatePatente').val(datos[2]);
           $('#updateInformacion').val(datos[3]);
           $('#updateFechaLimite').val(datos[4]);
           $('#updateFechaEntrega').val(datos[5]);
           $('#IdProcesoDespacho').val(datos[6]);
-          //$('#UpdatetipoCategoria option[id="'+datos[1]+'"]').attr("selected", true);
+          $('#UpdateEstadoDespacho option[value="'+datos[6]+'"]').attr("selected", true);
           
-          console.log(datos[1]);
+          console.log(datos[6]);
 
       }
   }) 

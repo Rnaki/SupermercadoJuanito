@@ -4,7 +4,11 @@ include("conexion.php");
 $gbd = conectar();
 
 //$sql = "SELECT my_function();";
-$sql = "SELECT * FROM despacho";
+$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+		JOIN sucursal ON
+		despacho.id_sucursal = sucursal.id_sucursal
+		where proceso_despacho = 'En proceso' or proceso_despacho= 'En camino' ";
+//$sql = "SELECT * FROM despacho where proceso_despacho ='En proceso' or proceso_despacho='En camino'";
 //$data = $conn->query($sql)->fetchAll();
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
@@ -245,7 +249,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                         <tr>
                             <th></th>
                             <th>ID Despacho</th>
-                            <th>ID Sucursal</th>
+                            <th>Nombre Sucursal</th>
                             <th>Patente</th>
                             <th>Información de envío</th>
                             <th>Fecha Limite</th>
@@ -266,7 +270,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                     d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
                             </svg></a></td>';
                             echo  '<td>'.$row["id_despacho"].'</td>';
-                            echo  '<td>'.$row["id_sucursal"].'</td>';
+                            echo  '<td>'.$row["tnombre_sucursal"].'</td>';
                             echo  '<td>'.$row["patente"].'</td>';
                             echo  '<td>'.$row["informacion_envio"].'</td>';
                             echo  '<td>'.$row["fecha_limite"].'</td>';
@@ -281,7 +285,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                     <path
                                         d='M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z' />
                                 </svg></a>";
-                            echo "<a href='' onclick='EliminarDespacho(\"".$row['id_despacho']."\")' class='delete' data-bs-toggle='modal' ><svg
+                            echo "<a href='' onclick='eliminarDespacho(\"".$row['id_despacho']."\")' class='delete' data-bs-toggle='modal' ><svg
                                     xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor'
                                     class='bi bi-trash-fill' viewBox='0 0 16 16'>
                                     <path
@@ -462,38 +466,49 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                <div class="form-group">
-                        <label>ID Despacho: </label>
-                        <input type="text" id="updateIdDespacho" class="form-control" disabled>
+                    <form method="POST" action="updateDespacho.php">
                         <div class="form-group">
-                            <label>ID Sucursal: </label>
-                            <input type="text" id="updateIdSucursal" class="form-control" disabled>
+                            <label>ID Despacho: </label>
+                            <input type="text" id="updateIdDespacho" class="form-control" disabled>
+                            <input class="updateIdDespacho" name="updateIdDespacho" type="hidden">
+                            <div class="form-group">
+                                <label>ID Sucursal: </label>
+                                <input name="updateIdSucursal" type="text" id="updateIdSucursal" class="form-control" disabled>
+                                <input name="idUpdateDespacho" type="hidden" id="idUpdateDespacho" value="">
+                            </div>
+                            <div class="form-group">
+                                <label>Patente: </label>
+                                <input name="updatePatente" type="text" id="updatePatente" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Información de envio: </label>
+                                <input name="updateInformacion" type="text" id="updateInformacion" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha limite: </label>
+                                <input name="updateFechaLimite" type="text" id="updateFechaLimite" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha entrega: </label>
+                                <input name="updateFechaEntrega" type="text" id="updateFechaEntrega" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Proceso despacho: </label>
+                                <br>
+                                    <select id="UpdateEstadoDespacho" class="form-select" name="updateProcesoDespacho" id="" aria-label="Default select example">
+                                        <option selected>Seleccione...</option>
+                                        <option value="En proceso">En proceso</option>
+                                        <option value="En camino">En camino</option>
+                                        <option value="Entregado">Entregado</option>
+                                    </select>
+                                <br>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Patente: </label>
-                            <input type="text" id="updatePatente" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Información de envio: </label>
-                            <input type="text" id="updateInformacion" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha limite: </label>
-                            <input type="text" id="updateFechaLimite" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha entrega: </label>
-                            <input type="text" id="updateFechaEntrega" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Proceso de despacho: </label>
-                            <input type="text" id="IdProcesoDespacho" class="form-control" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-warning">Guardar Cambios</button>
+                        </div>           
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -515,7 +530,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger">Eliminar</button>
+                    <button id="eliminarDespacho" type="button" class="btn btn-danger">Eliminar</button>
                 </div>
             </div>
         </div>
