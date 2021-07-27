@@ -8,11 +8,11 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
-	<script src="jquery/jquery.min.v3.6.0.js"></script>
-	<script src="js/funciones.js"></script>
-	<script src="bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="css/Estilos.css">
+<link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
+	<script src="../jquery/jquery.min.v3.6.0.js"></script>
+	<script src="../js/funciones.js"></script>
+	<script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="../css/Estilos.css">
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
@@ -89,7 +89,7 @@ table.table-striped.table-hover tbody a{
 					<a class="py-2 d-none d-md-inline-block link-light" href="#">Quienes Somos</a>
 				</div>
 				<div class="col-sm-2">
-					<a class="py-2 d-none d-md-inline-block link-light" href="index.php">Cerrar sesión</a>
+					<a class="py-2 d-none d-md-inline-block link-light" href="../index.php">Cerrar sesión</a>
 				</div>
 					
 				</div>
@@ -120,7 +120,7 @@ table.table-striped.table-hover tbody a{
 
 				<div class="row">
 					<div class="col-sm-12 text-center">
-						<img src="imagenes/foto.jpg" alt="foto" width="80px" height="120px">
+						<img src="../imagenes/foto.jpg" alt="foto" width="80px" height="120px">
 					</div>
 				</div>
 

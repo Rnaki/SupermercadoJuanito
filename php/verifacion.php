@@ -15,8 +15,10 @@ foreach ($data as $row){
 
 if($cuenta_col == 1){
     Header("Location: lobby.php");
+    session_start();
+    $_SESSION["rut_persona"] = $rut;
 }else if($cuenta_col == 0){
-    Header("Location: index.php?error=1"); 
+    Header("Location: ../index.php?error=1"); 
 } 
 
 

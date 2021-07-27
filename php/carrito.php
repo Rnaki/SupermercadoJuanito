@@ -7,12 +7,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Enlazando el CSS de Bootstrap -->
-  <link rel="stylesheet" href="bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
-  <script src="js/funciones.js"></script>
-  <link rel="stylesheet" href="css/Estilos.css">
+  <link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
+  <script src="../js/funciones.js"></script>
+  <link rel="stylesheet" href="../css/Estilos.css">
   <!-- JS BOOTSTRAP -->
-  <script src="jquery/jquery.min.v3.6.0.js"></script>
-  <script src="bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
+  <script src="../jquery/jquery.min.v3.6.0.js"></script>
+  <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
 
   <title>Carrito</title>
 </head>
@@ -24,7 +24,7 @@
     <a class="py-2 d-none d-md-inline-block text-white " href="lobby.php">Inicio</a>
     <a class="py-2 d-none d-md-inline-block text-white " href="carrito.php">Carrito</a>
     <a class="py-2 d-none d-md-inline-block text-white " href="perfil.php">Perfil</a>
-    <a class="py-2 d-none d-md-inline-block text-white " href="index.php">Cerrar sesión</a>
+    <a class="py-2 d-none d-md-inline-block text-white " href="../index.php">Cerrar sesión</a>
     
   </nav>
   </header>
@@ -45,7 +45,7 @@
         <br>
         <section>
           <div class="card" style="width: 18rem;">
-            <img src="imagenes/huevos.jpg" class="card-img-top" alt="...">
+            <img src="../imagenes/huevos.jpg" class="card-img-top" alt="...">
             <div class="card-body">
               <h5 class="card-title">Card title</h5>
               <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>

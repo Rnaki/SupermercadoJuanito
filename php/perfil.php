@@ -1,3 +1,11 @@
+<?php
+    session_start();
+    echo $_SESSION["rut_persona"];
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,10 +16,10 @@
     <title>Perfil</title>
 
     <!--Sacado de la carpeta-->
-    <link rel="stylesheet" href="bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
-    <script src="jquery/jquery.min.v3.6.0.js"></script>
-    <script src="js/funciones.js"></script>
-    <script src="bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
+    <script src="../jquery/jquery.min.v3.6.0.js"></script>
+    <script src="../js/funciones.js"></script>
+    <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
 
     <style>
         .table-responsive {

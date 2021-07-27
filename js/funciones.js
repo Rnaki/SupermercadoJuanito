@@ -215,3 +215,76 @@ function mostrarUpdateDespacho(idDespacho){
       }
   }) 
 }
+
+function mostrarUpdateCliente(rut_persona){
+
+   console.log(rut_persona);
+   cadena= {
+      "rut_persona": rut_persona,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarUpdateCliente.php",
+      data: cadena,
+      success:function(info){
+          datos = JSON.parse(info)
+          $('.updateRutCliente').val(datos[0])
+          $('#updateNombreCliente').val(datos[1])
+          $('#updateApellidoPCliente').val(datos[2]);
+          $('#updateApellidoMCliente').val(datos[3]);
+          $('#updateFechaNacimientoCliente').val(datos[4]);
+          $('#updateSexoCliente option[id="'+datos[5]+'"]').attr("selected", true);
+          $('#updateCorreoCliente').val(datos[6]);
+          $('#updateTelefonoCliente').val(datos[7]);
+          $('#updateRegionCliente').val(datos[8]);
+          $('#updateComunaCliente').val(datos[9]);
+          $('#updateCalleCliente').val(datos[10]);
+          $('#updateNcalleCliente').val(datos[11]);
+          $('#updateContraseñaCliente').val(datos[12]);
+         
+          
+         
+          
+         
+          
+          console.log(datos[0]);
+
+      }
+  }) 
+
+}
+
+function mostrarEliminarCliente(rut_persona){
+   console.log(rut_persona);
+   cadena= {
+      "rut_persona": rut_persona,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarEliminarCliente.php",
+      data: cadena,
+      success:function(info){
+          datos = JSON.parse(info)
+          $('#eliminarRutCliente').val(datos[0])
+          $('#EliminarNombreCliente').text(datos[0]+" "+datos[1]+" "+datos[2]+" "+datos[3])
+
+      }
+  }) 
+}
+
+function eliminarCliente(){
+   rut_persona = $('#eliminarRutCliente').val();
+   console.log(rut_persona);
+   cadena= {
+      "rut_persona": rut_persona,
+  };
+  $.ajax({
+      type: "POST",
+      url: "eliminarCliente.php",
+      data: cadena,
+      success:function(){
+         location.reload();
+          
+      }
+  }) 
+}

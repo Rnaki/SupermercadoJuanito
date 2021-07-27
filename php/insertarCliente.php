@@ -2,22 +2,21 @@
 include("conexion.php");
 $conn=conectar();
 
-echo $rut=$_POST["rut"];
-echo $nombre=$_POST["nombre"];
-echo $apellidoP=$_POST["apellidoP"];
-echo $apellidoM=$_POST["apellidoM"];
-echo $region=$_POST["region"];
-echo $comuna=$_POST["comuna"];
-echo $calle=$_POST["calle"];
-echo $nCalle=$_POST["nCalle"];
-echo $fechaNacimiento=$_POST["fechaNacimiento"];
-echo $sexo=$_POST["sexo"];
-echo $contraseña=$_POST["Contraseña"];
-echo $correo=$_POST["Correo"];
-echo $telefono=$_POST["Telefono"];
-echo $nombre_usuario = "Pepito";
+$rut=$_POST["rut"];
+$nombre=$_POST["nombre"];
+$apellidoP=$_POST["apellidoP"];
+$apellidoM=$_POST["apellidoM"];
+$region=$_POST["region"];
+$comuna=$_POST["comuna"];
+$calle=$_POST["calle"];
+$nCalle=$_POST["nCalle"];
+$fechaNacimiento=$_POST["fechaNacimiento"];
+$sexo=$_POST["sexo"];
+$contraseña=$_POST["Contraseña"];
+$correo=$_POST["Correo"];
+$telefono=$_POST["Telefono"];
 
-$sql0 ="Select rut_persona from persona where rut_persona = '$rut'";
+$sql0 ="Select rut_persona from cliente where rut_persona = '$rut'";
 $conn->exec($sql0);
 $data = $conn->query($sql0)->fetchAll();
 foreach ($data as $row){
@@ -25,12 +24,10 @@ foreach ($data as $row){
 }
 
 if(isset($columnas) == 1){
-    Header("Location: Registro.php?error=2");
+    Header("Location: cliente.php?error=2");
 }else{
 
 }
-
-
 
 //en $sql se guarda el insert
 $sql="SELECT insertarpersona('".$rut."','".$nombre."','".$apellidoP."','".$apellidoM."','".$fechaNacimiento."','".$sexo."','".$correo."','".$telefono."','".$region."','".$comuna."','".$calle."','".$nCalle."','".$contraseña."')";
@@ -41,9 +38,9 @@ $sql2="SELECT insertarcliente('".$rut."','".$nombre."','".$apellidoP."','".$apel
 echo $conn->exec($sql2);
 
 if($conn){
-    Header("Location: ../index.php");
+    Header("Location: cliente.php");
 }else{
-    Header("Location: ../index.php");
+    Header("Location: cliente.php");
 }
 
 ?>

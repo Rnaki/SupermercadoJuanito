@@ -193,7 +193,7 @@
 				<button type="submit" class="btn btn-primary btn-lg">Registrar</button>
 			</div>
 			<div class="">
-				<button type="input" onclick="location.href='index.php';" class="bnt btn-primary btn-lg">Regresar</button>
+				<button type="input" onclick="location.href='../index.php';" class="bnt btn-primary btn-lg">Regresar</button>
 			</div>
 		</form>
 </body>

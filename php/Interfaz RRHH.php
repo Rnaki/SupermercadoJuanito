@@ -282,7 +282,7 @@ $data = $gbd->query($sql)->fetchAll();
 	<header class="site-header sticky-top py-1">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-			<a class="py-2 d-none d-md-inline-block" href="Menu trabajador.html">Volver</a>
+			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
 			<a class="py-2 d-none d-md-inline-block" href="Contratos.php">Contratos</a>
 			<h2>ÁREA RECURSOS HUMANOS</h2>
 			<a class="py-2 d-none d-md-inline-block" href="cliente.php">Clientes</a>
