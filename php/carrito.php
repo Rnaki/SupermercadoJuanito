@@ -1,3 +1,17 @@
+<?php
+
+include("conexion.php");
+$gbd = conectar();
+
+//ZONA HORARIA
+date_default_timezone_set('America/Santiago');
+//FECHA ACTUAL
+$fecha_actual = date("Y-m-d");
+
+
+
+?>
+
 <!doctype html>
 <html lang="es">
 
@@ -65,7 +79,7 @@
           <h4><strong>Total</strong></h4>
           <br>
           <div class="d-grid gap-2">
-            <button class="btn btn-primary btn-lg" type="button">Comprar</button>
+          <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#creacionDespachoModal" type="button">Comprar</button>
           </div>
         </section>
       </div>
@@ -74,5 +88,39 @@
 
 
 </body>
+
+<!-- Modal de Creacion Despacho-->
+<div class="modal fade" id="creacionDespachoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header cread">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmar Compra</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label>Dirección de despacho: </label>
+                            <input type="text" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha limite: </label>
+                            <input type="datetime" name="fecha"  value="<?php echo date("Y-m-d",strtotime($fecha_actual."+ 5 days"));?>" disabled>
+                        </div>       
+                        <div class="form-group">
+                            <label>Proceso de despacho: </label>
+                            <input type="text" class="form-control" value="En proceso" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success cread">Crear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</html>
 
 </html>

@@ -135,6 +135,15 @@ if(isset($_GET["idCategoria"])){
                   <p class="card-text"><td><?php echo $row['descripcion'] ?></p>
                 </div>
                 <div class="card-footer">
+                <?php
+                echo "<form method='GET' action='lobby.php'>";
+
+                echo "<input type='hidden' name='idProducto' value=".$row["id_producto"].">";
+                echo "<div class='d-grid gap-2'>";
+                echo "<button class='btn btn-dark' type='submit' id=".$row["id_producto"].">Agregar al carrito</button>";
+                echo "</div>";
+                echo "</form>";
+              ?>
                   <small class="text-muted">&#9733; &#9733; &#9733; &#9733; &#9734;</small>
                 </div>
               </div>

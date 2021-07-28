@@ -3,7 +3,7 @@ include("conexion.php");
 $conn=conectar();
 
 $tipoCategoria=$_POST["tipoCategoria"];
-$rutProveedor="2222222222";
+$nombreProveedor=$_POST["nombreProveedor"];
 $nombreProducto=$_POST["nombreProducto"];
 $precio=$_POST["precio"];
 $descripcion=$_POST["descripcion"];
@@ -14,12 +14,21 @@ $marca=$_POST["marca"];
 //$idCategoria="67";
 $sql0 = "SELECT id_categoria FROM categoria WHERE tipo_categoria = '".$tipoCategoria."'; ";
 
-
 $conn->exec($sql0);
 $data = $conn->query($sql0)->fetchAll();
 foreach ($data as $row){
     $idCategoria = $row["id_categoria"];
     var_dump($idCategoria);
+}
+
+
+$sql1 = "SELECT rut_proveedor FROM proveedor WHERE nombre_proveedor = '".$nombreProveedor."'; ";
+
+$conn->exec($sql1);
+$data1 = $conn->query($sql1)->fetchAll();
+foreach ($data1 as $row1){
+    $rutProveedor = $row1["rut_proveedor"];
+    var_dump($rutProveedor);
 }
 
 if(isset($columnas) == 1){

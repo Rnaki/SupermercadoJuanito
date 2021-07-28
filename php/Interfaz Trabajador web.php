@@ -38,15 +38,20 @@ $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto
 //$data = $conn->query($sql)->fetchAll();
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
+$resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
-$resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
 $sql2 = "SELECT * FROM categoria";
 $gsent2 = $gbd->prepare($sql2);
 $gsent2->execute();
 $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
+
+$sql3 = "SELECT * FROM proveedor";
+$gsent3 = $gbd->prepare($sql3);
+$gsent3->execute();
+$resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -177,7 +182,7 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 	<header class="site-header sticky-top py-1">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-			<a class="py-2 d-none d-md-inline-block" href="../Menu trabajador.html">Volver</a>
+			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
 			<h2 class="letrah2">ÁREA TRABAJADOR WEB</h2>
 
 			<div class="dropdown">
@@ -218,7 +223,6 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 								</svg> Añadir Producto</a>
 						</div>
 					</div>
-
 					<div class="row">
 						<div class="accordion" id="accordionExample">
 							<div class="accordion-item">
@@ -291,8 +295,8 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 					<thead>
 						<tr>
 							<th>ID Producto</th>
-							<th>ID Categoria</th>
 							<th>Nombre</th>
+							<th>Tipo</th>
 							<th>Marca</th>
 							<th>Precio</th>
 							<th>Acciones</th>
@@ -303,8 +307,8 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 						foreach ($resultado as $row) {
 							echo '<tr>';
 							echo '<td>' . $row["id_producto"] . '</td>';
-							echo  '<td>' . $row["tnombre_categoria"] . '</td>';
 							echo  '<td>' . $row["nombre_producto"] . '</td>';
+							echo  '<td>' . $row["tnombre_categoria"] . '</td>';
 							echo  '<td>' . $row["marca"] . '</td>';
 							echo  '<td>$' . $row["precio"] . '</td>';
 							echo "<td>
@@ -358,17 +362,30 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 								<label>Categoria: </label>
 								<br>
 								<select class="form-select" name="tipoCategoria" id="tipoCategoria" required>
-								<option selected>Seleccione...</option>
-								<?php
-								foreach ($resultado2 as $row2) {
-								echo "<option id=".$row2["id_categoria"]." value=".$row2['nombre_categoria'].">".$row2["nombre_categoria"]."</option>";
-								}
-								?>
+									<option selected>Seleccione...</option>
+									<?php
+									foreach ($resultado2 as $row2) {
+										echo "<option id=" . $row2["id_categoria"] . " value=" . $row2['nombre_categoria'] . ">" . $row2["nombre_categoria"] . "</option>";
+									}
+									?>
 								</select>
 								<br>
 							</div>
 							<div class="form-group">
-								<label>Nombre: </label>
+								<label>Nombre Proveedor: </label>
+								<br>
+								<select class="form-select" name="nombreProveedor" id="nombreProveedor" required>
+									<option selected>Seleccione...</option>
+									<?php
+									foreach ($resultado3 as $row3) {
+										echo "<option id=" . $row3["rut_proveedor"] . " value=" . $row3['nombre_proveedor'] . ">" . $row3["nombre_proveedor"] . "</option>";
+									}
+									?>
+								</select>
+								<br>
+							</div>
+							<div class="form-group">
+								<label>Nombre Producto: </label>
 								<input type="text" class="form-control" name="nombreProducto" required>
 							</div>
 							<div class="form-group">
@@ -402,8 +419,8 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 		</div>
 	</div>
 
-	<!-- Modal de Edicion-->
-	<div class="modal fade" id="edicionexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+	<!--Modal de Edicion-->
+	<div class="modal fade" id="edicionexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header edi">
@@ -411,42 +428,68 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-				<form method="POST" action="updateProducto.php">
-					<div class="form-group ">
-						<label>ID Producto: </label>
-						<input type="text" class="form-control updateIdProducto" name="updateIdProducto" disabled>
-						<input class="updateIdProducto" name="updateIdProducto" type="hidden">
-						<div class="form-group">
-							<label>Categoria: </label>
-						 	<br>
-							 <select class="form-select" name="UpdatetipoCategoria" id="UpdatetipoCategoria" required>
-							 <option id="test">Seleccione...</option>
-								<?php
-								foreach ($resultado2 as $row2) {
-								echo "<option id=".$row2["id_categoria"]." value=".$row2['nombre_categoria'].">".$row2["nombre_categoria"]."</option>";
-								}
-								?>
-							</select>
+					<form method="POST" action="updateProducto.php">
+						<div class="form-group ">
+							<label>ID Producto: </label>
+							<input type="text" class="form-control updateIdProducto" name="updateIdProducto" disabled>
+							<input class="updateIdProducto" name="updateIdProducto" type="hidden">
+							<div class="form-group">
+								<label>Categoria: </label>
+								<br>
+								<select class="form-select" name="UpdatetipoCategoria" id="UpdatetipoCategoria" required>
+									<option id="test">Seleccione...</option>
+									<?php
+									foreach ($resultado2 as $row2) {
+										echo "<option id=" . $row2["id_categoria"] . " value=" . $row2['nombre_categoria'] . ">" . $row2["nombre_categoria"] . "</option>";
+									}
+									?>
+								</select>
+								<br>
+							</div>
 
-							<br>
+							<div class="form-group">
+								<label>Nombre Proveedor: </label>
+								<br>
+								<select class="form-select" name="updateNombreProveedor" id="updateNombreProveedor" required>
+									<option selected>Seleccione...</option>
+									<?php
+									foreach ($resultado3 as $row3) {
+										echo "<option id=" . $row3["rut_proveedor"] . " value=" . $row3['nombre_proveedor'] . ">" . $row3["nombre_proveedor"] . "</option>";
+									}
+									?>
+								</select>
+								<br>
+							</div>
+
+							<div class="form-group">
+								<label>Nombre: </label>
+								<input type="text" class="form-control" name="updateNombreProducto" id="updateNombreProducto" required>
+							</div>
+							<div class="form-group">
+								<label>Marca: </label>
+								<input type="text" class="form-control" name="updateMarca" id="updateMarca" required>
+							</div>
+							<div class="form-group">
+								<label>Precio: </label>
+								<input type="text" class="form-control" name="updatePrecio" id="updatePrecio" required>
+							</div>
+							<div class="form-group">
+								<label>Descuento: </label>
+								<input type="text" class="form-control" name="updateDescuento" id="updateDescuento" required>
+							</div>
+							<div class="form-group">
+								<label>Descripcion: </label>
+								<textarea class="form-control" name="updateDescripcion" id="updateDescripcion" required></textarea>
+							</div>
+							<div class="form-group">
+								<label>Imagen: </label>
+								<input type="file" class="form-control" name="updateImagen" id="updateImagen" required>
+							</div>
 						</div>
-						<div class="form-group">
-							<label>Nombre: </label>
-							<input type="text" class="form-control" name="updateNombreProducto" id="updateNombreProducto" required>
-						</div>
-						<div class="form-group">
-							<label>Marca: </label>
-							<input type="text" class="form-control" name="updateMarca" id="updateMarca" required>
-						</div>
-						<div class="form-group">
-							<label>Precio: </label>
-							<input type="text" class="form-control" name="updatePrecio" id="updatePrecio" required>
-						</div>
-					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-					<button type="button" class="btn btn-warning">Guardar Cambios</button>
+					<button type="submit" class="btn btn-warning">Guardar Cambios</button>
 					</form>
 				</div>
 			</div>
@@ -469,7 +512,7 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-					<button type="button" class="btn btn-danger">Eliminar</button>
+					<button id="eliminarProducto" type="button" class="btn btn-danger">Eliminar</button>
 				</div>
 			</div>
 		</div>

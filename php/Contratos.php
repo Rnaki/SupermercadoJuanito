@@ -298,7 +298,7 @@
 
 			<a class="py-2 d-none d-md-inline-block" href="Interfaz RRHH.php">Gestion de personal</a>
 			<h2>ÁREA RECURSOS HUMANOS</h2>
-			<a class="py-2 d-none d-md-inline-block" href="index.php">Cerrar sesión</a>
+			<a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
 
 		</nav>
 	</header>

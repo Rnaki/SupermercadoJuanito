@@ -142,10 +142,12 @@ function mostrarUpdateProducto(idProducto){
           $('#updateNombreProducto').val(datos[2]);
           $('#updateMarca').val(datos[3]);
           $('#updatePrecio').val(datos[4]);
+          $('#updateDescuento').val(datos[5]);
+          $('#updateDescripcion').val(datos[6]);
           $('#UpdatetipoCategoria option[id="'+datos[1]+'"]').attr("selected", true);
+          $('#updateNombreProveedor option[id="'+datos[9]+'"]').attr("selected", true);
           
-          console.log(datos[1]);
-
+          console.log(datos[8]);//importante print
       }
   }) 
 }
@@ -288,3 +290,65 @@ function eliminarCliente(){
       }
   }) 
 }
+
+function mostrarUpdateInfoBodega(idProducto){
+   cadena= {
+      "idProducto": idProducto,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarUpdateInfoBodega.php",
+      data: cadena,
+      success:function(info){
+          datos = JSON.parse(info)
+          $('.updateIdProducto').val(datos[0])
+          $('#updateNombreProducto').val(datos[1]);
+          $('#UpdateIdCategoria').val(datos[2]);
+          $('#updateMarca').val(datos[3]);
+          $('#updateNombreCategoria').val(datos[4]);
+          $('#updateStock').val(datos[5]);
+
+          $('#NombreProducto').val(datos[6]);
+          $('#actualStock').val(datos[7]);
+          console.log(datos[4]);//importante print
+          console.log(datos[1]);
+      }
+  }) 
+}
+
+function eliminarInfoBodega(idProducto){
+   $('#eliminarexampleModal').modal('show');
+   cadena= {
+      "idProducto": idProducto,
+      };
+   $('#eliminarInfoBodega').click(function() {
+      $.ajax({
+         type: "POST",
+         url: "eliminarInfoBodega.php",
+         data: cadena,
+         success:function(){
+            location.reload();
+            $('#eliminarexampleModal').modal('hide');
+         }
+      }) 
+   } );
+
+}
+
+function verificarStock(){
+   var n1 = Number(document.getElementById('actualStock').value);
+   var n2 = Number(document.getElementById('stock').value);
+
+   var n3 = n1 - n2;
+//alert( Fn.validaRut(valor_rut_login) ? 'RUT Valido' : 'RUT inválido');    
+if (n3 < 0){
+      $('#actualStock').addClass('rojoError');
+      alert("Stock insuficientes");
+      return false;
+      }
+else {
+   $('#actualStock').removeClass('rojoError');
+   $('#actualStock').addClass('verdeSuccess');
+   return true;
+     }
+};

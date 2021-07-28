@@ -296,7 +296,7 @@ $data = $gbd->query($sql)->fetchAll();
 
 			<a class="py-2 d-none d-md-inline-block" href="Interfaz RRHH.php">Volver</a>
 			<h2>CLIENTES</h2>
-			<a class="py-2 d-none d-md-inline-block" href="index.php">Cerrar sesión</a>
+			<a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
 
 		</nav>
 	</header>
