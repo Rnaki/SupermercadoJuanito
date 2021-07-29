@@ -352,3 +352,135 @@ else {
    return true;
      }
 };
+
+function eliminarDespacho(idDespacho){
+   $('#eliminarexampleModal').modal('show');
+   cadena= {
+      "idDespacho": idDespacho,
+      };
+   $('#eliminarDespacho').click(function() {
+      $.ajax({
+         type: "POST",
+         url: "eliminarDespacho.php",
+         data: cadena,
+         success:function(){
+            location.reload();
+            $('#eliminarexampleModal').modal('hide');
+         }
+      }) 
+   } );
+}
+
+
+function verificarMaxStockCam(){
+   var n1 = Number(document.getElementById('totalStock').value);
+   var n2 = Number(document.getElementById('updateStock').value);
+   var n3 = Number(document.getElementById('actualStock1').value);
+   var n4 = Number(document.getElementById('totalAlmecenamiento').value);
+   var n5;
+   if(n3 > n2){
+      n5 = n3 - n2;
+      n1 = n1 - n5;
+   }else if(n3 < n2){
+      n5 = n2 - n3;
+      n1 = n1 + n5;
+   }
+   if (n4 < n1){
+      $('#actualStock1').addClass('rojoError');
+      alert("Sobrecarga de almacenamiento");
+      return false;
+      }
+   else {
+      $('#actualStock1').removeClass('rojoError');
+      $('#actualStock1').addClass('verdeSuccess');
+      return true;
+     }
+   };
+
+   //Maximo Stock en ingresar
+/*
+function verificarMaxStockIn(){
+   id_producto = $('#id_producto').children(":selected").attr("id");
+
+   cadena= {
+      "id_producto": id_producto,
+      };
+      console.log(cadena);
+   
+      $.ajax({
+         type: "POST",
+         url: "verificarId.php",
+         data: cadena,
+         success:function(respuesta){
+            if (respuesta == 0){
+               window.variable = 1;
+               console.log("no encontro");
+            }else if (respuesta == 1){
+               console.log("encontro");
+               var n1 = Number(document.getElementById('totalStock').value);
+               var n2 = Number(document.getElementById('ingresarStock').value);
+               var n4 = Number(document.getElementById('totalAlmecenamiento').value);
+               n1 = n1 + n2;
+               if (n4 < n1){
+                  $('#actualStock1').addClass('rojoError');
+                  alert("Sobrecarga de almacenamiento");
+                  return false;
+                  }
+               else {
+                  $('#actualStock1').removeClass('rojoError');
+                  $('#actualStock1').addClass('verdeSuccess');
+                  return true;
+               }
+            else if (Id == false){
+               console.log ('retorno false');
+               return false;
+              
+            }
+            }
+         }
+      }) 
+      
+   }
+   
+*/
+function verificarId(){
+   
+}
+
+//Maximo Stock en ingresar
+
+function verificarMaxStockIn(){
+
+   var n1 = Number(document.getElementById('totalStock').value);
+
+   var n2 = Number(document.getElementById('ingresarStock').value);
+
+   var n4 = Number(document.getElementById('totalAlmecenamiento').value);
+
+   
+
+   n1 = n1 + n2;
+
+   
+
+   if (n4 < n1){
+
+      $('#actualStock1').addClass('rojoError');
+
+      alert("Sobrecarga de almacenamiento");
+
+      return false;
+
+      }
+
+   else {
+
+      $('#actualStock1').removeClass('rojoError');
+
+      $('#actualStock1').addClass('verdeSuccess');
+
+      return true;
+
+     }
+
+   };

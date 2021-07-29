@@ -2,6 +2,12 @@
 
 include("conexion.php");
 $gbd = conectar();
+
+
+if(isset($_GET["error"])){
+    $error = $_GET["error"];
+    echo '<script>alert("El producto ya existe en bodega")</script>';
+}
 /*
 if (isset($_POST["rutBuscar"])) {
 	$rutBuscar = $_POST["rutBuscar"];
@@ -49,6 +55,19 @@ $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.sto
 $gsent3 = $gbd->prepare($sql3);
 $gsent3->execute();
 $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
+
+$sql4 = "SELECT sum(stock) FROM contiene;";
+//$data = $conn->query($sql)->fetchAll();
+$gsent4 = $gbd->prepare($sql4);
+$gsent4->execute();
+$resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
+
+$sql5 = "SELECT almacenamiento FROM bodega WHERE id_bodega = '1';";
+//$data = $conn->query($sql)->fetchAll();
+$gsent5 = $gbd->prepare($sql5);
+$gsent5->execute();
+$resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
+
 
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
@@ -367,9 +386,24 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
                 </table>
                 <table class="table table-striped table-hover tab">
                     <tr>
-                        <th style="padding-left: 88px;"></th>
                         <div class="row">
                             <div class="col-sm-3">
+                                <th style="padding-right: 20px;"></th>
+                                <th>
+                                    <h5><b>Total de Stock: </b></h5>
+                                </th>
+                            </div>
+                            <div class="col-sm-6">
+                                <?php
+                                foreach ($resultado4 as $row4) {
+                                    echo '<td>' . $row4["sum"] . '</td>';
+                                }
+                                ?>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <th style="padding-right: 30px;"></th>
                                 <th>
                                     <h5><b>Total de Almacenamiento: </b></h5>
                                 </th>
@@ -380,8 +414,8 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
                                     echo '<td>' . $row["almacenamiento"] . '</td>';
                                 }
                                 ?>
+                                <th style="padding-left: 30px;"></th>
                             </div>
-                            <th style="padding-right: 88px;"></th>
                         </div>
                     </tr>
                 </table>
@@ -470,13 +504,23 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
                             <br>
                             <div class="form-group">
                                 <label>Stock: </label>
-                                <input type="text" class="form-control" name="stock" required>
+                                <input type="text" class="form-control" name="stock" id="ingresarStock" required>
+                                <?php
+                                foreach ($resultado4 as $row4) {
+                                    echo '<input id="totalStock" type="hidden" value='.$row4["sum"].'>';
+                                }
+                                ?>
+                                <?php
+                                foreach ($resultado as $row) {
+                                    echo '<input id="totalAlmecenamiento" type="hidden" value='.$row["almacenamiento"].'>';
+                                }
+                                ?>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-success cread">Añadir</button>
+                        <button type="submit" onclick="return verificarMaxStockIn();" class="btn btn-success cread">Añadir</button>
                     </div>
                 </form>
             </div>
@@ -509,7 +553,7 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
                             </div> -->
                             <div class="form-group">
                                 <label>¿Cuantos stock desea enviar a la sucursal? </label>
-                                <input type="text" class="form-control" name="envioStock" id = "stock" required>
+                                <input type="text" class="form-control" name="envioStock" id="stock" required>
                                 <input class="form-control" name="actualStock" id="actualStock" type="hidden">
                             </div>
                         </div>
@@ -552,12 +596,23 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
                             <div class="form-group">
                                 <label>Stock: </label>
                                 <input type="text" class="form-control" name="updateStock" id="updateStock" required>
+                                <input type="hidden" id="actualStock1" required>
+                                <?php
+                                foreach ($resultado4 as $row4) {
+                                    echo '<input id="totalStock" type="hidden" value='.$row4["sum"].'>';
+                                }
+                                ?>
+                                <?php
+                                foreach ($resultado as $row) {
+                                    echo '<input id="totalAlmecenamiento" type="hidden" value='.$row["almacenamiento"].'>';
+                                }
+                                ?>
                             </div>
                         </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+                    <button type="submit" onclick="return verificarMaxStockCam();" class="btn btn-warning">Guardar Cambios</button>
                     </form>
                 </div>
             </div>

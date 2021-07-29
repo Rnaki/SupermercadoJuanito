@@ -16,15 +16,18 @@ foreach ($data as $row){
     $idProducto = $row["id_producto"];
     var_dump($idProducto);
 }*/
+$sql="SELECT id_producto from contiene where id_producto = '".$idProducto."'";
+$conn->exec($sql);
+$data = $conn->query($sql)->fetchAll();
+foreach ($data as $row){
+    $columnas ++;
+}
 
 if(isset($columnas) == 1){
     Header("Location: infoBodega.php?error=2");
 }else{
 
-}
-
-//en $sql se guarda el insert
-$sql="SELECT insertarInfoBodega('$idProducto','".$idBodega."','$stock','".$idSucursal."')";
+    $sql="SELECT insertarInfoBodega('$idProducto','".$idBodega."','$stock','".$idSucursal."')";
 //del $con quiero sacar el $sql para que sea un $query
 echo $conn->exec($sql);
 
@@ -33,5 +36,10 @@ if($conn){
 }else{
     Header("Location: infoBodega.php");
 }
+
+}
+
+//en $sql se guarda el insert
+
 
 ?>

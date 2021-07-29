@@ -1,6 +1,7 @@
 <?php
     session_start();
     echo $_SESSION["rut_persona"];
+    session_destroy();
 
 
 ?>
@@ -157,7 +158,7 @@
             <a class="py-2 d-none d-md-inline-block text-white " href="lobby.php">Inicio</a>
             <a class="py-2 d-none d-md-inline-block text-white " href="carrito.php">Carrito</a>
             <a class="py-2 d-none d-md-inline-block text-white " href="perfil.php">Perfil</a>
-            <a class="py-2 d-none d-md-inline-block text-white " href="index.php">Cerrar sesión</a>
+            <a class="py-2 d-none d-md-inline-block text-white " href="../index.php">Cerrar sesión</a>
 
         </nav>
     </header>

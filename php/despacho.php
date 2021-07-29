@@ -4,20 +4,56 @@ include("conexion.php");
 $gbd = conectar();
 
 //$sql = "SELECT my_function();";
-$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
-		JOIN sucursal ON
-		despacho.id_sucursal = sucursal.id_sucursal
-		where proceso_despacho = 'En proceso' or proceso_despacho= 'En camino' ";
-//$sql = "SELECT * FROM despacho where proceso_despacho ='En proceso' or proceso_despacho='En camino'";
+
+
+
+
+
 //$data = $conn->query($sql)->fetchAll();
+
+//var_dump($resultado);
+
+$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
+where proceso_despacho = 'En proceso' or proceso_despacho= 'En camino' ";
+
+//BUSCADOR
+if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
+	$idBuscar = $_POST["idBuscar"];
+	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where id_despacho = '$idBuscar' ";
+} else if (isset($_POST["estadoBuscar"])) {
+	$estadoBuscar = $_POST["estadoBuscar"];
+	if ($_POST["estadoBuscar"] == "") {
+        echo 1;
+        echo    $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                        JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
+                        where proceso_despacho = '$estadoBuscar'";
+	} else {
+        echo 2;
+        echo	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                        JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal  where proceso_despacho = '$estadoBuscar'";
+	}
+} else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
+echo	$desde = $_POST["desde"];
+echo	$hasta = $_POST["hasta"];
+echo	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where fecha_limite Between '$desde' and '$hasta' and (proceso_despacho = 'En proceso' or proceso_despacho = 'En camino')";
+} 
+
+
+
+	echo 1;
+
+
+
+
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
 
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
-//var_dump($resultado);
-
 
 ?>
 
@@ -196,18 +232,18 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="Interfaz RRHH.php" method="POST" class="d-flex">
+                                                <form action="despacho.php" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Despacho" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                             <div class="col-sm-6">
-                                                <form action="" method="POST" class="d-flex">
-                                                    <select class="form-select" name="buscar">
+                                                <form action="despacho.php" method="POST" class="d-flex">
+                                                    <select class="form-select" name="estadoBuscar">
                                                         <option selected>Seleccione...</option>
-                                                        <option value="Hombre" id="Hombre">Preparación</option>
-                                                        <option value="Mujer" id="Mujer">En curso</option>
-                                                        <option value="Otros" id="Otros">Recibido</option>
+                                                        <option value="En proceso" >En proceso</option>
+                                                        <option value="En camino" >En camino</option>
+                                                        <option value="Entregado" >Entregado</option>
                                                     </select>
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -223,7 +259,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                                 <label> Desde: </label>
                                             </div>
                                             <div class="col-sm-4">
-                                                <form action="Interfaz RRHH.php" method="POST" class="d-flex">
+                                                <form action="despacho.php" method="POST" class="d-flex">
                                                     <input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
                                             </div>
                                             <div class="col-sm-1 buscar">

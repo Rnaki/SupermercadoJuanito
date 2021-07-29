@@ -1,4 +1,11 @@
-<?php include("conexion.php");
+<?php 
+
+session_start();
+if(isset($_SESSION["rut_persona"])){
+
+
+
+include("conexion.php");
 $gbd=conectar();
 
 $sql = "SELECT * FROM categoria ";
@@ -51,7 +58,7 @@ if(isset($_GET["idCategoria"])){
       <a class="py-2 d-none d-md-inline-block text-white " href="lobby.php">Inicio</a>
       <a class="py-2 d-none d-md-inline-block text-white " href="carrito.php">Carrito</a>
       <a class="py-2 d-none d-md-inline-block text-white " href="perfil.php">Perfil</a>
-      <a class="py-2 d-none d-md-inline-block text-white " href="../index.php">Cerrar sesión</a>
+      <a class="py-2 d-none d-md-inline-block text-white " href="cerrar_session.php">Cerrar sesión</a>
 
     </nav>
   </header>
@@ -179,3 +186,14 @@ if(isset($_GET["idCategoria"])){
 </body>
 
 </html>
+
+<?php 
+
+}else{
+  echo "NO ENTRES INTRUSO";
+  
+  Header("refresh:5; url=../index.php");
+}
+
+
+?>
