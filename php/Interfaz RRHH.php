@@ -1,23 +1,43 @@
 <?php
+session_start();
+
+echo $_SESSION["sucursal"];
+
+
+
 include("conexion.php");
 $gbd = conectar();
 
 if (isset($_POST["rutBuscar"])) {
 	$rutBuscar = $_POST["rutBuscar"];
-	$sql = "SELECT * from trabajador where rut_persona like '$rutBuscar%'";
+	$sql = "SELECT * from trabajador
+	join trabaja
+	on trabaja.rut_persona = trabajador.rut_persona 
+	where trabajador.rut_persona like '$rutBuscar%'
+	and trabaja.id_sucursal = '".$_SESSION["sucursal"]."'";
 } else if (isset($_POST["apellidoPBuscar"])) {
 	$apellidoPBuscar = $_POST["apellidoPBuscar"];
 	if ($_POST["apellidoPBuscar"] == "") {
-		$sql = "SELECT * FROM trabajador";
+		$sql = "SELECT * FROM trabajador
+		join trabaja
+		on trabaja.rut_persona = trabajador.rut_persona
+		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."'";
 	} else {
-		$sql = "SELECT * from trabajador where apellidop_persona = '$apellidoPBuscar'";
+		$sql = "SELECT * from trabajador 
+		join trabaja
+		on trabaja.rut_persona = trabajador.rut_persona 
+		where apellidop_persona like '$apellidoPBuscar%' 
+		and trabaja.id_sucursal = '".$_SESSION["sucursal"]."'";
 	}
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
 	$desde = $_POST["desde"];
 	$hasta = $_POST["hasta"];
 	$sql = "SELECT * from trabajador where fecha_nacimiento_persona Between '$desde' and '$hasta'";
 } else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["desde"] == "" || $_POST["hasta"] == "") {
-	$sql = "SELECT * FROM trabajador";
+	$sql = "SELECT * FROM trabajador
+			join trabaja
+			on trabaja.rut_persona = trabajador.rut_persona
+			where trabaja.id_sucursal = '".$_SESSION["sucursal"]."'";
 }
 
 
@@ -25,6 +45,11 @@ if (isset($_POST["rutBuscar"])) {
 $gsent = $gbd->prepare($sql);
 $cuenta_col = $gsent->columnCount();
 $data = $gbd->query($sql)->fetchAll();
+
+
+$sql1 = "SELECT sucursal.nombre_sucursal from sucursal where id_sucursal = '".$_SESSION["sucursal"]."'";
+$gsent = $gbd->prepare($sql1);
+$resultado1 = $gbd->query($sql1)->fetchAll();
 
 ?>
 <!DOCTYPE html>
@@ -289,6 +314,7 @@ $data = $gbd->query($sql)->fetchAll();
 			<a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
 
 		</nav>
+		<h2 class="text-center"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></h2>
 	</header>
 
 	<div class="container-fluid">
@@ -422,8 +448,8 @@ $data = $gbd->query($sql)->fetchAll();
 								<td><?php echo $row['foto'] ?></td>
 								<td><?php echo $row['estado_persona'] ?></td>
 								<td>
-									<a href="#?id=<?php echo $row['rut_persona'] ?>" class="edit" data-bs-toggle="modal" data-bs-target="#edicionexampleModal<?php echo $row['rut_persona']; ?>"><i class="material-icons" data-toggle="tooltip" title="Editar">&#xE254;</i></a>
-									<a href="#?id=<?php echo $row['rut_persona'] ?>" class="delete" data-bs-toggle="modal" data-bs-target="#eliminarexampleModal<?php echo $row['rut_persona'] ?>"><i class="material-icons" data-toggle="tooltip" title="Eliminar">&#xE872;</i></a>
+									<a href="#edicionexampleModal" class="edit" data-bs-toggle="modal" data-bs-target="#edicionexampleModal"><i class="material-icons" data-toggle="tooltip" title="Editar">&#xE254;</i></a>
+									<a href="#eliminarexampleModal" class="delete" data-bs-toggle="modal" data-bs-target="#eliminarexampleModal"><i class="material-icons" data-toggle="tooltip" title="Eliminar">&#xE872;</i></a>
 								</td>
 							</tr>
 							<?php //include("modalEditarPersonal.php"); ?>
@@ -451,5 +477,271 @@ $data = $gbd->query($sql)->fetchAll();
 	</div>
 
 </body>
+<style>
+    .modal-content {
+        max-width: 85%;
+    }
+
+    div .aña {
+        background-color: forestgreen;
+        color: honeydew;
+        margin-bottom: 15px;
+        padding: 20px 30px;
+    }
+
+    div .c {
+        margin-bottom: 12px;
+    }
+
+    div form div {
+        padding: 20px 30px;
+    }
+
+    div form label {
+        color: #212529;
+        margin-bottom: 0px;
+        font-size: 14px;
+    }
+
+    div .modal-footer {
+        background: #ecf0f1;
+    }
+
+    div form .btn-default {
+        background-color: gray;
+    }
+
+    div .modal-footer .b1 {
+        padding: 2px 12px;
+    }
+
+    div form .btn-success {
+        background-color: forestgreen;
+        font-size: 30px;
+    }
+
+    div form h6 {
+        font-size: 16px;
+        margin-top: 8px;
+    }
+</style>
+
+<div class="modal fade" id="añadirexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header aña">
+                <h5 class="modal-title" id="exampleModalLabel">Añadir Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="insertarPersonal.php" method="POST">
+                <div>
+                    <label>Rut: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" id="rutAgregar" name="rut" placeholder="Rut" maxlength="10">
+                    <label>Nombre: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="nombre" placeholder="Nombre" maxlength="32">
+                    <label>Apellido Paterno: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="apellidoP" placeholder="Apellido Paterno" maxlength="32">
+                    <label>Apellido Materno: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="apellidoM" placeholder="Apellido Materno" maxlength="32">
+                    <label>Región: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="region" placeholder="Region" maxlength="32">
+                    <label>Comuna: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="comuna" placeholder="Comuna" maxlength="32">
+                    <label>Calle: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="calle" placeholder="Calle" maxlength="32">
+                    <label>Nº Calle: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="nCalle" placeholder="N° Calle" maxlength="32">
+                    <label>Fecha Nacimiento: </label>
+                    <input type="date" class="form-control mb-3 c" required="required" name="fechaNacimiento" placeholder="Fecha Nacimiento">
+                    <label>Sexo: </label>
+                    <br>
+                    <select class="form-select" name="sexo" id="sexo">
+                        <option selected>Seleccione...</option>
+                        <option value="Hombre">Hombre</option>
+                        <option value="Mujer">Mujer</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                    <br>
+                    <label>Contraseña: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="Contraseña" placeholder="Contraseña" maxlength="12">
+                    <label>Correo: </label>
+                    <input type="email" class="form-control mb-3 c" required="required" name="Correo" placeholder="Correo" maxlength="64">
+                    <label>Teléfono: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="Telefono" placeholder="Telefono" maxlength="16">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary b1" data-bs-dismiss="modal">
+                        <h6>Cancelar</h6>
+                    </button>
+                    <button type="submit" onclick="return validarRut();" class="btn btn-success b1">
+                        <h6>Añadir</h6>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-content {
+        max-width: 85%;
+    }
+
+    div .edi {
+        background-color: gold;
+        color: honeydew;
+        margin-bottom: 15px;
+        padding: 20px 30px;
+    }
+
+    div .modal-content .form label {
+        color: #212529;
+        margin-bottom: 0px;
+        font-size: 14px;
+    }
+
+    div .c {
+        margin-bottom: 12px;
+    }
+
+    div .modal-body {
+        padding: 20px 30px;
+    }
+
+    .modal .modal-footer .btn-warning {
+        color: rgb(255, 255, 255);
+    }
+
+    div .modal-footer {
+        background: #ecf0f1;
+    }
+</style>
+
+<div class="modal fade" id="edicionexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header edi">
+                <h5 class="modal-title" id="exampleModalLabel">Editar Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="updatePersonal.php" method="POST">
+                <input type="hidden" name="rut" value="<?php echo $row['rut'] ?>">
+                <div class="modal-body">
+                    <div class="form-group form">
+                        <div class="form-group">
+                            <label>Rut: </label>
+                            <input type="text" class="form-control c" name="nombre" required value="<?php echo $row['rut'] ?>" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre: </label>
+                            <input type="text" class="form-control c" name="nombre" required value="<?php echo $row['nombre'] ?>">
+                        </div>
+                        <div class="form-group">
+                            <label>Apellido Paterno: </label>
+                            <input type="text" class="form-control c" name="apellidoP" required value="<?php echo $row['apellidop'] ?>">
+                        </div>
+                        <div class="form-group">
+                            <label>Apellido Materno: </label>
+                            <input type="text" class="form-control c" name="apellidoM" required value="<?php echo $row['apellidom'] ?>">
+                        </div>
+                        <div class="form-group">
+                            <label>Region: </label>
+                            <input type="text" class="form-control c" name="region" required value="<?php echo $row['region'] ?>" maxlength="32">
+                        </div>
+                        <div class="form-group">
+                            <label>Comuna: </label>
+                            <input type="text" class="form-control c" name="comuna" required value="<?php echo $row['comuna'] ?>" maxlength="32">
+                        </div>
+                        <div class="form-group">
+                            <label>Calle: </label>
+                            <input type="text" class="form-control c" name="calle" required value="<?php echo $row['calle'] ?>" maxlength="32">
+                        </div>
+                        <div class="form-group">
+                            <label>Nª Calle: </label>
+                            <input type="text" class="form-control c" name="ncalle" required value="<?php echo $row['ncalle'] ?>" maxlength="32">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha Nacimiento: </label>
+                            <input type="text" class="form-control c" name="fechaNacimiento" required value="<?php echo $row['fechanacimiento'] ?>">
+                        </div>
+                        <label>Sexo: </label>
+                        <br>
+                        <select class="form-select" name="sexo" id="sexoupdate<?php echo $row['rut'] ?>">
+                            <option value="Hombre" id="Hombre">Hombre</option>
+                            <option value="Mujer" id="Mujer">Mujer</option>
+                            <option value="Otros" id="Otros">Otros</option>
+                        </select>
+                        <br>
+                        <div class="form-group">
+                            <label>Contraseña: </label>
+                            <input type="text" class="form-control c" name="Contraseña" required value="<?php echo $row['contraseña'] ?>">
+                        </div>
+                        <div class="form-group">
+                            <label>Correo: </label>
+                            <input type="text" class="form-control c" name="Correo" required value="<?php echo $row['correo'] ?>">
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono: </label>
+                            <input type="text" class="form-control c" name="Telefono" required value="<?php echo $row['teléfono'] ?>">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        //$('#sexoupdate<?php //echo $row['rut'] ?> option[id="<?php //echo $row['sexo'] ?>"]').attr("selected", true);
+        //$('#sexoupdate option[id="'+$info['compañia']+'"]').attr("selected", true);
+    </script>
+</div>
+
+<style>
+    div .modal-dialog .eli{
+        padding: 20px 30px;
+        background-color: rgb(202, 15, 15);
+        color: ivory;
+    }
+
+    div .modal-footer .btn-danger{
+        background-color: rgb(202, 15, 15);
+    }
+
+    div .cuadro{
+        padding-bottom: 0px;
+    }
+
+    div .fuente label{
+        padding-top: 12px;
+        color: #212529;
+        font-size: 15px;
+    }
+</style>
+
+<div class="modal fade" id="eliminarexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header eli">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Empleado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body cuadro">
+                    <div class="form-group fuente">
+                        <label>¿Estas seguro que quieres eliminar al empleado <b><?php echo $row['nombre']." ". $row['apellidop']." ". $row['apellidom'];?></b>?</label>
+                        <div style="height:16px"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="eliminarPersonal.php?rut=" class="btn btn-danger">Eliminar</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </html>

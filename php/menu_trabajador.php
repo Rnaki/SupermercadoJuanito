@@ -1,3 +1,69 @@
+<?php
+	session_start();
+
+	include("conexion.php");
+	$conn=conectar();
+	$rut = $_SESSION["rut_persona"];
+	$sql= "SELECT * from trabajador where rut_persona = '$rut'";
+	$gsent = $conn->prepare($sql);
+	$data = $conn->query($sql)->fetchAll();
+
+
+
+	$sql2 = "SELECT acceso.id_acceso, funcion, pagina_web from acceso
+        join controla on
+        acceso.id_acceso = controla.id_acceso
+        where controla.rut_persona = '".$rut."'";
+
+	$gsent = $conn->prepare($sql2);
+	$data2 = $conn->query($sql2)->fetchAll();
+	$contador = 0;
+	$esGerente =0;
+	foreach ($data2 as $row2){
+		$id_acceso[$contador] = $row2['id_acceso'];
+		$funcion[$contador] = $row2['funcion'];
+		$pagina_web[$contador] = $row2['pagina_web'];
+		
+		if ($id_acceso[$contador] == 7){
+			$esGerente = 1;
+		};
+		$contador ++;
+	}
+
+	$sql3 = "SELECT sucursal.id_sucursal, sucursal.nombre_sucursal from sucursal";
+
+	$gsent = $conn->prepare($sql3);
+	$resultado3 = $conn->query($sql3)->fetchAll();
+
+
+	$sucursal = "Sucursal Sin Seleccionar";
+	if (isset($_POST["sucursal"])){
+		$sql5 = "SELECT sucursal.nombre_sucursal from sucursal where id_sucursal = '".$_POST["sucursal"]."'";
+		$gsent = $conn->prepare($sql5);
+		$resultado5 = $conn->query($sql5)->fetchAll();
+		foreach ($resultado5 as $row5){
+		$sucursal = $row5["nombre_sucursal"];
+		$_SESSION["sucursal"] = $_POST["sucursal"];
+		}
+	};
+
+	if (isset($_SESSION["sucursal"])){
+		echo $_SESSION["sucursal"];
+	};
+
+	$sql4 = "SELECT sucursal.nombre_sucursal, sucursal.id_sucursal from sucursal 
+			join trabaja 
+			on sucursal.id_sucursal = trabaja.id_sucursal
+			join trabajador 
+			on trabajador.rut_persona = trabaja.rut_persona
+			where trabajador.rut_persona = '".$rut."'";
+	$gsent = $conn->prepare($sql4);
+	$resultado4 = $conn->query($sql4)->fetchAll();
+
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,7 +166,19 @@ table.table-striped.table-hover tbody a{
 		<div class="row">
 		 
 		  <div class="col-sm-12">
-			<h2 class = "text-center">SUCURSAL TARAPACA</h2>
+			<?php 
+		  	if ($esGerente ==1){
+			echo '<h2 class = "text-center">';echo $sucursal.'</h2>';
+			}else if ($esGerente == 0){
+				echo '<h2 class = "text-center">';
+				foreach ($resultado4 as $row4){
+					echo $row4["nombre_sucursal"];
+					$_SESSION["sucursal"] = $row4["id_sucursal"];
+				}
+				
+				echo '</h2>';
+			}
+			?>
 		  </div>
 		  
 		</div>
@@ -111,71 +189,121 @@ table.table-striped.table-hover tbody a{
 <div class="container-xl">
 	<div class="table-responsive">
 		<div class="table-wrapper">
-			<div class="table-title">
-				<div class="row">
-					<div class="col-sm-12">
-						<h2 class = "text-center">BIENVENIDO</h2>
-					</div>
-				</div>
+		<?php
+		foreach ($data as $row){
 
-				<div class="row">
-					<div class="col-sm-12 text-center">
-						<img src="../imagenes/foto.jpg" alt="foto" width="80px" height="120px">
-					</div>
-				</div>
-
-				<br>
-				<div class="row">
-					<div class="col-sm-12">
-						<h4 class = "text-center">JUAN PEREZ</h4>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-6">
-						<h5>RUT: 9999999-9</h5>
-					</div>
-					<div class="col-sm-6">
-						<h5 class = "text-right">CARGO: GERENTE GENERAL</h5>
-					</div>
+		echo '	<div class="table-title">
+			<div class="row">
+				<div class="col-sm-12">
+					<h2 class = "text-center">BIENVENIDO</h2>
 				</div>
 			</div>
 
+			<div class="row">
+				<div class="col-sm-12 text-center">
+					<img src="../imagenes/foto.jpg" alt="foto" width="80px" height="120px">
+				</div>
+			</div>
+
+			<br>
+			<div class="row">
+				<div class="col-sm-12">
+					<h4 class = "text-center">'.$row["nombre_persona"].' '.$row["apellidop_persona"].' '.$row["apellidom_persona"].'</h4>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6">
+					<h5>RUT: '.$row["rut_persona"].'</h5>
+				</div>
+				<div class="col-sm-6">
+					<h5 class = "text-right">CARGO: '.$row["cargo"].'</h5>
+				</div>
+			</div>
+		</div>';
+		}
+		?>
+		<?php
+		if ($esGerente == 1){
+
+		
+		echo '
+		<div class="row" style="height: 100px;">
+		<h5>SUCURSALES: </h5>'; 
+		echo '<form method="POST" action="menu_trabajador.php">';
+		echo '<select class="form-select" name="sucursal" id="sucursal" required>';
+		echo '<option selected>Seleccione...</option>';
+		foreach ($resultado3 as $row3) {
+			echo "<option id=" . $row3["id_sucursal"] . " value='" . $row3['id_sucursal'] . "'>" . $row3["nombre_sucursal"] . "</option>";
+		}
+		echo '</select>';
+		echo '</div>';
+		echo '<button class="btn btn-success btn-lg btn-block" type="submit"> Seleccionar Sucursal</button>';
+		echo '</form>';
+		echo '<br>';
+		}
+		if ($esGerente == 1 && isset($_POST["sucursal"])){
+
+			
+
+			echo'
 			<div class="row" style="height: 100px;">	
-				<div class="col-sm-6 text-center h-100 border border-light bg-dark">
-					<div class="inline alinear-central">
-              		<a class="link-options link-light"  href="/php/Interfaz RRHH.php">RECURSO HUMANOS</a>
-					</div>
-				</div>
-				<div class="col-sm-6 text-center h-100 border border-light bg-dark">
-					<div class="inline alinear-central">
-					<a class="link-options link-light" href="/php/Interfaz Trabajador web.php">TRABAJADOR WEB</a>
-					</div>
-				</div>	
-			</div>
-			<div class="row" style="height: 100px;">
-				<div class="col-sm-6 text-center h-100 border border-light bg-dark">
-					<div class="inline alinear-central">
-					<a class="link-options link-light" href="/php/infoBodega.php">BODEGA</a>
-					</div>
-				</div>
-				<div class="col-sm-6 text-center h-100 border border-light bg-dark">
-					<div class="inline alinear-central">
-					<a class="link-options link-light" href="/php/proveedor.php">PROVEEDORES</a>
-					</div>
+			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+				<div class="inline alinear-central">
+				  <a class="link-options link-light"  href="/php/Interfaz RRHH.php">RECURSO HUMANOS</a>
 				</div>
 			</div>
-			<div class="row" style="height: 100px;">
-				<div class="col-sm-6 text-center h-100 border border-light bg-dark">
-					<div class="inline alinear-central">
-					<a class="link-options link-light" href="/php/despacho.php">DESPACHO</a>
-					</div>
+			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+				<div class="inline alinear-central">
+				<a class="link-options link-light" href="/php/Interfaz Trabajador web.php">TRABAJADOR WEB</a>
 				</div>
-				<div class="col-sm-6 text-center h-100 border border-light bg-dark">
-					<div class="inline alinear-central">
-					<a class="link-options link-light" href="/php/lobby.php">TIENDA</a>
-					</div>
+			</div>	
+		</div>
+
+		<div class="row" style="height: 100px;">
+			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+				<div class="inline alinear-central">
+				<a class="link-options link-light" href="/php/infoBodega.php">BODEGA</a>
 				</div>
 			</div>
+			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+				<div class="inline alinear-central">
+				<a class="link-options link-light" href="/php/proveedor.php">PROVEEDORES</a>
+				</div>
+			</div>
+		</div>
+		<div class="row" style="height: 100px;">
+			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+				<div class="inline alinear-central">
+				<a class="link-options link-light" href="/php/despacho.php">DESPACHO</a>
+				</div>
+			</div>
+			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+				<div class="inline alinear-central">
+				<a class="link-options link-light" href="/php/lobby.php">TIENDA</a>
+				</div>
+			</div>
+		</div>';
+		}elseif ($esGerente == 0){
+			
+			for ($i=0; $i<$contador; $i++){
+				if ($i == 0 || $i == 2 || $i == 4){
+					echo '<div class="row" style="height: 100px;">';
+				}	
+			echo '<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+					<div class="inline alinear-central">
+              		<a class="link-options link-light"  href="/php/'.$pagina_web[$i].'">'.$funcion[$i].'</a>
+					</div>
+				</div>';
+
+				;
+			}
+				if ($i == 0 || $i == 2 || $i == 4){
+					echo '</div>';
+				}	
+		}
+
+		?>
+
 				
 		</div>
 	</div>        
