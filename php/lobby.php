@@ -14,8 +14,8 @@ $cuenta_col = $gsent->columnCount();
 $data = $gbd->query($sql)->fetchAll();
 
 $sql2 = "SELECT * FROM producto";
-  $gsent = $gbd->prepare($sql2);
-  $data2 = $gbd->query($sql2)->fetchAll();
+$gsent = $gbd->prepare($sql2);
+$data2 = $gbd->query($sql2)->fetchAll();
 
 if(isset($_GET["idCategoria"])){
   $idCategoria = $_GET["idCategoria"];
@@ -47,6 +47,56 @@ if(isset($_GET["idCategoria"])){
   <!-- JS BOOTSTRAP -->
   <script src="../jquery/jquery.min.v3.6.0.js"></script>
   <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
+  <style>
+
+    /*Botones*/
+    .btn-dark-l{
+      color: #fff;
+      background-color: #212529;
+      border-color: #212529;
+      text-align: center;
+      width: 87px;
+      height: 36px;
+      
+  
+    }
+
+    /*Cantidad*/
+    .num{
+      line-height: 65px;
+      text-align: center;
+      width: 87px;
+      height: 36px;
+      margin-right: 5px !important;
+      margin-left: 5px !important;
+      margin-top: 0px;
+      padding: 0px
+      
+
+    }
+
+    /*Agregar al carrito*/
+    .btn-dark{
+      margin-top: 10px;
+      height: 45px;
+      width: 273px;
+    }
+
+  </style>
+
+  <script>
+    function incrementar() {
+    valor = document.getElementById("cantidad");
+    if (valor.value < 10)valor.value ++;
+    return false;
+    }
+ 
+    function decrementar() {
+    valor = document.getElementById("cantidad");
+    if (valor.value > 01)valor.value --;
+    return false;
+    }
+    </script>
 
   <title> Ventas Juanito </title>
 </head>
@@ -72,32 +122,23 @@ if(isset($_GET["idCategoria"])){
 
     <!-- Page Content -->
     <div class="container">
-
       <div class="row">
-
         <div class="col-lg-3">
-
           <h1 class="my-4">Categorias</h1>
           <div class="list-group">
-         <?php foreach ($data as $row){
+            <?php foreach ($data as $row){
               echo "<form method='GET' action='lobby.php'>";
-
               echo "<input type='hidden' name='idCategoria' value=".$row["id_categoria"].">";
               echo "<div class='d-grid gap-2'>";
               echo "<button class='btn btn-dark' type='submit' id=".$row["id_categoria"].">".$row["nombre_categoria"]."</button>";
               echo "</div>";
               echo "</form>";
-          }
-         ?>
-
-
+            }
+            ?>
           </div>
-
         </div>
         <!-- /.col-lg-3 -->
-
         <div class="col-lg-9">
-
           <div id="carouselExampleIndicators" class="carousel slide my-4" data-ride="carousel">
             <ol class="carousel-indicators">
               <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -130,12 +171,12 @@ if(isset($_GET["idCategoria"])){
                   foreach ($data2 as $row) {
                       ?>
             <div class="col-lg-4 col-md-6 mb-4">
-              <div class="card h-100">
+              <div class="card h-100 w-500">
                 <a href="#"><img class="card-img-top" src="http://placehold.it/700x400" alt=""></a>
                 <div class="card-body">
                   <h4 class="card-title">
                    
-                    <a href=""><td><?php echo $row['nombre_producto'] ?></td></a>
+                    <a ><td><?php echo $row['nombre_producto'] ?></td></a>
                   
                   </h4>
                   <h5><td>$<?php echo $row['precio'] ?></h5>
@@ -143,10 +184,15 @@ if(isset($_GET["idCategoria"])){
                 </div>
                 <div class="card-footer">
                 <?php
-                echo "<form method='GET' action='lobby.php'>";
-
+                echo "<form class='form-num' method='POST' action='insertarCarrito.php'>";
                 echo "<input type='hidden' name='idProducto' value=".$row["id_producto"].">";
-                echo "<div class='d-grid gap-2'>";
+                echo "<div class=' gap-2'>";
+
+                
+                echo "<button class='btn btn-dark-l' onclick='return decrementar()'>-</button>";
+                echo "<input class='num' type='text' value='1' id='cantidad' name='cantidad' disabled>";
+                echo "<button class='btn btn-dark-l' onclick='return incrementar()'>+</button>";
+
                 echo "<button class='btn btn-dark' type='submit' id=".$row["id_producto"].">Agregar al carrito</button>";
                 echo "</div>";
                 echo "</form>";
@@ -188,12 +234,8 @@ if(isset($_GET["idCategoria"])){
 </html>
 
 <?php 
-
-}else{
-  echo "NO ENTRES INTRUSO";
-  
-  Header("refresh:5; url=../index.php");
-}
-
-
+  }else{
+    echo "NO ENTRES INTRUSO";
+    Header("refresh:5; url=../index.php");
+  }
 ?>

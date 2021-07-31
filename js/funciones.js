@@ -484,3 +484,21 @@ function verificarMaxStockIn(){
      }
 
    };
+
+   function devolverProducto(idProducto){
+      $('#devolverProducEmployeeModal').modal('show');
+      cadena= {
+         "idProducto": idProducto,
+         };
+      $('#devolProducto').click(function() {
+         $.ajax({
+            type: "POST",
+            url: "devolverProducto.php",
+            data: cadena,
+            success:function(){
+               location.reload();
+               $('#devolverProducEmployeeModal').modal('hide');
+            }
+         }) 
+      } );
+   }

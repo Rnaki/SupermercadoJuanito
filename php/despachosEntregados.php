@@ -8,8 +8,34 @@ $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho
 		JOIN sucursal ON
 		despacho.id_sucursal = sucursal.id_sucursal
 		where proceso_despacho = 'Entregado'";
-//$sql = "SELECT * FROM despacho where proceso_despacho ='En proceso' or proceso_despacho='En camino'";
-//$data = $conn->query($sql)->fetchAll();
+
+//BUSCADOR
+if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
+	$idBuscar = $_POST["idBuscar"];
+	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where id_despacho = '$idBuscar' ";
+/*} else if (isset($_POST["estadoBuscar"])) {
+	$estadoBuscar = $_POST["estadoBuscar"];
+	if ($_POST["estadoBuscar"] == "Seleccione...") {       
+        $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
+                where proceso_despacho = 'En proceso' or proceso_despacho= 'En camino' ";
+	} else {
+    	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal  where proceso_despacho = '$estadoBuscar'";
+	} */
+} else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
+	$desde = $_POST["desde"];
+	$hasta = $_POST["hasta"];
+	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+            JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where fecha_limite Between '$desde' and '$hasta' and (proceso_despacho = 'Entregado')";
+} else if (isset($_POST["edesde"]) && isset($_POST["ehasta"]) && $_POST["edesde"] !== "" && $_POST["ehasta"] !== "") {
+	$edesde = $_POST["edesde"];
+	$ehasta = $_POST["ehasta"];
+	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+            JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where fecha_entrega Between '$edesde' and '$ehasta' and (proceso_despacho = 'Entregado')";
+}
+
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
 
@@ -155,7 +181,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <header class="site-header sticky-top py-1">
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
-            <a class="py-2 d-none d-md-inline-block" href="despacho.php">Volver</a>
+            <a class="py-2 d-none d-md-inline-block" href="despacho.php">Volver a Despachos</a>
             <h2 class="letrah2">DESPACHOS ENTREGADOS</h2>
             <a class="py-2 d-none d-md-inline-block" href="index.php">Cerrar sesión</a>
         </nav>
@@ -186,19 +212,19 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                             <div class="col-sm-6">
                                                 <h5>ID Despacho: </h5>
                                             </div>
-                                            <div class="col-sm-6">
+                                            <!--<div class="col-sm-6">
                                                 <h5>Estado: </h5>
-                                            </div>
+                                            </div> -->
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="Interfaz RRHH.php" method="POST" class="d-flex">
+                                                <form action="despachosEntregados.php" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Despacho" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
-                                            <div class="col-sm-6">
-                                                <form action="" method="POST" class="d-flex">
+                                            <!--<div class="col-sm-6">
+                                                <form action="despachosEntregados.php" method="POST" class="d-flex">
                                                     <select class="form-select" name="buscar">
                                                         <option selected>Seleccione...</option>
                                                         <option value="Hombre" id="Hombre">Preparación</option>
@@ -207,11 +233,11 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                                     </select>
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            </div> -->
+                                        </div> 
                                         <div class="row">
                                             <div class="col-sm-4">
-                                                <h5>Fecha de Entrega: </h5>
+                                                <h5>Fecha Limite: </h5>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -219,7 +245,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                                 <label> Desde: </label>
                                             </div>
                                             <div class="col-sm-4">
-                                                <form action="Interfaz RRHH.php" method="POST" class="d-flex">
+                                                <form action="despachosEntregados.php" method="POST" class="d-flex">
                                                     <input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
                                             </div>
                                             <div class="col-sm-1 buscar">
@@ -233,6 +259,32 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                                 </form>
                                             </div>
                                         </div>
+                                        <br></br>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <h5>Fecha Entrega: </h5>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-2 buscar">
+                                                <label> Desde: </label>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <form action="despachosEntregados.php" method="POST" class="d-flex">
+                                                    <input class="form-control me-2" type="date" name="edesde" placeholder="Fecha" aria-label="Search">
+                                            </div>
+                                            <div class="col-sm-1 buscar">
+                                                <label> Hasta: </label>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input class="form-control me-2" type="date" name="ehasta" placeholder="Fecha" aria-label="Search">
+                                            </div>
+                                            <div class="col-sm-1 colb">
+                                                <button class="btn btn-success" type="submit">Buscar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>

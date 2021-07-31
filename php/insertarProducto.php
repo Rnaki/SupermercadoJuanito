@@ -11,6 +11,8 @@ $imagen=$_POST["imagen"];
 $descuento=$_POST["descuento"];
 $marca=$_POST["marca"];
 
+$imagenTotal = '../imagenes/'+$imagen;
+
 //$idCategoria="67";
 $sql0 = "SELECT id_categoria FROM categoria WHERE tipo_categoria = '".$tipoCategoria."'; ";
 
@@ -38,7 +40,7 @@ if(isset($columnas) == 1){
 }
 
 //en $sql se guarda el insert
-$sql="SELECT insertarProducto('$idCategoria','".$rutProveedor."','".$nombreProducto."','$precio', '".$descripcion."','".$imagen."','$descuento','".$marca."')";
+$sql="SELECT insertarProducto('$idCategoria','".$rutProveedor."','".$nombreProducto."','$precio', '".$descripcion."','".$imagenTotal."','$descuento','".$marca."')";
 //del $con quiero sacar el $sql para que sea un $query
 echo $conn->exec($sql);
 

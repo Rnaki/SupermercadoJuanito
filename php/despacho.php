@@ -4,18 +4,9 @@ include("conexion.php");
 $gbd = conectar();
 
 //$sql = "SELECT my_function();";
-
-
-
-
-
-//$data = $conn->query($sql)->fetchAll();
-
-//var_dump($resultado);
-
 $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
-JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
-where proceso_despacho = 'En proceso' or proceso_despacho= 'En camino' ";
+        JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
+        where proceso_despacho = 'En proceso' or proceso_despacho= 'En camino' ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
@@ -24,26 +15,21 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
                 JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where id_despacho = '$idBuscar' ";
 } else if (isset($_POST["estadoBuscar"])) {
 	$estadoBuscar = $_POST["estadoBuscar"];
-	if ($_POST["estadoBuscar"] == "") {
-        echo 1;
-        echo    $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
-                        JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
-                        where proceso_despacho = '$estadoBuscar'";
+	if ($_POST["estadoBuscar"] == "Seleccione...") {       
+        $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+        JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
+        where proceso_despacho = 'En proceso' or proceso_despacho= 'En camino' ";
 	} else {
         echo 2;
         echo	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
                         JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal  where proceso_despacho = '$estadoBuscar'";
 	}
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
-echo	$desde = $_POST["desde"];
-echo	$hasta = $_POST["hasta"];
-echo	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
-                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where fecha_limite Between '$desde' and '$hasta' and (proceso_despacho = 'En proceso' or proceso_despacho = 'En camino')";
+	$desde = $_POST["desde"];
+	$hasta = $_POST["hasta"];
+	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+            JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where fecha_limite Between '$desde' and '$hasta' and (proceso_despacho = 'En proceso' or proceso_despacho = 'En camino')";
 } 
-
-
-
-	echo 1;
 
 
 
@@ -54,6 +40,8 @@ $gsent->execute();
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
+
+//var_dump($resultado);
 
 ?>
 
@@ -243,7 +231,6 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                                         <option selected>Seleccione...</option>
                                                         <option value="En proceso" >En proceso</option>
                                                         <option value="En camino" >En camino</option>
-                                                        <option value="Entregado" >Entregado</option>
                                                     </select>
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>

@@ -9,7 +9,6 @@
 	$data = $conn->query($sql)->fetchAll();
 
 
-
 	$sql2 = "SELECT acceso.id_acceso, funcion, pagina_web from acceso
         join controla on
         acceso.id_acceso = controla.id_acceso

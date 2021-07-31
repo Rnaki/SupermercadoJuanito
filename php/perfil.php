@@ -1,11 +1,26 @@
-<?php
-    session_start();
-    echo $_SESSION["rut_persona"];
-    session_destroy();
+<?php 
+
+session_start();
+if(isset($_SESSION["rut_persona"])){
+
+
+
+ include("conexion.php");
+$gbd=conectar();
+
+$sql2 = "SELECT * FROM cliente";
+$gsent = $gbd->prepare($sql2);
+$data2 = $gbd->query($sql2)->fetchAll();
+
+$rutPersona = $_SESSION["rut_persona"];
+$sql2 = "SELECT * FROM cliente where rut_persona = '".$rutPersona."' ";
+$gsent = $gbd->prepare($sql2);
+$data2 = $gbd->query($sql2)->fetchAll();
+  
+
 
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -158,7 +173,7 @@
             <a class="py-2 d-none d-md-inline-block text-white " href="lobby.php">Inicio</a>
             <a class="py-2 d-none d-md-inline-block text-white " href="carrito.php">Carrito</a>
             <a class="py-2 d-none d-md-inline-block text-white " href="perfil.php">Perfil</a>
-            <a class="py-2 d-none d-md-inline-block text-white " href="../index.php">Cerrar sesión</a>
+            <a class="py-2 d-none d-md-inline-block text-white " href="cerrar_session.php">Cerrar sesión</a>
 
         </nav>
     </header>
@@ -175,17 +190,21 @@
                     </div>
                 </div>
                 <table class="table table-striped table-hover tab">
+                <?php
+                  foreach ($data2 as $row) {
+                      ?>
+           
                     <tr>
                         <th></th>
                         <th>
                             <h5>Rut: </h5>
                         </th>
-                        <td>20435895-4</td>
+                        <td><?php echo $row['rut_persona'] ?></td>
                         <th></th>
                         <th>
                             <h5>Nombre: </h5>
                         </th>
-                        <td>Luis</td>
+                        <td><?php echo $row['nombre_persona'] ?></td>
                         <th></th>
                     </tr>
                     <tr>
@@ -193,12 +212,12 @@
                         <th>
                             <h5>Apellido Paterno: </h5>
                         </th>
-                        <td>Castro</td>
+                        <td><?php echo $row['apellidop_persona'] ?></td>
                         <th></th>
                         <th>
                             <h5>Apellido Materno: </h5>
                         </th>
-                        <td>Godoy</td>
+                        <td><?php echo $row['apellidom_persona'] ?></td>
                         <th></th>
                     </tr>
                     <tr>
@@ -206,12 +225,12 @@
                         <th>
                             <h5>Región: </h5>
                         </th>
-                        <td>Tarapaca</td>
+                        <td><?php echo $row['region'] ?></td>
                         <th></th>
                         <th>
                             <h5>Comuna: </h5>
                         </th>
-                        <td>Alto Hospicio</td>
+                        <td><?php echo $row['comuna'] ?></td>
                         <th></th>
                     </tr>
                     <tr>
@@ -219,24 +238,24 @@
                         <th>
                             <h5>Calle: </h5>
                         </th>
-                        <td>Salmon</td>
+                        <td><?php echo $row['calle'] ?></td>
                         <th></th>
                         <th>
                             <h5>Nº Calle: </h5>
                         </th>
-                        <td>32</td>
+                        <td><?php echo $row['numero_calle'] ?></td>
                     </tr>
                     <tr>
                         <th></th>
                         <th>
                             <h5>Fecha de nacimiento: </h5>
                         </th>
-                        <td>2021-05-12</td>
+                        <td><?php echo $row['fecha_nacimiento_persona'] ?></td>
                         <th></th>
                         <th>
                             <h5>Sexo: </h5>
                         </th>
-                        <td>Hombre</td>
+                        <td><?php echo $row['sexo'] ?></td>
                         <th></th>
                     </tr>
                     <tr>
@@ -244,19 +263,19 @@
                         <th>
                             <h5>Contraseña: </h5>
                         </th>
-                        <td>seba</td>
+                        <td></td>
                         <th></th>
                         <th>
                             <h5>Correo: </h5>
                         </th>
-                        <td>luis@gmail.com</td>
+                        <td><?php echo $row['correo'] ?></td>
                     </tr>
                     <tr>
                         <th></th>
                         <th>
                             <h5>Telefono: </h5>
                         </th>
-                        <td>32454365</td>
+                        <td><?php echo $row['fono'] ?></td>
                         <th></th>
                         <th></th>
                         <th></th>
@@ -271,7 +290,9 @@
         </div>
     </div>
 
-
+    <?php
+                  }
+              ?>
 
     <!--
     <div class="container-xl">
@@ -388,48 +409,49 @@
                     <h5 class="modal-title" id="exampleModalLabel">Editar Cliente</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST">
-                    <div class="modal-body">
+                <form action="updateClientePerfil.php" method="POST">
+					<div class="modal-body">
                         <div class="form-group form">
                             <div class="form-group">
                                 <label>Rut: </label>
-                                <input type="text" class="form-control c" name="nombre" disabled>
+                                <input type="text" class="form-control c updateRutCliente" name="" value="" disabled>
+								<input type="hidden" class="form-control c updateRutCliente" id ="updateRutCliente" name="updateRutCliente" required value="" >
                             </div>
                             <div class="form-group">
                                 <label>Nombre: </label>
-                                <input type="text" class="form-control c" name="nombre" maxlength="32">
+                                <input type="text" class="form-control c" id="updateNombreCliente" name="updateNombreCliente" required value="" maxlength="32">
                             </div>
                             <div class="form-group">
                                 <label>Apellido Paterno: </label>
-                                <input type="text" class="form-control c" name="apellidoP" maxlength="32">
+                                <input type="text" class="form-control c" id="updateApellidoPCliente" name="updateApellidoPCliente" required value="" maxlength="32">
                             </div>
                             <div class="form-group">
                                 <label>Apellido Materno: </label>
-                                <input type="text" class="form-control c" name="apellidoM" maxlength="32">
+                                <input type="text" class="form-control c" id="updateApellidoMCliente" name="updateApellidoMCliente" required value="" maxlength="32">
                             </div>
                             <div class="form-group">
                                 <label>Region: </label>
-                                <input type="text" class="form-control c" name="region" maxlength="32">
+                                <input type="text" class="form-control c" id="updateRegionCliente" name="updateRegionCliente" required value="" maxlength="32">
                             </div>
                             <div class="form-group">
                                 <label>Comuna: </label>
-                                <input type="text" class="form-control c" name="comuna" maxlength="32">
+                                <input type="text" class="form-control c" id="updateComunaCliente" name="updateComunaCliente" required value="" maxlength="32">
                             </div>
                             <div class="form-group">
                                 <label>Calle: </label>
-                                <input type="text" class="form-control c" name="calle" maxlength="32">
+                                <input type="text" class="form-control c" id="updateCalleCliente" name="updateCalleCliente" required value="" maxlength="32">
                             </div>
                             <div class="form-group">
                                 <label>Nª Calle: </label>
-                                <input type="text" class="form-control c" name="ncalle" maxlength="32">
+                                <input type="text" class="form-control c" id="updateNcalleCliente" name="updateNcalleCliente" required value="" maxlength="32">
                             </div>
                             <div class="form-group">
                                 <label>Fecha Nacimiento: </label>
-                                <input type="text" class="form-control c" name="fechaNacimiento">
+                                <input type="text" class="form-control c" id="updateFechaNacimientoCliente" name="updateFechaNacimientoCliente" required value="">
                             </div>
                             <label>Sexo: </label>
                             <br>
-                            <select class="form-select" name="sexo">
+                            <select class="form-select" id="updateSexoCliente" name="updateSexoCliente" id="sexoupdate">
                                 <option value="Hombre" id="Hombre">Hombre</option>
                                 <option value="Mujer" id="Mujer">Mujer</option>
                                 <option value="Otros" id="Otros">Otros</option>
@@ -437,15 +459,15 @@
                             <br>
                             <div class="form-group">
                                 <label>Contraseña: </label>
-                                <input type="text" class="form-control c" name="Contraseña" maxlength="12">
+                                <input type="text" class="form-control c" id="updateContraseñaCliente" name="updateContraseñaCliente" required value="" maxlength="12">
                             </div>
                             <div class="form-group">
                                 <label>Correo: </label>
-                                <input type="text" class="form-control c" name="Correo" maxlength="64">
+                                <input type="text" class="form-control c" id="updateCorreoCliente" name="updateCorreoCliente" required value="" maxlength="64">
                             </div>
                             <div class="form-group">
                                 <label>Teléfono: </label>
-                                <input type="text" class="form-control c" name="Telefono" maxlength="16">
+                                <input type="text" class="form-control c" id="updateTelefonoCliente" name=<?php echo $row['fono'] ?> required value="" maxlength="16">
                             </div>
                         </div>
                     </div>
@@ -457,7 +479,17 @@
             </div>
         </div>
     </div>
-
 </body>
 
 </html>
+
+<?php 
+
+}else{
+  echo "NO ENTRES INTRUSO";
+  
+  Header("refresh:5; url=../index.php");
+}
+
+
+?>

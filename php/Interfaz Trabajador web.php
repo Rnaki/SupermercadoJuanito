@@ -31,11 +31,46 @@ if(isset($_GET["error"])){
 }
 */
 //$sql = "SELECT my_function();";
+
 $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
-		JOIN categoria ON
-		producto.id_categoria = categoria.id_categoria
-		where estado_producto = true";
-//$data = $conn->query($sql)->fetchAll();
+		JOIN categoria ON producto.id_categoria = categoria.id_categoria
+		where estado_producto = true;";
+
+//BUSCADOR
+if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
+	$idBuscar = $_POST["idBuscar"];
+	$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
+			JOIN categoria ON producto.id_categoria = categoria.id_categoria
+			where estado_producto = true and id_producto = '$idBuscar';";
+} else if (isset($_POST["nombreBuscar"])) {
+	$nombreBuscar = $_POST["nombreBuscar"];
+	if ($_POST["nombreBuscar"] == "") {
+		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
+				JOIN categoria ON producto.id_categoria = categoria.id_categoria
+				where estado_producto = true;";
+	} else {
+		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
+				JOIN categoria ON producto.id_categoria = categoria.id_categoria
+				where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%');";
+	}
+} else if (isset($_POST["nombreCategoria"]) && isset($_POST["marca"]) && $_POST["nombreCategoria"] !== " " && $_POST["marca"] !== " ") {
+	$idCategoria = $_POST["nombreCategoria"];
+	$marca = $_POST["marca"];
+	if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] == "Seleccione...") {
+		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
+				JOIN categoria ON producto.id_categoria = categoria.id_categoria
+				where estado_producto = true and categoria.id_categoria = '$idCategoria';";
+	} else if ($_POST["nombreCategoria"] == "Seleccione..." && $_POST["marca"] != "Seleccione...") {
+		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
+				JOIN categoria ON producto.id_categoria = categoria.id_categoria
+				where estado_producto = true and marca = '$marca';";
+	} else if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] != "Seleccione...") {
+		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
+				JOIN categoria ON producto.id_categoria = categoria.id_categoria
+				where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca';";
+	}
+}
+
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
@@ -52,6 +87,16 @@ $sql3 = "SELECT * FROM proveedor";
 $gsent3 = $gbd->prepare($sql3);
 $gsent3->execute();
 $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
+
+$sql4 = "SELECT imagen FROM producto where id_producto = '3'";
+$gsent4 = $gbd->prepare($sql4);
+$gsent4->execute();
+$resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
+
+$sql5 = "SELECT distinct marca FROM producto where estado_producto = true order by marca";
+$gsent5 = $gbd->prepare($sql5);
+$gsent5->execute();
+$resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -87,7 +132,11 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 		div .primero .col {
 			text-align: right;
 		}
-
+		/*
+		.container-xl .primero .col-sm-1{
+			padding-left: 0px 0px;
+		}
+		*/
 		/*Cambio*/
 		div .primero {
 			margin-bottom: 12px;
@@ -182,7 +231,7 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 	<header class="site-header sticky-top py-1">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
+			<a class="py-2 d-none d-md-inline-block" href="Menu_trabajador.php">Volver</a>
 			<h2 class="letrah2">ÁREA TRABAJADOR WEB</h2>
 
 			<div class="dropdown">
@@ -209,6 +258,7 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 	</header>
 
 	<div style="height:30px"></div>
+
 	<div class="container-xl">
 		<div class="table-responsive">
 			<div class="table-wrapper">
@@ -221,6 +271,10 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 							<a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#creacionEmployeeModal"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
 									<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
 								</svg> Añadir Producto</a>
+								<a class="btn btn-danger" href="interfazProductosEliminados.php"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+									<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
+								</svg></a>
+								
 						</div>
 					</div>
 					<div class="row">
@@ -243,14 +297,14 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
-													<input class="form-control me-3" type="search" name="rutBuscar" placeholder="ID Producto" aria-label="Search">
+												<form action="Interfaz Trabajador web.php" method="POST" class="d-flex">
+													<input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Producto" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
-													<input class="form-control me-3" type="search" name="apellidoPBuscar" placeholder="Nombre" aria-label="Search">
+												<form action="Interfaz Trabajador web.php" method="POST" class="d-flex">
+													<input class="form-control me-3" type="search" name="nombreBuscar" placeholder="Nombre" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
@@ -260,23 +314,27 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 												<label> Tipo: </label>
 											</div>
 											<div class="col-sm-4">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
-													<select class="form-select" name="buscar">
+												<form action="Interfaz Trabajador web.php" method="POST" class="d-flex">
+													<select class="form-select" name="nombreCategoria" id="nombreCategoria" required>
 														<option selected>Seleccione...</option>
-														<option value="Hombre" id="Hombre">Verduras</option>
-														<option value="Mujer" id="Mujer">Fruta</option>
-														<option value="Otros" id="Otros">Electrodomesticos</option>
+														<?php
+														foreach ($resultado2 as $row2) {
+															echo "<option id=" . $row2["id_categoria"] . " value=" . $row2['id_categoria'] . ">" . $row2["nombre_categoria"] . "</option>";
+														}
+														?>
 													</select>
 											</div>
 											<div class="col-sm-1 buscar">
 												<label> Marca: </label>
 											</div>
 											<div class="col-sm-4">
-												<select class="form-select" name="buscar">
+												<select class="form-select" name="marca" id="marca" required>
 													<option selected>Seleccione...</option>
-													<option value="Hombre" id="Hombre">Organic</option>
-													<option value="Mujer" id="Mujer">La Huerta</option>
-													<option value="Otros" id="Otros">Samsung</option>
+													<?php
+													foreach ($resultado5 as $row5) {
+														echo "<option id=" . $row5["id_producto"] . " value=" . $row5['marca'] . ">" . $row5["marca"] . "</option>";
+													}
+													?>
 												</select>
 											</div>
 											<div class="col-sm-1">
@@ -318,7 +376,7 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
                                     <path
                                         d='M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z' />
                                 </svg></a>";
-							echo "<a href='' onclick='eliminarProducto(\"" . $row['id_producto'] . "\")' class='delete' data-bs-toggle='modal' ><svg
+							echo "<a href='' onclick='eliminarProducto(\"" . $row['id_producto'] . "\")' class='delete' data-bs-toggle='modal'><svg
                                     xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor'
                                     class='bi bi-trash-fill' viewBox='0 0 16 16'>
                                     <path
@@ -360,7 +418,6 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 						<div class="form-group ">
 							<div class="form-group">
 								<label>Categoria: </label>
-								<br>
 								<select class="form-select" name="tipoCategoria" id="tipoCategoria" required>
 									<option selected>Seleccione...</option>
 									<?php
@@ -369,11 +426,9 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 									}
 									?>
 								</select>
-								<br>
 							</div>
 							<div class="form-group">
 								<label>Nombre Proveedor: </label>
-								<br>
 								<select class="form-select" name="nombreProveedor" id="nombreProveedor" required>
 									<option selected>Seleccione...</option>
 									<?php
@@ -382,7 +437,6 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 									}
 									?>
 								</select>
-								<br>
 							</div>
 							<div class="form-group">
 								<label>Nombre Producto: </label>
@@ -460,7 +514,6 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 								</select>
 								<br>
 							</div>
-
 							<div class="form-group">
 								<label>Nombre: </label>
 								<input type="text" class="form-control" name="updateNombreProducto" id="updateNombreProducto" required>

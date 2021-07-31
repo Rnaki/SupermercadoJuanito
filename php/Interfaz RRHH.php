@@ -568,6 +568,20 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                     <input type="email" class="form-control mb-3 c" required="required" name="Correo" placeholder="Correo" maxlength="64">
                     <label>Teléfono: </label>
                     <input type="text" class="form-control mb-3 c" required="required" name="Telefono" placeholder="Telefono" maxlength="16">
+					<label>Cargo: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="Cargo" placeholder="Cargo" maxlength="16">
+					<label>Acceso: </label>
+					<br>
+					<input type="checkbox" id="acceso1" name="cargo1" value="1" >
+					<label for="cargo1"> Recursos Humanos</label><br>
+					<input type="checkbox" id="acceso2" name="cargo2" value="2">
+					<label for="cargo2"> Trabajador Web</label><br>
+					<input type="checkbox" id="acceso3" name="cargo3" value="3">
+					<label for="cargo3"> Bodega</label><br>
+					<input type="checkbox" id="acceso4" name="cargo4" value="4">
+					<label for="cargo4"> Proveedor</label><br>
+					<input type="checkbox" id="acceso5" name="cargo5" value="5">
+					<label for="cargo5">Despacho</label><br>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary b1" data-bs-dismiss="modal">
@@ -625,48 +639,48 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="updatePersonal.php" method="POST">
-                <input type="hidden" name="rut" value="<?php echo $row['rut'] ?>">
+                <input type="hidden" name="rut" value="">
                 <div class="modal-body">
                     <div class="form-group form">
                         <div class="form-group">
                             <label>Rut: </label>
-                            <input type="text" class="form-control c" name="nombre" required value="<?php echo $row['rut'] ?>" disabled>
+                            <input type="text" class="form-control c" name="nombre" required value="" disabled>
                         </div>
                         <div class="form-group">
                             <label>Nombre: </label>
-                            <input type="text" class="form-control c" name="nombre" required value="<?php echo $row['nombre'] ?>">
+                            <input type="text" class="form-control c" name="nombre" required value="'">
                         </div>
                         <div class="form-group">
                             <label>Apellido Paterno: </label>
-                            <input type="text" class="form-control c" name="apellidoP" required value="<?php echo $row['apellidop'] ?>">
+                            <input type="text" class="form-control c" name="apellidoP" required value="">
                         </div>
                         <div class="form-group">
                             <label>Apellido Materno: </label>
-                            <input type="text" class="form-control c" name="apellidoM" required value="<?php echo $row['apellidom'] ?>">
+                            <input type="text" class="form-control c" name="apellidoM" required value="">
                         </div>
                         <div class="form-group">
                             <label>Region: </label>
-                            <input type="text" class="form-control c" name="region" required value="<?php echo $row['region'] ?>" maxlength="32">
+                            <input type="text" class="form-control c" name="region" required value="" maxlength="32">
                         </div>
                         <div class="form-group">
                             <label>Comuna: </label>
-                            <input type="text" class="form-control c" name="comuna" required value="<?php echo $row['comuna'] ?>" maxlength="32">
+                            <input type="text" class="form-control c" name="comuna" required value="" maxlength="32">
                         </div>
                         <div class="form-group">
                             <label>Calle: </label>
-                            <input type="text" class="form-control c" name="calle" required value="<?php echo $row['calle'] ?>" maxlength="32">
+                            <input type="text" class="form-control c" name="calle" required value="" maxlength="32">
                         </div>
                         <div class="form-group">
                             <label>Nª Calle: </label>
-                            <input type="text" class="form-control c" name="ncalle" required value="<?php echo $row['ncalle'] ?>" maxlength="32">
+                            <input type="text" class="form-control c" name="ncalle" required value="" maxlength="32">
                         </div>
                         <div class="form-group">
                             <label>Fecha Nacimiento: </label>
-                            <input type="text" class="form-control c" name="fechaNacimiento" required value="<?php echo $row['fechanacimiento'] ?>">
+                            <input type="text" class="form-control c" name="fechaNacimiento" required value="">
                         </div>
                         <label>Sexo: </label>
                         <br>
-                        <select class="form-select" name="sexo" id="sexoupdate<?php echo $row['rut'] ?>">
+                        <select class="form-select" name="sexo" id="sexoupdate">
                             <option value="Hombre" id="Hombre">Hombre</option>
                             <option value="Mujer" id="Mujer">Mujer</option>
                             <option value="Otros" id="Otros">Otros</option>
@@ -674,16 +688,30 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                         <br>
                         <div class="form-group">
                             <label>Contraseña: </label>
-                            <input type="text" class="form-control c" name="Contraseña" required value="<?php echo $row['contraseña'] ?>">
+                            <input type="text" class="form-control c" name="Contraseña" required value="">
                         </div>
                         <div class="form-group">
                             <label>Correo: </label>
-                            <input type="text" class="form-control c" name="Correo" required value="<?php echo $row['correo'] ?>">
+                            <input type="text" class="form-control c" name="Correo" required value="">
                         </div>
                         <div class="form-group">
                             <label>Teléfono: </label>
-                            <input type="text" class="form-control c" name="Telefono" required value="<?php echo $row['teléfono'] ?>">
+                            <input type="text" class="form-control c" name="Telefono" required value="">
                         </div>
+						<label>Cargo: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="Cargo" placeholder="Cargo" maxlength="16">
+					<label>Acceso: </label>
+					<br>
+					<input type="checkbox" id="accesoEdit1" name="cargo1" value="1" >
+					<label for="cargo1"> Recursos Humanos</label><br>
+					<input type="checkbox" id="accesoEdit2" name="cargo2" value="2">
+					<label for="cargo2"> Trabajador Web</label><br>
+					<input type="checkbox" id="accesoEdit3" name="cargo3" value="3">
+					<label for="cargo3"> Bodega</label><br>
+					<input type="checkbox" id="accesoEdit4" name="cargo4" value="4">
+					<label for="cargo4"> Proveedor</label><br>
+					<input type="checkbox" id="accesoEdit5" name="cargo5" value="5">
+					<label for="cargo5">Despacho</label><br>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -732,7 +760,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                 </div>
                 <div class="modal-body cuadro">
                     <div class="form-group fuente">
-                        <label>¿Estas seguro que quieres eliminar al empleado <b><?php echo $row['nombre']." ". $row['apellidop']." ". $row['apellidom'];?></b>?</label>
+                        <label>¿Estas seguro que quieres eliminar al empleado <b></b>?</label>
                         <div style="height:16px"></div>
                     </div>
                 </div>

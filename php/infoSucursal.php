@@ -3,110 +3,73 @@
 include("conexion.php");
 $gbd = conectar();
 
-if (isset($_GET["error"])) {
-    $error = $_GET["error"];
-    echo '<script>alert("El producto ya existe en bodega")</script>';
-}
-/*
-if (isset($_POST["rutBuscar"])) {
-	$rutBuscar = $_POST["rutBuscar"];
-	$sql = "SELECT * from cliente where rut like '$rutBuscar%'";
-} else if (isset($_POST["apellidoPBuscar"])) {
-	$apellidoPBuscar = $_POST["apellidoPBuscar"];
-	if ($_POST["apellidoPBuscar"] == "") {
-		$sql = "SELECT * FROM cliente";
-	} else {
-		$sql = "SELECT * from cliente where apellidoP = '$apellidoPBuscar'";
-	}
-} else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
-	$desde = $_POST["desde"];
-	$hasta = $_POST["hasta"];
-	$sql = "SELECT * from cliente where fechaNacimiento Between '$desde' and '$hasta'";
-} else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["desde"] == "" || $_POST["hasta"] == "") {
-	$sql = "SELECT * FROM cliente";
-}
 
-if(isset($_GET["error"])){
-	$tipoError = $_GET["error"];
-	if($tipoError ==2){
-		echo "<script>
-				alert('Rut ya existente');
-			</script>";
-	} 
-}
-*/
+
 //$sql = "SELECT my_function();";
-$sql = "SELECT * FROM bodega WHERE id_bodega = '1';";
+$sql = "SELECT * FROM sucursal WHERE id_sucursal = '1';";
 //$data = $conn->query($sql)->fetchAll();
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
-$sql2 = "SELECT * FROM producto WHERE estado_producto = true;";
+$sql2 = "SELECT * FROM categoria;";
 $gsent2 = $gbd->prepare($sql2);
 $gsent2->execute();
 $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 
-$sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
+$sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
 		JOIN categoria ON producto.id_categoria = categoria.id_categoria
-        JOIN contiene ON producto.id_producto = contiene.id_producto
+        JOIN incluye ON producto.id_producto = incluye.id_producto
 		where estado_producto = true;";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
     $idBuscar = $_POST["idBuscar"];
-    $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
+    $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
             JOIN categoria ON producto.id_categoria = categoria.id_categoria
-            JOIN contiene ON producto.id_producto = contiene.id_producto
+            JOIN incluye ON producto.id_producto = incluye.id_producto
             where estado_producto = true and producto.id_producto = '$idBuscar';";
 } else if (isset($_POST["nombreBuscar"])) {
     $nombreBuscar = $_POST["nombreBuscar"];
     if ($_POST["nombreBuscar"] == "") {
-        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
-                JOIN categoria ON producto.id_categoria = categoria.id_categoria
-                JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true;";
+        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
+		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
+                JOIN incluye ON producto.id_producto = incluye.id_producto
+		        where estado_producto = true;";
     } else {
-        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
-                JOIN categoria ON producto.id_categoria = categoria.id_categoria
-                JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%');";
+        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
+		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
+                JOIN incluye ON producto.id_producto = incluye.id_producto
+		        where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%');";
     }
 } else if (isset($_POST["nombreCategoria"]) && isset($_POST["marca"]) && $_POST["nombreCategoria"] !== " " && $_POST["marca"] !== " ") {
     $idCategoria = $_POST["nombreCategoria"];
     $marca = $_POST["marca"];
     if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] == "Seleccione...") {
-        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
-                JOIN categoria ON producto.id_categoria = categoria.id_categoria
-                JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and categoria.id_categoria = '$idCategoria';";
+        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
+		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
+                JOIN incluye ON producto.id_producto = incluye.id_producto
+		        where estado_producto = true and categoria.id_categoria = '$idCategoria';";
     } else if ($_POST["nombreCategoria"] == "Seleccione..." && $_POST["marca"] != "Seleccione...") {
-        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
-                JOIN categoria ON producto.id_categoria = categoria.id_categoria
-                JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and marca = '$marca';";
+        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
+		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
+                JOIN incluye ON producto.id_producto = incluye.id_producto
+		        where estado_producto = true and marca = '$marca';";
     } else if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] != "Seleccione...") {
-        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
-                JOIN categoria ON producto.id_categoria = categoria.id_categoria
-                JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca';";
+        $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
+		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
+                JOIN incluye ON producto.id_producto = incluye.id_producto
+		        where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca';";
     }
 }
-
 $gsent3 = $gbd->prepare($sql3);
 $gsent3->execute();
 $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 
-$sql4 = "SELECT sum(stock) FROM contiene;";
-//$data = $conn->query($sql)->fetchAll();
+$sql4 = "SELECT sum(stock_sucursal) FROM incluye;";
 $gsent4 = $gbd->prepare($sql4);
 $gsent4->execute();
 $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
-
-$sql5 = "SELECT * FROM categoria;";
-$gsent5 = $gbd->prepare($sql5);
-$gsent5->execute();
-$resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 
 $sql6 = "SELECT distinct marca FROM producto where estado_producto = true order by marca";
 $gsent6 = $gbd->prepare($sql6);
@@ -125,7 +88,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informacion de Bodega</title>
+    <title>Informacion de Sucursal</title>
     <link rel="stylesheet" href="../css/estilosDaniel.css">
 
     <!-- BOOTSTRAP -->
@@ -250,9 +213,13 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
 <body class="body-infoB">
     <header class="site-header sticky-top py-1">
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
-            <a class="py-2 d-none d-md-inline-block" href="Menu_trabajador.php">Volver</a>
-            <a class="py-2 d-none d-md-inline-block" href="infoSucursal.php">Sucursal</a>
-            <h2 class="letrah2">INFORMACIÓN DE BODEGA</h2>
+            <a class="py-2 d-none d-md-inline-block" href="infoBodega.php">Volver</a>
+            
+            <?php
+            foreach ($resultado as $row) {
+                echo '<h2 class="letrah2" style="text-transform: uppercase;">'.$row["nombre_sucursal"].'</h2>';
+            }
+            ?>
 
             <div class="dropdown">
                 <button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
@@ -286,11 +253,6 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                         <div class="col-sm-6">
                             <h4>DETALLES: </h4>
                         </div>
-                        <div class="col-sm-6 col">
-                            <a class="btn btn-success b1" data-bs-toggle="modal" data-bs-target="#creacionEmployeeModal"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
-                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
-                                </svg> Añadir Producto</a>
-                        </div>
                     </div>
 
                     <div class="row">
@@ -313,13 +275,13 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="infoBodega.php" method="POST" class="d-flex">
+                                                <form action="infoSucursal.php" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Producto" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                             <div class="col-sm-6">
-                                                <form action="infoBodega.php" method="POST" class="d-flex">
+                                                <form action="infoSucursal.php" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="nombreBuscar" placeholder="Nombre" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -330,12 +292,12 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                                 <label> Tipo: </label>
                                             </div>
                                             <div class="col-sm-4">
-                                                <form action="infoBodega.php" method="POST" class="d-flex">
-                                                    <select class="form-select" name="nombreCategoria" id="nombreCategoria" required>
+                                                <form action="infoSucursal.php" method="POST" class="d-flex">
+                                                <select class="form-select" name="nombreCategoria" id="nombreCategoria" required>
                                                         <option selected>Seleccione...</option>
                                                         <?php
-                                                        foreach ($resultado5 as $row5) {
-                                                            echo "<option id=" . $row5["id_categoria"] . " value=" . $row5['id_categoria'] . ">" . $row5["nombre_categoria"] . "</option>";
+                                                        foreach ($resultado2 as $row2) {
+                                                            echo "<option id=" . $row2["id_categoria"] . " value=" . $row2['id_categoria'] . ">" . $row2["nombre_categoria"] . "</option>";
                                                         }
                                                         ?>
                                                     </select>
@@ -344,7 +306,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                                 <label> Marca: </label>
                                             </div>
                                             <div class="col-sm-4">
-                                                <select class="form-select" name="marca" id="marca" required>
+                                            <select class="form-select" name="marca" id="marca" required>
                                                     <option selected>Seleccione...</option>
                                                     <?php
                                                     foreach ($resultado6 as $row6) {
@@ -371,13 +333,13 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                         <div class="row">
                             <div class="col-sm-3">
                                 <th>
-                                    <h5><b>Id Bodega: </b></h5>
+                                    <h5><b>Id Sucursal: </b></h5>
                                 </th>
                             </div>
                             <div class="col-sm-3">
                                 <?php
                                 foreach ($resultado as $row) {
-                                    echo '<td>' . $row["id_bodega"] . '</td>';
+                                    echo '<td>' . $row["id_sucursal"] . '</td>';
                                 }
                                 ?>
                             </div>
@@ -391,7 +353,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                             <div class="col-sm-3">
                                 <?php
                                 foreach ($resultado as $row) {
-                                    echo '<td>' . $row["region_bodega"] . '</td>';
+                                    echo '<td>' . $row["region_sucursal"] . '</td>';
                                 }
                                 ?>
                             </div>
@@ -410,7 +372,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                             <div class="col-sm-3">
                                 <?php
                                 foreach ($resultado as $row) {
-                                    echo '<td>' . $row["comuna_bodega"] . '</td>';
+                                    echo '<td>' . $row["comuna_sucursal"] . '</td>';
                                 }
                                 ?>
                             </div>
@@ -422,7 +384,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                             <div class="col-sm-3">
                                 <?php
                                 foreach ($resultado as $row) {
-                                    echo '<td style="text-align: center;">' . $row["calle_bodega"] . '</td>';
+                                    echo '<td style="text-align: center;">' . $row["calle_sucursal"] . '</td>';
                                 }
                                 ?>
                             </div>
@@ -434,7 +396,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                             <div class="col-sm-3">
                                 <?php
                                 foreach ($resultado as $row) {
-                                    echo '<td>' . $row["numero_calle_bodega"] . '</td>';
+                                    echo '<td>' . $row["numero_calle_sucursal"] . '</td>';
                                 }
                                 ?>
                             </div>
@@ -445,9 +407,37 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                     <tr>
                         <div class="row">
                             <div class="col-sm-3">
-                                <th style="padding-right: 120px;"></th>
+                                <th style="padding-right: 20px;"></th>
                                 <th>
-                                    <h5><b>Total de Stock: </b></h5>
+                                    <h5><b>Fono: </b></h5>
+                                </th>
+                            </div>
+                            <div class="col-sm-6">
+                                <?php
+                                foreach ($resultado as $row) {
+                                    echo '<td>' . $row["fono_sucursal"] . '</td>';
+                                }
+                                ?>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <th style="padding-right: 30px;"></th>
+                                <th>
+                                    <h5><b>Cantidad de Trabajadores: </b></h5>
+                                </th>
+                            </div>
+                            <div class="col-sm-6">
+                                <?php
+                                foreach ($resultado as $row) {
+                                    echo '<td>' . $row["cantidad_trabajadores"] . '</td>';
+                                }
+                                ?>
+                                <th style="padding-left: 30px;"></th>
+                            </div>
+                            <div class="col-sm-3">
+                                <th>
+                                    <h5><b>Stock Total: </b></h5>
                                 </th>
                             </div>
                             <div class="col-sm-6">
@@ -456,7 +446,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                     echo '<td>' . $row4["sum"] . '</td>';
                                 }
                                 ?>
-                                <th style="padding-left: 120px;"></th>
+                                <th style="padding-left: 30px;"></th>
                             </div>
                         </div>
                     </tr>
@@ -483,23 +473,11 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                             echo  '<td>' . $row3["marca"] . '</td>';
                             echo  '<td>' . $row3["tstock"] . '</td>';
                             echo "<td>
-                            <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row3['id_producto'] . "\")' class='envio' data-bs-toggle='modal' data-bs-target='#envioEmployeeModal' data-backdrop='static' data-keyboard='false' ><svg 
-                                    xmlns='http://www.w3.org/2000/svg' width='17' height='17' fill='currentColor' 
-                                    class='bi bi-check-circle-fill' viewBox='0 0 16 16'>
-                                    <path d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z'/>
-                                </svg></a>
-                                <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row3['id_producto'] . "\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal' data-backdrop='static' data-keyboard='false' ><svg
-                                    xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
-                                    class='bi bi-pencil-fill' viewBox='0 0 16 16'>
-                                    <path
-                                        d='M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z' />
-                                </svg></a>";
-                            echo "<a href='' onclick='eliminarInfoBodega(\"" . $row3['id_producto'] . "\")' class='delete' data-bs-toggle='modal' ><svg
-                                    xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor'
-                                    class='bi bi-trash-fill' viewBox='0 0 16 16'>
-                                    <path
-                                        d='M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z' />
-                                </svg></a>
+                                <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row3['id_producto'] . "\")' class='envio' data-bs-toggle='modal' data-bs-target='#envioEmployeeModal' data-backdrop='static' data-keyboard='false' ><svg 
+                                    xmlns='http://www.w3.org/2000/svg' width='19' height='19' fill='currentColor' 
+                                    class='bi bi-reply-fill' viewBox='0 0 16 16'>
+                                    <path d='M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z'/>
+                                    </svg></a>
                             </td>";
                             echo "</tr>";
                         }
@@ -522,53 +500,16 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <!-- Modal de Creacion-->
-    <div class="modal fade" id="creacionEmployeeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header cread">
-                    <h5 class="modal-title" id="exampleModalLabel">Añadir Producto</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form method="POST" action="insertarInfoBodega.php">
-                    <div class="modal-body">
-                        <div class="form-group ">
-                            <label>Nombre Producto: </label>
-                            <br>
-                            <select class="form-select" name="id_producto" id="id_producto" required>
-                                <option selected>Seleccione...</option>
-                                <?php
-                                foreach ($resultado2 as $row2) {
-                                    echo "<option id=" . $row2["id_producto"] . " value=" . $row2['id_producto'] . ">" . $row2["nombre_producto"] . "</option>";
-                                }
-                                ?>
-                            </select>
-                            <br>
-                            <div class="form-group">
-                                <label>Stock: </label>
-                                <input type="text" class="form-control" name="stock" id="ingresarStock" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-success cread">Añadir</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Envio-->
+    <!-- Modal de Envio a Bodega-->
     <div class="modal fade" id="envioEmployeeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header cread">
-                    <h5 class="modal-title" id="exampleModalLabel">Enviar Producto a Sucursal</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Devolver Producto a Bodega</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="envioInfoBodega.php">
+                    <form method="POST" action="envioSucursal.php">
                         <div class="form-group">
                             <label>ID Producto: </label>
                             <input type="text" class="form-control updateIdProducto" name="envioIdProducto" disabled>
@@ -577,91 +518,22 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                 <label>Nombre Producto: </label>
                                 <input type="text" class="form-control" id="NombreProducto" disabled>
                             </div>
-                            <!-- Stock visto
                             <div class="form-group">
-                                <label>Stock: </label>
-                                
-                                <input class="form-control" name="actualStock" id="actualStock" type="hidden">
-                            </div> -->
-                            <div class="form-group">
-                                <label>Stock a enviar a Sucursal: </label>
+                                <label>Stock a devolver a Bodega: </label>
                                 <input type="text" class="form-control" name="envioStock" id="stock" required>
-                                <input class="form-control" name="actualStock" id="actualStock" type="hidden">
+                                <input class="form-control" name="stockSucursal" id="stockSucursal" type="hidden">
                             </div>
                         </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" onclick="return verificarStockBo();" class="btn btn-success cread">Enviar</button>
+                    <button type="submit" onclick="return verificarStockSu();" class="btn btn-success cread">Enviar</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Modal de Edicion-->
-    <div class="modal fade" id="edicionexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header edi">
-                    <h5 class="modal-title" id="exampleModalLabel">Editar Producto</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="updateInfoBodega.php">
-                        <div class="form-group">
-                            <label>ID Producto: </label>
-                            <input type="text" class="form-control updateIdProducto" name="updateIdProducto" disabled>
-                            <input class="updateIdProducto" name="updateIdProducto" type="hidden">
-                            <div class="form-group">
-                                <label>Nombre Producto: </label>
-                                <input type="text" class="form-control" id="updateNombreProducto" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label>Tipo: </label>
-                                <input type="text" class="form-control" id="updateNombreCategoria" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label>Marca: </label>
-                                <input type="text" class="form-control" id="updateMarca" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label>Stock: </label>
-                                <input type="text" class="form-control" name="updateStock" id="updateStock" required>
-                                <input type="hidden" id="actualStock1" required>
-                            </div>
-                        </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning">Guardar Cambios</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Eliminar-->
-    <div class="modal fade" id="eliminarexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header eli">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Producto</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>¿Estas seguro que quieres eliminar este producto?</label>
-                        <div style="height:16px"></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="eliminarInfoBodega">Eliminar</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
 </body>
 

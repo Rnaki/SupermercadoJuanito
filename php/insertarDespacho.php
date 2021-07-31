@@ -2,11 +2,11 @@
 include("conexion.php");
 $conn=conectar();
 
-$id_sucursal= "1";
-$patente= "HK1273";
+$id_sucursal= "";
+$patente= "";
 $informacion_envio=$_POST["informacion_envio"];
 $fecha_limite=$_POST["fecha_limite"];
-$fecha_entrega=$_POST["fecha_entrega"];
+$fecha_entrega= "";
 $proceso_despacho=$_POST"En proceso";
 
 ///////

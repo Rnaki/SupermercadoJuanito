@@ -1,13 +1,23 @@
-<?php
+<?php   
 
-include("conexion.php");
-$gbd = conectar();
+ session_start();
+ if(isset($_SESSION["rut_persona"])){
 
-//ZONA HORARIA
-date_default_timezone_set('America/Santiago');
-//FECHA ACTUAL
-$fecha_actual = date("Y-m-d");
+    include("conexion.php");
+    $gbd = conectar();
 
+    $sql = "SELECT * FROM pertenece ";
+    $gsent = $gbd->prepare($sql);
+    $gsent->execute();
+    //$cuenta_col = $gsent->columnCount();
+    //$data = $gbd->query($sql)->fetchAll();
+    $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
+
+    //ZONA HORARIA
+    date_default_timezone_set('America/Santiago');
+    //FECHA ACTUAL
+    $fecha_actual = date("Y-m-d");
+ }
 
 
 ?>
@@ -58,14 +68,47 @@ $fecha_actual = date("Y-m-d");
         </section>
         <br>
         <section>
-          <div class="card" style="width: 18rem;">
+          
+          
+
+        <table class="table table-striped table-hover">
+
+        <thead>
+                        <tr>                         
+                            <th>Id producto</th>
+                            <th>Nombre</th>  
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>     
+                            <!--Que productos tiene cada, la cantidad, almacenamiento-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                            foreach ($resultado as $row){
+                            echo '<tr>';
+                            echo  '<td>'.$row["id_producto"].'</td>';
+                            echo  '<td>'.$row["nombre_producto"].'</td>';
+                            echo  '<td>'.$row["cantidad"].'</td>';
+                            echo  '<td>'.$row["precio"].'</td>';
+                            echo "<tr>";
+                            }
+                        ?>  
+                    </tbody>
+                          </table>
+          
+          
+          
+          
+          
+          <!--<div class="card" style="width: 18rem;">
             <img src="../imagenes/huevos.jpg" class="card-img-top" alt="...">
             <div class="card-body">
               <h5 class="card-title">Card title</h5>
               <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
               <a href="#" class="btn btn-primary">Go somewhere</a>
             </div>
-          </div>
+          </div> -->
+
         </section>
       </div>
       
@@ -73,8 +116,10 @@ $fecha_actual = date("Y-m-d");
         <section class="registro">
           <h3><strong>Resumen del pedido</strong></h3>
           <br>
-          <h5>Id del carrito ------</h5>
-          <h5>Subtotal ------</h5>
+          <h5>Id de venta ------ <td><?php echo $row['id_venta'] ?></td> </h5>
+          
+          <h5>Subtotal ------ <td><?php echo $row['124124'] ?></td> </h5>
+          
           <br>
           <h4><strong>Total</strong></h4>
           <br>
