@@ -3,6 +3,9 @@ session_start();
 
 echo $_SESSION["sucursal"];
 
+if(isset($_GET["error"]) && $_GET["error"] == 2){
+	echo "<script>alert('El rut ya se encuentra registrado')</script>";
+}
 
 
 include("conexion.php");
@@ -414,7 +417,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 							<th>Contraseña</th>
 							<th>Correo</th>
 							<th>Telefono</th>
-							<th>Rut trabajador</th>
+							<th>Supervisor</th>
 							<th>Cargo</th>
 							<th>Area de trabajo</th>
 							<th>Foto</th>
@@ -448,8 +451,8 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 								<td><?php echo $row['foto'] ?></td>
 								<td><?php echo $row['estado_persona'] ?></td>
 								<td>
-									<a href="#edicionexampleModal" class="edit" data-bs-toggle="modal" data-bs-target="#edicionexampleModal"><i class="material-icons" data-toggle="tooltip" title="Editar">&#xE254;</i></a>
-									<a href="#eliminarexampleModal" class="delete" data-bs-toggle="modal" data-bs-target="#eliminarexampleModal"><i class="material-icons" data-toggle="tooltip" title="Eliminar">&#xE872;</i></a>
+						<?php	echo "<a onclick='mostrarUpdateTrabajador(\"" . $row['rut_persona'] . "\")' href='#edicionexampleModal' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><i class='material-icons' data-toggle='tooltip' title='Editar'>&#xE254;</i></a> "?>
+						<?php 	echo "<a onclick='mostrarEliminarTrabajador(\"" . $row['rut_persona'] . "\")' href='#eliminarexampleModal' class='delete' data-bs-toggle='modal' data-bs-target='#eliminarexampleModal'><i class='material-icons' data-toggle='tooltip' title='Eliminar'>&#xE872;</i></a>" ?>
 								</td>
 							</tr>
 							<?php //include("modalEditarPersonal.php"); ?>
@@ -533,7 +536,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                 <h5 class="modal-title" id="exampleModalLabel">Añadir Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="insertarPersonal.php" method="POST">
+            <form action="insertarTrabajador.php" method="POST">
                 <div>
                     <label>Rut: </label>
                     <input type="text" class="form-control mb-3 c" required="required" id="rutAgregar" name="rut" placeholder="Rut" maxlength="10">
@@ -572,16 +575,16 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                     <input type="text" class="form-control mb-3 c" required="required" name="Cargo" placeholder="Cargo" maxlength="16">
 					<label>Acceso: </label>
 					<br>
-					<input type="checkbox" id="acceso1" name="cargo1" value="1" >
-					<label for="cargo1"> Recursos Humanos</label><br>
-					<input type="checkbox" id="acceso2" name="cargo2" value="2">
-					<label for="cargo2"> Trabajador Web</label><br>
-					<input type="checkbox" id="acceso3" name="cargo3" value="3">
-					<label for="cargo3"> Bodega</label><br>
-					<input type="checkbox" id="acceso4" name="cargo4" value="4">
-					<label for="cargo4"> Proveedor</label><br>
-					<input type="checkbox" id="acceso5" name="cargo5" value="5">
-					<label for="cargo5">Despacho</label><br>
+					<input type="checkbox" id="RRHH" name="RRHH" value="1" >
+					<label for="RRHH"> Recursos Humanos</label><br>
+					<input type="checkbox" id="Tweb" name="Tweb" value="2">
+					<label for="Tweb"> Trabajador Web</label><br>
+					<input type="checkbox" id="Bodega" name="Bodega" value="3">
+					<label for="Bodega"> Bodega</label><br>
+					<input type="checkbox" id="Proveedor" name="Proveedor" value="4">
+					<label for="Proveedor"> Proveedor</label><br>
+					<input type="checkbox" id="Despacho" name="Despacho" value="5">
+					<label for="Despacho">Despacho</label><br>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary b1" data-bs-dismiss="modal">
@@ -639,48 +642,48 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="updatePersonal.php" method="POST">
-                <input type="hidden" name="rut" value="">
+                <input type="hidden" id="editRut" name="rut" value="">
                 <div class="modal-body">
                     <div class="form-group form">
                         <div class="form-group">
                             <label>Rut: </label>
-                            <input type="text" class="form-control c" name="nombre" required value="" disabled>
+                            <input type="text" class="form-control c" id="editRut2" name="Rut" required value="" disabled>
                         </div>
                         <div class="form-group">
                             <label>Nombre: </label>
-                            <input type="text" class="form-control c" name="nombre" required value="'">
+                            <input type="text" class="form-control c" id="editNombre" name="nombre" required value="'">
                         </div>
                         <div class="form-group">
                             <label>Apellido Paterno: </label>
-                            <input type="text" class="form-control c" name="apellidoP" required value="">
+                            <input type="text" class="form-control c" id="editApellidoP" name="apellidoP" required value="">
                         </div>
                         <div class="form-group">
                             <label>Apellido Materno: </label>
-                            <input type="text" class="form-control c" name="apellidoM" required value="">
+                            <input type="text" class="form-control c" id="editApellidoM" name="apellidoM" required value="">
                         </div>
                         <div class="form-group">
                             <label>Region: </label>
-                            <input type="text" class="form-control c" name="region" required value="" maxlength="32">
+                            <input type="text" class="form-control c" id="editRegion" name="region" required value="" maxlength="32">
                         </div>
                         <div class="form-group">
                             <label>Comuna: </label>
-                            <input type="text" class="form-control c" name="comuna" required value="" maxlength="32">
+                            <input type="text" class="form-control c" id="editComuna" name="comuna" required value="" maxlength="32">
                         </div>
                         <div class="form-group">
                             <label>Calle: </label>
-                            <input type="text" class="form-control c" name="calle" required value="" maxlength="32">
+                            <input type="text" class="form-control c" id="editCalle" name="calle" required value="" maxlength="32">
                         </div>
                         <div class="form-group">
                             <label>Nª Calle: </label>
-                            <input type="text" class="form-control c" name="ncalle" required value="" maxlength="32">
+                            <input type="text" class="form-control c" id="editNCalle" name="ncalle" required value="" maxlength="32">
                         </div>
                         <div class="form-group">
                             <label>Fecha Nacimiento: </label>
-                            <input type="text" class="form-control c" name="fechaNacimiento" required value="">
+                            <input type="text" class="form-control c" id="editFechaNacimiento" name="fechaNacimiento" required value="">
                         </div>
                         <label>Sexo: </label>
                         <br>
-                        <select class="form-select" name="sexo" id="sexoupdate">
+                        <select class="form-select" id="editSexo" name="sexo" id="sexoupdate">
                             <option value="Hombre" id="Hombre">Hombre</option>
                             <option value="Mujer" id="Mujer">Mujer</option>
                             <option value="Otros" id="Otros">Otros</option>
@@ -688,18 +691,18 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                         <br>
                         <div class="form-group">
                             <label>Contraseña: </label>
-                            <input type="text" class="form-control c" name="Contraseña" required value="">
+                            <input type="text" class="form-control c" id="editContraseña" name="Contraseña" required value="">
                         </div>
                         <div class="form-group">
                             <label>Correo: </label>
-                            <input type="text" class="form-control c" name="Correo" required value="">
+                            <input type="text" class="form-control c" id="editCorreo" name="Correo" required value="">
                         </div>
                         <div class="form-group">
                             <label>Teléfono: </label>
-                            <input type="text" class="form-control c" name="Telefono" required value="">
+                            <input type="text" class="form-control c" id="editTelefono" name="Telefono" required value="">
                         </div>
 						<label>Cargo: </label>
-                    <input type="text" class="form-control mb-3 c" required="required" name="Cargo" placeholder="Cargo" maxlength="16">
+                    <input type="text" class="form-control mb-3 c" required="required" id="editCargo" name="Cargo" placeholder="Cargo" maxlength="16">
 					<label>Acceso: </label>
 					<br>
 					<input type="checkbox" id="accesoEdit1" name="cargo1" value="1" >

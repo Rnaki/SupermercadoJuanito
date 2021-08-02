@@ -281,6 +281,18 @@ table.table-striped.table-hover tbody a{
 				<a class="link-options link-light" href="/php/lobby.php">TIENDA</a>
 				</div>
 			</div>
+		</div>
+		<div class="row" style="height: 100px;">
+		<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+			<div class="inline alinear-central">
+			<a class="link-options link-light" href="sucursalGerente.php">SUCURSALES</a>
+			</div>
+		</div>
+		<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+			<div class="inline alinear-central">
+			<a class="link-options link-light" href="bodegaGerente.php">BODEGA</a>
+			</div>
+		</div>
 		</div>';
 		}elseif ($esGerente == 0){
 			
@@ -295,10 +307,11 @@ table.table-striped.table-hover tbody a{
 				</div>';
 
 				;
-			}
-				if ($i == 0 || $i == 2 || $i == 4){
+			
+				if ($i == 1 || $i == 3 || $i == 5){
 					echo '</div>';
 				}	
+			}
 		}
 
 		?>

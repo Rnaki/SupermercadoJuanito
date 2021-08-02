@@ -502,3 +502,235 @@ function verificarMaxStockIn(){
          }) 
       } );
    }
+
+function mostrarUpdateTrabajador(rut_trabajador){
+   cadena= {
+      "rut_trabajador": rut_trabajador,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarUpdateTrabajador.php",
+      data: cadena,
+      success:function(info){
+          datos = JSON.parse(info)
+          $('#editRut').val(datos[0])
+          $('#editRut2').val(datos[0]);
+          $('#editNombre').val(datos[1]);
+          $('#editApellidoP').val(datos[2]);
+          $('#editApellidoM').val(datos[3]);
+          $('#editRegion').val(datos[8]);
+          $('#editComuna').val(datos[9])
+          $('#editCalle').val(datos[10]);
+          $('#editNCalle').val(datos[11]);
+          $('#editFechaNacimiento').val(datos[4]);
+          $('#editSexo option[id="'+datos[5]+'"]').attr("selected", true);
+          $('#editSexo').val(datos[5]);
+          $('#editContraseña').val(datos[12]);
+          $('#editCorreo').val(datos[6])
+          $('#editTelefono').val(datos[7]);
+          $('#editCargo').val(datos[13]);
+
+
+      }
+  }) 
+}
+
+
+function mostrarUpdateSucursal(id_sucursal){
+   console.log(id_sucursal);
+   cadena= {
+      "id_sucursal": id_sucursal,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarUpdateSucursal.php",
+      data: cadena,
+      success:function(info){
+         datos = JSON.parse(info)
+         $('#updateIdSucursal').val(datos[0])
+         $('#updateIdBodega').val(datos[1]);
+         $('#updateRegionSucursal').val(datos[2]);
+         $('#updateComunaSucursal').val(datos[3]);
+         $('#updateCalleSucursal').val(datos[4]);
+         $('#updateNumeroCalleSucursal').val(datos[5]);
+         $('#updateFonoSucursal').val(datos[6]);
+         $('#updateNombreSucursal').val(datos[7]);
+         $('#updateCantidadTrabajadores').val(datos[8]);
+         console.log(datos[0]);
+      }
+   }) 
+}
+
+function eliminarSucursal(id_sucursal){
+   $('#eliminarexampleModal').modal('show');
+   cadena= {
+      "id_sucursal": id_sucursal,
+      };
+   $('#eliminarSucursal').click(function() {
+      $.ajax({
+         type: "POST",
+         url: "eliminarSucursal.php",
+         data: cadena,
+         success:function(){
+            location.reload();
+            $('#eliminarexampleModal').modal('hide');
+         }
+      }) 
+   } );
+}
+
+function mostrarUpdateBodega(id_bodega){
+
+   console.log(id_bodega);
+   cadena= {
+      "id_bodega": id_bodega,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarUpdateBodega.php",
+      data: cadena,
+      success:function(info){
+         datos = JSON.parse(info)
+         $('#updateIdBodega').val(datos[0])
+         $('#updateAlmacenamiento').val(datos[1]);
+         $('#updateRegionBodega').val(datos[2]);
+         $('#updateComunaBodega').val(datos[3]);
+         $('#updateCalleBodega').val(datos[4]);
+         $('#updateNumeroCalleBodega').val(datos[5]);
+         console.log(datos[0]);
+      }
+   }) 
+}
+
+
+function eliminarBodega(id_bodega){
+   $('#eliminarexampleModal').modal('show');
+   cadena= {
+      "id_bodega": id_bodega,
+      };
+   $('#eliminarBodega').click(function() {
+      $.ajax({
+         type: "POST",
+         url: "eliminarBodega.php",
+         data: cadena,
+         success:function(){
+            location.reload();
+            $('#eliminarexampleModal').modal('hide');
+         }
+      }) 
+   } );
+}
+
+function verificarStockSu(){
+   var n1 = Number(document.getElementById('envioStockSucursal').value);
+   var n2 = Number(document.getElementById('stock').value);
+   n1 = n1 - n2;
+   if (n1 < 0){
+      $('#actualStock1').addClass('rojoError');
+      alert("Stocks insuficientes");
+      return false;
+      }
+   else {
+      $('#actualStock1').removeClass('rojoError');
+      $('#actualStock1').addClass('verdeSuccess');
+      return true;
+   }
+}
+
+function verificarStockBo(){
+   var n1 = Number(document.getElementById('actualStock').value);
+   var n2 = Number(document.getElementById('stock').value);
+    n1 = n1 - n2;
+   if (n1 < 0){
+      $('#actualStock1').addClass('rojoError');
+      alert("Stocks insuficientes");
+      return false;
+      }
+   else {
+      $('#actualStock1').removeClass('rojoError');
+      $('#actualStock1').addClass('verdeSuccess');
+      return true;
+   }
+}
+
+function mostrarEnvioSucursal(idProducto,idSucursal){
+   cadena= {
+      "idProducto": idProducto,
+      "idSucursal": idSucursal,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarEnvioSucursal.php",
+      data: cadena,
+      success:function(info){
+          datos = JSON.parse(info)
+          $('.envioIdProducto').val(datos[0])
+          $('#envioNombreProducto').val(datos[1]);
+          $('#envioStockSucursal').val(datos[2]);
+          console.log(datos[0]);//importante print
+          console.log(datos[1]);
+          console.log(datos[2]);
+      }
+  }) 
+}
+
+function devolverProveedor(rutProveedor){
+
+   $('#devolverProveeEmployeeModal').modal('show');
+
+   cadena= {
+      "rutProveedor": rutProveedor,
+      };
+   $('#devolProveedor').click(function() {
+      $.ajax({
+         type: "POST",
+         url: "devolverProveedor.php",
+         data: cadena,
+         success:function(){
+            location.reload();
+            $('#devolverProveeEmployeeModal').modal('hide');
+         }
+      }) 
+   } );
+
+}
+
+function mostrarUpdateTransporte(patente){
+
+   cadena= {
+      "patente": patente,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarUpdateTransporte.php",
+      data: cadena,
+      success:function(info){
+          datos = JSON.parse(info)
+          $('.updatePatente').val(datos[0])
+          $('#updateTipoTransporte').val(datos[1]);
+          $('#updateIdSucursal').val(datos[2]);
+          console.log(datos[0]);//importante print
+          console.log(datos[1]);
+          console.log(datos[2]);
+      }
+  }) 
+}
+
+function eliminarTransporte(patente){
+
+   $('#eliminarexampleModal').modal('show');
+   cadena= {
+      "patente": patente,
+      };
+   $('#eliminarTransporte').click(function() {
+      $.ajax({
+         type: "POST",
+         url: "eliminarTransporte.php",
+         data: cadena,
+         success:function(){
+            location.reload();
+            $('#eliminarexampleModal').modal('hide');
+         }
+      }) 
+   } );
+}

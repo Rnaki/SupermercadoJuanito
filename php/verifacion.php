@@ -30,7 +30,7 @@ foreach ($data2 as $row2){
 
 // CASO 1: Solo cliente//
 
-if ($contador == 1){
+if ($cuenta_col == 1 && $contador <= 1){
     Header("Location: lobby.php");
     session_start();
     $_SESSION["rut_persona"] = $rut;

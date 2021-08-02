@@ -85,14 +85,14 @@ if(isset($_GET["idCategoria"])){
   </style>
 
   <script>
-    function incrementar() {
-    valor = document.getElementById("cantidad");
+    function incrementar(n) {
+    valor = document.getElementById("cantidad"+n);
     if (valor.value < 10)valor.value ++;
     return false;
     }
  
-    function decrementar() {
-    valor = document.getElementById("cantidad");
+    function decrementar(n) {
+    valor = document.getElementById("cantidad"+n);
     if (valor.value > 01)valor.value --;
     return false;
     }
@@ -168,7 +168,9 @@ if(isset($_GET["idCategoria"])){
 
           <div class="row">
           <?php
+          $n = 0;
                   foreach ($data2 as $row) {
+
                       ?>
             <div class="col-lg-4 col-md-6 mb-4">
               <div class="card h-100 w-500">
@@ -189,13 +191,14 @@ if(isset($_GET["idCategoria"])){
                 echo "<div class=' gap-2'>";
 
                 
-                echo "<button class='btn btn-dark-l' onclick='return decrementar()'>-</button>";
-                echo "<input class='num' type='text' value='1' id='cantidad' name='cantidad' disabled>";
-                echo "<button class='btn btn-dark-l' onclick='return incrementar()'>+</button>";
+                echo "<button class='btn btn-dark-l' onclick='return decrementar(".$n.")'>-</button>";
+                echo "<input class='num' type='text' value='1' id='cantidad".$n."' name='cantidad' disabled>";
+                echo "<button class='btn btn-dark-l' onclick='return incrementar(".$n.")'>+</button>";
 
                 echo "<button class='btn btn-dark' type='submit' id=".$row["id_producto"].">Agregar al carrito</button>";
                 echo "</div>";
                 echo "</form>";
+                $n++;
               ?>
                   <small class="text-muted">&#9733; &#9733; &#9733; &#9733; &#9734;</small>
                 </div>

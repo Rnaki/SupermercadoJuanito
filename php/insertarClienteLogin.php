@@ -40,6 +40,9 @@ $sql2="SELECT insertarcliente('".$rut."','".$nombre."','".$apellidoP."','".$apel
 //del $con quiero sacar el $sql para que sea un $query
 echo $conn->exec($sql2);
 
+$sql3 = "INSERT INTO controla (rut_persona, id_acceso) values ('".$rut."', 6)";
+echo $conn->exec($sql3);
+
 if($conn){
     Header("Location: ../index.php");
 }else{
