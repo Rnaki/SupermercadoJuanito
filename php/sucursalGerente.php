@@ -490,19 +490,22 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                         <div class="form-group">
                             <label>ID Sucursal: </label>
                             <input type="text" id="updateIdSucursal" class="form-control" disabled>
-                            <input class="updateIdSucursal" name="updateIdSucursal" type="hidden">
+                            <input id="updateIdSucursal2" name="updateIdSucursal2" type="hidden">
                             <div class="form-group">
                                 <label>ID Bodega: </label>
                                 <input name="updateIdBodega" type="text" id="updateIdBodega" class="form-control" disabled>
-                                <!--<input name="idUpdateSucursal" type="hidden" id="idUpdateSucursal" value="">-->
+                                <input name="updateIdBodega2" type="hidden" id="updateIdBodega2" >
                             </div>
                             <div class="form-group">
                                 <label>Región: </label>
                                 <input name="updateRegionSucursal" type="text" id="updateRegionSucursal" class="form-control" disabled>
+                                <input name="updateRegionSucursal2" type="hidden" id="updateRegionSucursal2" class="form-control" >
+
                             </div>
                             <div class="form-group">
                                 <label>Comuna: </label>
                                 <input name="updateComunaSucursal" type="text" id="updateComunaSucursal" class="form-control" disabled>
+                                <input name="updateComunaSucursal2" type="hidden" id="updateComunaSucursal2" class="form-control">
                             </div>
                             <div class="form-group">
                                 <label>Calle: </label>

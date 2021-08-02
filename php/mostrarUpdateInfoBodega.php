@@ -3,13 +3,14 @@
 include("conexion.php");
 $gbd = conectar();
 $idProducto = $_POST['idProducto'];
+$idBodega = $_POST['idBodega'];
 
 try {
     $sql = "SELECT contiene.id_producto, producto.nombre_producto, categoria.id_categoria, marca, categoria.nombre_categoria, stock, incluye.stock_sucursal FROM contiene 
                 JOIN producto ON producto.id_producto = contiene.id_producto
                 JOIN categoria ON categoria.id_categoria = producto.id_categoria
                 JOIN incluye ON incluye.id_producto  = contiene.id_producto
-        WHERE contiene.id_producto = '" . $idProducto . "';";
+        WHERE contiene.id_producto = '$idProducto' and id_bodega = '$idBodega';";
     $gsent = $gbd->prepare($sql);
     $gsent->execute();
     $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);

@@ -4,6 +4,7 @@ $conn=conectar();
 
 $updateIdProducto=$_POST["updateIdProducto"];
 $updateStock=$_POST["updateStock"];
+$updateidBodega=$_POST["updateIdBodega"];
 
 
 /*$sql="UPDATE cliente SET rut='$rut', nombre='$nombre', apellidoP='$apellidoP',
@@ -16,7 +17,7 @@ $updateStock=$_POST["updateStock"];
                          Teléfono='$Telefono'
  WHERE rut='$rut'";
  */
-$sql = "SELECT updateInfoBodega('".$updateIdProducto."', '$updateStock')";
+$sql = "SELECT updateInfoBodega('".$updateIdProducto."', '$updateStock','".$updateidBodega."')";
 echo $conn->exec($sql);
 
 if($conn){

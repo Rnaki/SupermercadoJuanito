@@ -3,7 +3,7 @@ include("conexion.php");
 $conn=conectar();
 
 $rutProovedor=$_POST["rutProovedor"];
-$rutPersona="11111111-1";
+$rutPersona=$_POST["rutPersona"];
 $nombreProveedor=$_POST["nombreProveedor"];
 $tipoProveedor=$_POST["tipoProveedor"];
 $marcaProveedor=$_POST["marcaProveedor"];
@@ -24,7 +24,7 @@ if(isset($columnas) == 1){
 }
 
 //en $sql se guarda el insert
-$sql="SELECT insertarProveedor('$rutProovedor','$rutPersona','$nombreProveedor','$tipoProveedor','$marcaProveedor', '$fonoProveedor')";
+$sql="SELECT insertarProveedor('$rutProovedor','$rutPersona', '$fonoProveedor','$marcaProveedor','$tipoProveedor','$nombreProveedor')";
 //del $con quiero sacar el $sql para que sea un $query
 echo $conn->exec($sql);
 

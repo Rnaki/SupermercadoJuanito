@@ -548,9 +548,13 @@ function mostrarUpdateSucursal(id_sucursal){
       success:function(info){
          datos = JSON.parse(info)
          $('#updateIdSucursal').val(datos[0])
+         $('#updateIdSucursal2').val(datos[0])
          $('#updateIdBodega').val(datos[1]);
+         $('#updateIdBodega2').val(datos[1]);
          $('#updateRegionSucursal').val(datos[2]);
+         $('#updateRegionSucursal2').val(datos[2]);
          $('#updateComunaSucursal').val(datos[3]);
+         $('#updateComunaSucursal2').val(datos[3]);
          $('#updateCalleSucursal').val(datos[4]);
          $('#updateNumeroCalleSucursal').val(datos[5]);
          $('#updateFonoSucursal').val(datos[6]);
@@ -591,10 +595,13 @@ function mostrarUpdateBodega(id_bodega){
       data: cadena,
       success:function(info){
          datos = JSON.parse(info)
-         $('#updateIdBodega').val(datos[0])
+         $('#updateIdBodega').val(datos[0]);
+         $('#updateIdBodega2').val(datos[0])
          $('#updateAlmacenamiento').val(datos[1]);
          $('#updateRegionBodega').val(datos[2]);
+         $('#updateRegionBodega2').val(datos[2]);
          $('#updateComunaBodega').val(datos[3]);
+         $('#updateComunaBodega2').val(datos[3]);
          $('#updateCalleBodega').val(datos[4]);
          $('#updateNumeroCalleBodega').val(datos[5]);
          console.log(datos[0]);

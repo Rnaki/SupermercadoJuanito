@@ -2,10 +2,10 @@
 include("conexion.php");
 $conn=conectar();
 
- $updateIdSucursal=$_POST["updateIdSucursal"];
- $updateIdBodega=$_POST["updateIdBodega"];
- $updateRegionSucursal=$_POST["updateRegionSucursal"];
- $updateComunaSucursal=$_POST["updateComunaSucursal"];
+ $updateIdSucursal=$_POST["updateIdSucursal2"];
+ $updateIdBodega=$_POST["updateIdBodega2"];
+ $updateRegionSucursal=$_POST["updateRegionSucursal2"];
+ $updateComunaSucursal=$_POST["updateComunaSucursal2"];
  $updateCalleSucursal=$_POST["updateCalleSucursal"];
  $updateNumeroCalleSucursal=$_POST["updateNumeroCalleSucursal"];
  $updateFonoSucursal=$_POST["updateFonoSucursal"];

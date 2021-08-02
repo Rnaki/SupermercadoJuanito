@@ -290,7 +290,7 @@ table.table-striped.table-hover tbody a{
 		</div>
 		<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 			<div class="inline alinear-central">
-			<a class="link-options link-light" href="bodegaGerente.php">BODEGA</a>
+			<a class="link-options link-light" href="bodegaGerente.php">MENU BODEGA</a>
 			</div>
 		</div>
 		</div>';

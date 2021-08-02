@@ -1,4 +1,6 @@
 <?php
+session_start();
+$_SESSION["sucursal"];
 
 include("conexion.php");
 $gbd = conectar();
@@ -7,36 +9,19 @@ if (isset($_GET["error"])) {
     $error = $_GET["error"];
     echo '<script>alert("El producto ya existe en bodega")</script>';
 }
-/*
-if (isset($_POST["rutBuscar"])) {
-	$rutBuscar = $_POST["rutBuscar"];
-	$sql = "SELECT * from cliente where rut like '$rutBuscar%'";
-} else if (isset($_POST["apellidoPBuscar"])) {
-	$apellidoPBuscar = $_POST["apellidoPBuscar"];
-	if ($_POST["apellidoPBuscar"] == "") {
-		$sql = "SELECT * FROM cliente";
-	} else {
-		$sql = "SELECT * from cliente where apellidoP = '$apellidoPBuscar'";
-	}
-} else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
-	$desde = $_POST["desde"];
-	$hasta = $_POST["hasta"];
-	$sql = "SELECT * from cliente where fechaNacimiento Between '$desde' and '$hasta'";
-} else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["desde"] == "" || $_POST["hasta"] == "") {
-	$sql = "SELECT * FROM cliente";
+
+$sql1 = "SELECT id_bodega FROM sucursal WHERE id_sucursal = '".$_SESSION["sucursal"]."';";
+//$data = $conn->query($sql)->fetchAll();
+$gsent1 = $gbd->prepare($sql1);
+$gsent1->execute();
+$resultado1 = $gsent1->fetchAll(PDO::FETCH_ASSOC);
+foreach ($resultado1 as $row1){
+    $idBodega = $row1["id_bodega"];
+    //var_dump($idBodega); es imprimir
 }
 
-if(isset($_GET["error"])){
-	$tipoError = $_GET["error"];
-	if($tipoError ==2){
-		echo "<script>
-				alert('Rut ya existente');
-			</script>";
-	} 
-}
-*/
 //$sql = "SELECT my_function();";
-$sql = "SELECT * FROM bodega WHERE id_bodega = '1';";
+$sql = "SELECT * FROM bodega WHERE id_bodega = '".$idBodega."';";
 //$data = $conn->query($sql)->fetchAll();
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
@@ -50,7 +35,7 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
 		JOIN categoria ON producto.id_categoria = categoria.id_categoria
         JOIN contiene ON producto.id_producto = contiene.id_producto
-		where estado_producto = true;";
+		where estado_producto = true and contiene.id_bodega = '".$idBodega."';";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
@@ -58,19 +43,19 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
     $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
             JOIN categoria ON producto.id_categoria = categoria.id_categoria
             JOIN contiene ON producto.id_producto = contiene.id_producto
-            where estado_producto = true and producto.id_producto = '$idBuscar';";
+            where estado_producto = true and producto.id_producto = '$idBuscar' and contiene.id_bodega = '".$idBodega."';";
 } else if (isset($_POST["nombreBuscar"])) {
     $nombreBuscar = $_POST["nombreBuscar"];
     if ($_POST["nombreBuscar"] == "") {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true;";
+                where estado_producto = true and contiene.id_bodega = '".$idBodega."';";
     } else {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%');";
+                where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%') and contiene.id_bodega = '".$idBodega."';";
     }
 } else if (isset($_POST["nombreCategoria"]) && isset($_POST["marca"]) && $_POST["nombreCategoria"] !== " " && $_POST["marca"] !== " ") {
     $idCategoria = $_POST["nombreCategoria"];
@@ -79,17 +64,17 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and categoria.id_categoria = '$idCategoria';";
+                where estado_producto = true and categoria.id_categoria = '$idCategoria' and contiene.id_bodega = '".$idBodega."';";
     } else if ($_POST["nombreCategoria"] == "Seleccione..." && $_POST["marca"] != "Seleccione...") {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and marca = '$marca';";
+                where estado_producto = true and marca = '$marca' and contiene.id_bodega = '".$idBodega."';";
     } else if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] != "Seleccione...") {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca';";
+                where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca' and contiene.id_bodega = '".$idBodega."';";
     }
 }
 
@@ -97,7 +82,7 @@ $gsent3 = $gbd->prepare($sql3);
 $gsent3->execute();
 $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 
-$sql4 = "SELECT sum(stock) FROM contiene;";
+$sql4 = "SELECT sum(stock) FROM contiene where id_bodega = '".$idBodega."';";
 //$data = $conn->query($sql)->fetchAll();
 $gsent4 = $gbd->prepare($sql4);
 $gsent4->execute();
@@ -483,12 +468,12 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                             echo  '<td>' . $row3["marca"] . '</td>';
                             echo  '<td>' . $row3["tstock"] . '</td>';
                             echo "<td>
-                            <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row3['id_producto'] . "\")' class='envio' data-bs-toggle='modal' data-bs-target='#envioEmployeeModal' data-backdrop='static' data-keyboard='false' ><svg 
+                            <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row3['id_producto'] . "\",\"" . $row3['id_bodega'] . "\")' class='envio' data-bs-toggle='modal' data-bs-target='#envioEmployeeModal' data-backdrop='static' data-keyboard='false' ><svg 
                                     xmlns='http://www.w3.org/2000/svg' width='17' height='17' fill='currentColor' 
                                     class='bi bi-check-circle-fill' viewBox='0 0 16 16'>
                                     <path d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z'/>
                                 </svg></a>
-                                <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row3['id_producto'] . "\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal' data-backdrop='static' data-keyboard='false' ><svg
+                                <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row3['id_producto'] . "\",\"" . $row3['id_bodega'] . "\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal' data-backdrop='static' data-keyboard='false' ><svg
                                     xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
                                     class='bi bi-pencil-fill' viewBox='0 0 16 16'>
                                     <path
@@ -543,10 +528,15 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                 }
                                 ?>
                             </select>
-                            <br>
                             <div class="form-group">
                                 <label>Stock: </label>
                                 <input type="text" class="form-control" name="stock" id="ingresarStock" required>
+                                <?php
+                                foreach ($resultado1 as $row1) {
+                                    echo '<input type="hidden" name="idBodega" class="form-control" value="'.$row1["id_bodega"].'">';
+                                }
+                                ?>
+                                <br>
                             </div>
                         </div>
                     </div>
@@ -587,6 +577,11 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                 <label>Stock a enviar a Sucursal: </label>
                                 <input type="text" class="form-control" name="envioStock" id="stock" required>
                                 <input class="form-control" name="actualStock" id="actualStock" type="hidden">
+                                <?php
+                                foreach ($resultado1 as $row1) {
+                                    echo '<input type="hidden" name="envioIdBodega" class="form-control" value="'.$row1["id_bodega"].'">';
+                                }
+                                ?>
                             </div>
                         </div>
                 </div>
@@ -629,6 +624,11 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                 <label>Stock: </label>
                                 <input type="text" class="form-control" name="updateStock" id="updateStock" required>
                                 <input type="hidden" id="actualStock1" required>
+                                <?php
+                                foreach ($resultado1 as $row1) {
+                                    echo '<input type="hidden" name="updateIdBodega" class="form-control" value="'.$row1["id_bodega"].'">';
+                                }
+                                ?>
                             </div>
                         </div>
                 </div>

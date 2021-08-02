@@ -1,40 +1,55 @@
 <?php
 
+session_start();
+$_SESSION["rut_persona"];
+
 include("conexion.php");
 $gbd = conectar();
-/*
-if (isset($_POST["rutBuscar"])) {
-	$rutBuscar = $_POST["rutBuscar"];
-	$sql = "SELECT * from cliente where rut like '$rutBuscar%'";
-} else if (isset($_POST["apellidoPBuscar"])) {
-	$apellidoPBuscar = $_POST["apellidoPBuscar"];
-	if ($_POST["apellidoPBuscar"] == "") {
-		$sql = "SELECT * FROM cliente";
-	} else {
-		$sql = "SELECT * from cliente where apellidoP = '$apellidoPBuscar'";
-	}
-} else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
-	$desde = $_POST["desde"];
-	$hasta = $_POST["hasta"];
-	$sql = "SELECT * from cliente where fechaNacimiento Between '$desde' and '$hasta'";
-} else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["desde"] == "" || $_POST["hasta"] == "") {
-	$sql = "SELECT * FROM cliente";
+
+//$sql = "SELECT my_function();";
+$sql = "SELECT * FROM proveedor where estado_proveedor = true;";
+
+//BUSCADOR
+if (isset($_POST["rutBuscar"]) && ($_POST["rutBuscar"] != '')) {
+    $rutBuscar = $_POST["rutBuscar"];
+    $sql = "SELECT * FROM proveedor where estado_proveedor = true and rut_proveedor like '$rutBuscar%';";
+} else if (isset($_POST["nombreBuscar"])) {
+    $nombreBuscar = $_POST["nombreBuscar"];
+    if ($_POST["nombreBuscar"] == "") {
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true;";
+    } else {
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true and upper(nombre_proveedor) like upper('%$nombreBuscar%');";
+    }
+} else if (isset($_POST["tipo"]) && isset($_POST["marca"]) && $_POST["tipo"] !== " " && $_POST["marca"] !== " ") {
+    $tipo = $_POST["tipo"];
+    $marca = $_POST["marca"];
+    if ($_POST["tipo"] != "Seleccione..." && $_POST["marca"] == "Seleccione...") {
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true and tipo_proveedor = '$tipo';";
+    } else if ($_POST["tipo"] == "Seleccione..." && $_POST["marca"] != "Seleccione...") {
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true and marca_proveedor = '$marca';";
+    } else if ($_POST["tipo"] != "Seleccione..." && $_POST["marca"] != "Seleccione...") {
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true and tipo_proveedor = '$tipo' and marca_proveedor = '$marca';";
+    }
 }
 
-if(isset($_GET["error"])){
-	$tipoError = $_GET["error"];
-	if($tipoError ==2){
-		echo "<script>
-				alert('Rut ya existente');
-			</script>";
-	} 
-}
-*/
-//$sql = "SELECT my_function();";
-$sql = "SELECT * FROM proveedor where estado_proveedor = true";
 //$data = $conn->query($sql)->fetchAll();
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
+
+$sql2 = "SELECT distinct marca_proveedor FROM proveedor WHERE estado_proveedor = true order by marca_proveedor;";
+$gsent2 = $gbd->prepare($sql2);
+$gsent2->execute();
+$resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
+
+$sql3 = "SELECT distinct tipo_proveedor FROM proveedor WHERE estado_proveedor = true order by tipo_proveedor;";
+$gsent3 = $gbd->prepare($sql3);
+$gsent3->execute();
+$resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
+
+$sql4 = "SELECT rut_persona FROM trabajador where rut_persona = '".$_SESSION["rut_persona"]."';";
+$gsent4 = $gbd->prepare($sql4);
+$gsent4->execute();
+$resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
 
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
@@ -72,9 +87,9 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             font-family: 'Varela Round', sans-serif;
         }
 
-        div .col-sm-6 .b1{
-            margin-left: 67%;
-        }
+        div .primero .col {
+			text-align: right;
+		}
 
         /*Cambio*/
         div .primero {
@@ -137,42 +152,24 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             <a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
             <h2 class="letrah2">INFORMACIÓN DE PROVEEDORES</h2>
             <div class="dropdown">
-
                 <button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
-
                     <div class="row juan">
-
                         <div class="col-md-3 text-center">
-
                             <img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
-
                         </div>
-
                         <div class="col-md-8 text-start">
-
                             <div class="card-body">
-
                                 <h5 class="card-title">Juan Perez</h5>
-
                                 <p class="card-text">Gerente General</p>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </button>
                 <div class="dropdown-menu" aria-labelledby="bd-version">
-
                     <li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
-
                     <div class="dropdown-divider"></div>
-
                     <li><a class="dropdown-item" aria-current="true" href="../index.php">Cerrar sesión</a></li>
-
                 </div>
-
             </div>
         </nav>
     </header>
@@ -193,6 +190,9 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                     <path
                                         d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
                                 </svg> Añadir Proveedor</a>
+                                <a class="btn btn-danger" href="proveedoresEliminados.php"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+									<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
+								</svg></a>
                         </div>
                     </div>
 
@@ -216,14 +216,14 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="proveedor.php" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="rutBuscar" placeholder="RUT" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
-													<input class="form-control me-3" type="search" name="nombrePBuscar" placeholder="Nombre" aria-label="Search">
+												<form action="proveedor.php" method="POST" class="d-flex">
+													<input class="form-control me-3" type="search" name="nombreBuscar" placeholder="Nombre" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
@@ -233,15 +233,28 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 												<label> Tipo: </label>
 											</div>
 											<div class="col-sm-4">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
-													<input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
-
+												<form action="proveedor.php" method="POST" class="d-flex">
+                                                <select class="form-select" name="tipo" id="tipo" required>
+                                                        <option selected>Seleccione...</option>
+                                                        <?php
+                                                        foreach ($resultado3 as $row3) {
+                                                            echo "<option id=" . $row3["rut_proveedor"] . " value=" . $row3['tipo_proveedor'] . ">" . $row3["tipo_proveedor"] . "</option>";
+                                                        }
+                                                        ?>
+                                                    </select>
 											</div>
 											<div class="col-sm-1 buscar">
 												<label> Marca: </label>
 											</div>
 											<div class="col-sm-4">
-												<input class="form-control me-2" type="date" name="hasta" placeholder="Fecha" aria-label="Search">
+                                            <select class="form-select" name="marca" id="marca" required>
+                                                        <option selected>Seleccione...</option>
+                                                        <?php
+                                                        foreach ($resultado2 as $row2) {
+                                                            echo "<option id=" . $row2["rut_proveedor"] . " value=" . $row2['marca_proveedor'] . ">" . $row2["marca_proveedor"] . "</option>";
+                                                        }
+                                                        ?>
+                                                    </select>
 											</div>
 											<div class="col-sm-1 colb">
 												<button class="btn btn-success" type="submit">Buscar</button>
@@ -297,7 +310,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                 </svg></a>
 
                             </td>";
-                            echo "<tr>";
+                            echo "</tr>";
                             }
                         ?>
                     </tbody>
@@ -323,7 +336,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header cread">
+             <div class="modal-header cread">
                     <h5 class="modal-title" id="exampleModalLabel">Añadir Proveedor</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -331,10 +344,15 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                     <div class="modal-body">
                         <div class="form-group ">
                             <label>RUT: </label>
-                            <input name="rutProovedor" type="text" class="form-control" required>
+                            <input name="rutProovedor" id="rutAgregar" type="text" class="form-control" required>
                             <div class="form-group">
                                 <label>Nombre: </label>
                                 <input name="nombreProveedor" type="text" class="form-control" required>
+                                <?php
+                                foreach ($resultado4 as $row4) {
+                                    echo '<input type="hidden" name="rutPersona" class="form-control" value="'.$row4["rut_persona"].'">';
+                                }
+                                ?>
                             </div>
                             <div class="form-group">
                                 <label>Tipo: </label>
@@ -352,7 +370,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-success cread">Crear</button>
+                        <button type="submit" onclick="return validarRut();" class="btn btn-success cread">Crear</button>
                     </div>
                 </form>
             </div>
@@ -425,4 +443,5 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
 </body>
+
 </html>

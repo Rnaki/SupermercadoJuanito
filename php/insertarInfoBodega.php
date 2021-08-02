@@ -3,9 +3,17 @@ include("conexion.php");
 $conn=conectar();
 
 $idProducto=$_POST["id_producto"];
-$idBodega="1";
+$idBodega=$_POST["idBodega"];
 $stock=$_POST["stock"];
-$idSucursal="1";
+
+$sql0 = "SELECT id_sucursal FROM sucursal WHERE id_bodega = '".$idBodega."';";
+
+$conn->exec($sql0);
+$data = $conn->query($sql0)->fetchAll();
+foreach ($data as $row){
+    $idSucursal = $row["id_sucursal"];
+}
+
 /*
 //$idCategoria="67";
 $sql0 = "SELECT id_producto FROM producto WHERE nombre_producto = '".$nombreProducto."'; ";
@@ -17,7 +25,7 @@ foreach ($data as $row){
     var_dump($idProducto);
 }*/
 
-$sql="SELECT id_producto from contiene where id_producto = '".$idProducto."'";
+$sql="SELECT id_producto from contiene where id_producto = '$idProducto' and id_bodega = '".$idBodega."';";
 $conn->exec($sql);
 $data = $conn->query($sql)->fetchAll();
 foreach ($data as $row){

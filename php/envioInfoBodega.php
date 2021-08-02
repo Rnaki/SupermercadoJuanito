@@ -4,7 +4,7 @@ $conn=conectar();
 
 $envioIdProducto=$_POST["envioIdProducto"];
 $envioStock=$_POST["envioStock"];
-
+$envioIdBodega=$_POST["envioIdBodega"];
 
 /*$sql="UPDATE cliente SET rut='$rut', nombre='$nombre', apellidoP='$apellidoP',
                          apellidoM='$apellidoM', region='$region',
@@ -17,7 +17,7 @@ $envioStock=$_POST["envioStock"];
  WHERE rut='$rut'";
  */
 
-$sql0 = "SELECT stock FROM contiene WHERE id_producto = '".$envioIdProducto."'; ";
+$sql0 = "SELECT stock FROM contiene WHERE id_producto = '$envioIdProducto' and id_bodega = '".$envioIdBodega."';";
 //'". ."' letras y ' ' num
 $conn->exec($sql0);
 $data = $conn->query($sql0)->fetchAll();
@@ -28,26 +28,29 @@ foreach ($data as $row){
 
 $stockMenos = $stockTotal - $envioStock;
 
-echo "este es el numero: ".$stockMenos." si";
-
 if(isset($stockMenos) < 0){
     Header("Location: infoBodega.php?error=2");
 }
 
-$sql1 = "SELECT stock_sucursal FROM incluye WHERE id_producto = '$envioIdProducto'; ";
+$sql1 = "SELECT id_sucursal FROM sucursal WHERE id_bodega = '".$envioIdBodega."';";
 $conn->exec($sql1);
 $data1 = $conn->query($sql1)->fetchAll();
 foreach ($data1 as $row1){
-    $stockIncluye = $row1["stock_sucursal"];
+    $idSucursal = $row1["id_sucursal"];
+    var_dump($idSucursal);
+}
+
+$sql2 = "SELECT stock_sucursal FROM incluye WHERE id_producto = '$envioIdProducto' and id_sucursal = '".$idSucursal."';";
+$conn->exec($sql2);
+$data2 = $conn->query($sql2)->fetchAll();
+foreach ($data2 as $row2){
+    $stockIncluye = $row2["stock_sucursal"];
     var_dump($stockIncluye);
 }
 
 $stockFinal = $stockIncluye + $envioStock;
 
-$sql2="SELECT restaStockInfoBodega('".$envioIdProducto."','$stockMenos')";
-echo $conn->exec($sql2);
-
-$sql = "SELECT envioInfoBodega('".$envioIdProducto."', '$stockFinal')";
+$sql = "SELECT envioInfoBodega('$envioIdProducto', '$stockFinal','$stockMenos','".$envioIdBodega."','".$idSucursal."')";
 echo $conn->exec($sql);
 
 
