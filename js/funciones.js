@@ -504,6 +504,11 @@ function verificarMaxStockIn(){
    }
 
 function mostrarUpdateTrabajador(rut_trabajador){
+   for (z=0; z<=6; z++){
+      $('#accesoEdit'+z).prop('checked', false);
+      console.log(z);
+    }
+
    cadena= {
       "rut_trabajador": rut_trabajador,
   };
@@ -529,6 +534,10 @@ function mostrarUpdateTrabajador(rut_trabajador){
           $('#editCorreo').val(datos[6])
           $('#editTelefono').val(datos[7]);
           $('#editCargo').val(datos[13]);
+          for (z=0; z<=datos[16]; z++){
+            $('#accesoEdit'+datos[14][z]).prop('checked', true);
+            console.log(datos[14][z]);
+          }
 
 
       }
@@ -740,4 +749,39 @@ function eliminarTransporte(patente){
          }
       }) 
    } );
+}
+
+function mostrarEliminarTrabajador(rut_persona){
+   console.log(rut_persona);
+   cadena= {
+      "rut_persona": rut_persona,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarEliminarTrabajador.php",
+      data: cadena,
+      success:function(info){
+          datos = JSON.parse(info)
+          $('#eliminarRutTrabajador').val(datos[0])
+          $('#EliminarNombreTrabajador').text(datos[0]+" "+datos[1]+" "+datos[2]+" "+datos[3])
+
+      }
+  }) 
+}
+
+function eliminarTrabajador(){
+   rut_persona = $('#eliminarRutTrabajador').val();
+   console.log(rut_persona);
+   cadena= {
+      "rut_persona": rut_persona,
+  };
+  $.ajax({
+      type: "POST",
+      url: "eliminarTrabajador.php",
+      data: cadena,
+      success:function(){
+        location.reload();
+          
+      }
+  }) 
 }

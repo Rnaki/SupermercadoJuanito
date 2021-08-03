@@ -17,20 +17,20 @@ if (isset($_POST["rutBuscar"])) {
 	join trabaja
 	on trabaja.rut_persona = trabajador.rut_persona 
 	where trabajador.rut_persona like '$rutBuscar%'
-	and trabaja.id_sucursal = '".$_SESSION["sucursal"]."'";
+	and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
 } else if (isset($_POST["apellidoPBuscar"])) {
 	$apellidoPBuscar = $_POST["apellidoPBuscar"];
 	if ($_POST["apellidoPBuscar"] == "") {
 		$sql = "SELECT * FROM trabajador
 		join trabaja
 		on trabaja.rut_persona = trabajador.rut_persona
-		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."'";
+		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
 	} else {
 		$sql = "SELECT * from trabajador 
 		join trabaja
 		on trabaja.rut_persona = trabajador.rut_persona 
 		where apellidop_persona like '$apellidoPBuscar%' 
-		and trabaja.id_sucursal = '".$_SESSION["sucursal"]."'";
+		and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
 	}
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
 	$desde = $_POST["desde"];
@@ -40,7 +40,7 @@ if (isset($_POST["rutBuscar"])) {
 	$sql = "SELECT * FROM trabajador
 			join trabaja
 			on trabaja.rut_persona = trabajador.rut_persona
-			where trabaja.id_sucursal = '".$_SESSION["sucursal"]."'";
+			where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
 }
 
 
@@ -420,8 +420,6 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 							<th>Supervisor</th>
 							<th>Cargo</th>
 							<th>Area de trabajo</th>
-							<th>Foto</th>
-							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
@@ -448,8 +446,6 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 								<td><?php echo $row['tra_rut_persona'] ?></td>
 								<td><?php echo $row['cargo'] ?></td>
 								<td><?php echo $row['area_trabajo'] ?></td>
-								<td><?php echo $row['foto'] ?></td>
-								<td><?php echo $row['estado_persona'] ?></td>
 								<td>
 						<?php	echo "<a onclick='mostrarUpdateTrabajador(\"" . $row['rut_persona'] . "\")' href='#edicionexampleModal' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><i class='material-icons' data-toggle='tooltip' title='Editar'>&#xE254;</i></a> "?>
 						<?php 	echo "<a onclick='mostrarEliminarTrabajador(\"" . $row['rut_persona'] . "\")' href='#eliminarexampleModal' class='delete' data-bs-toggle='modal' data-bs-target='#eliminarexampleModal'><i class='material-icons' data-toggle='tooltip' title='Eliminar'>&#xE872;</i></a>" ?>
@@ -641,7 +637,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                 <h5 class="modal-title" id="exampleModalLabel">Editar Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="updatePersonal.php" method="POST">
+            <form action="updateTrabajador.php" method="POST">
                 <input type="hidden" id="editRut" name="rut" value="">
                 <div class="modal-body">
                     <div class="form-group form">
@@ -651,7 +647,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                         </div>
                         <div class="form-group">
                             <label>Nombre: </label>
-                            <input type="text" class="form-control c" id="editNombre" name="nombre" required value="'">
+                            <input type="text" class="form-control c" id="editNombre" name="nombre" required value="">
                         </div>
                         <div class="form-group">
                             <label>Apellido Paterno: </label>
@@ -705,16 +701,16 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                     <input type="text" class="form-control mb-3 c" required="required" id="editCargo" name="Cargo" placeholder="Cargo" maxlength="16">
 					<label>Acceso: </label>
 					<br>
-					<input type="checkbox" id="accesoEdit1" name="cargo1" value="1" >
-					<label for="cargo1"> Recursos Humanos</label><br>
-					<input type="checkbox" id="accesoEdit2" name="cargo2" value="2">
-					<label for="cargo2"> Trabajador Web</label><br>
-					<input type="checkbox" id="accesoEdit3" name="cargo3" value="3">
-					<label for="cargo3"> Bodega</label><br>
-					<input type="checkbox" id="accesoEdit4" name="cargo4" value="4">
-					<label for="cargo4"> Proveedor</label><br>
-					<input type="checkbox" id="accesoEdit5" name="cargo5" value="5">
-					<label for="cargo5">Despacho</label><br>
+					<input type="checkbox" id="accesoEdit1" name="RRHH" value="1" >
+					<label for="RRHH"> Recursos Humanos</label><br>
+					<input type="checkbox" id="accesoEdit2" name="Tweb" value="2">
+					<label for="Tweb"> Trabajador Web</label><br>
+					<input type="checkbox" id="accesoEdit3" name="Bodega" value="3">
+					<label for="Bodega"> Bodega</label><br>
+					<input type="checkbox" id="accesoEdit4" name="Proveedor" value="4">
+					<label for="Proveedor"> Proveedor</label><br>
+					<input type="checkbox" id="accesoEdit5" name="Despacho" value="5">
+					<label for="Despacho">Despacho</label><br>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -763,13 +759,15 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                 </div>
                 <div class="modal-body cuadro">
                     <div class="form-group fuente">
-                        <label>¿Estas seguro que quieres eliminar al empleado <b></b>?</label>
+                        <label>¿Estas seguro que quieres eliminar al Trabajador <b></b>?</label>
+						<input type="hidden" id="eliminarRutTrabajador" value="">
+						<h5 id="EliminarNombreTrabajador"></h5>
                         <div style="height:16px"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <a href="eliminarPersonal.php?rut=" class="btn btn-danger">Eliminar</a>
+                    <button onclick="eliminarTrabajador()"  class="btn btn-danger" data-bs-dismiss="modal">Eliminar</button>
                 </div>
             </div>
         </div>

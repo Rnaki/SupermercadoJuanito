@@ -42,7 +42,30 @@ $gbd = conectar();
 
         }
 
-        $info = [$rut_persona, 
+        
+ 
+        $sql = "SELECT acceso.id_acceso, funcion 
+                FROM controla
+                join acceso
+                on controla.id_acceso = acceso.id_acceso 
+                WHERE rut_persona = '".$rut_trabajador."' ";
+        $gsent = $gbd->prepare($sql);
+        $gsent->execute();
+        $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
+
+        $contador = 0;
+        foreach ($resultado as $row) {
+       $id_acceso[$contador] = $row["id_acceso"];
+       $funcion[$contador] = $row["funcion"];
+           $contador ++;
+        }
+        $cantidad_tuplas = $contador - 1;
+        
+    } catch (Exception $e) {
+        echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+    }
+
+    $info = [$rut_persona, 
                  $nombre_persona, 
                  $apellidop_persona, 
                  $apellidom_persona,
@@ -55,10 +78,10 @@ $gbd = conectar();
                  $calle, 
                  $numero_calle, 
                  $contrasena,  
-                 $cargo];
+                 $cargo,
+                 $id_acceso,
+                 $funcion,
+                 $cantidad_tuplas];
         
         echo json_encode($info);
-    } catch (Exception $e) {
-        echo 'Excepción capturada: ',  $e->getMessage(), "\n";
-    }
 ?>
