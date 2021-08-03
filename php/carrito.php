@@ -1,12 +1,16 @@
 <?php   
 
  session_start();
+ $id_venta = $_SESSION["id_venta"];
  if(isset($_SESSION["rut_persona"])){
 
     include("conexion.php");
     $gbd = conectar();
 
-    $sql = "SELECT * FROM pertenece ";
+    $sql = "SELECT pertenece.id_producto, pertenece.cantidad, nombre_producto, precio FROM pertenece 
+            join producto
+            on pertenece.id_producto = producto.id_producto
+            where pertenece.id_venta = '".$id_venta."'";
     $gsent = $gbd->prepare($sql);
     $gsent->execute();
     //$cuenta_col = $gsent->columnCount();
@@ -17,6 +21,17 @@
     date_default_timezone_set('America/Santiago');
     //FECHA ACTUAL
     $fecha_actual = date("Y-m-d");
+
+    $sql2 = "SELECT  SUM(precio * cantidad) as total FROM pertenece 
+    join producto
+    on pertenece.id_producto = producto.id_producto
+    where pertenece.id_venta = '".$id_venta."'";
+    $gsent2 = $gbd->prepare($sql2);
+    $gsent2->execute();
+    //$cuenta_col = $gsent->columnCount();
+    //$data = $gbd->query($sql)->fetchAll();
+    $total = $gsent2->fetchAll(PDO::FETCH_ASSOC);
+
  }
 
 
@@ -78,7 +93,8 @@
                             <th>Id producto</th>
                             <th>Nombre</th>  
                             <th>Cantidad</th>
-                            <th>Precio Unitario</th>     
+                            <th>Precio Unitario</th>
+                            <th>Sub Total</th>     
                             <!--Que productos tiene cada, la cantidad, almacenamiento-->
                         </tr>
                     </thead>
@@ -90,13 +106,14 @@
                             echo  '<td>'.$row["nombre_producto"].'</td>';
                             echo  '<td>'.$row["cantidad"].'</td>';
                             echo  '<td>'.$row["precio"].'</td>';
+                            echo  '<td>'.$row["precio"]*$row["cantidad"].'</td>';
                             echo "<tr>";
                             }
                         ?>  
                     </tbody>
-                          </table>
+          </table>
           
-          
+          <h2> TOTAL: <?php foreach ($total as $row){ echo $row["total"]; } ?></h2>
           
           
           

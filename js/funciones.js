@@ -785,3 +785,41 @@ function eliminarTrabajador(){
       }
   }) 
 }
+
+function decrementar(id_producto){
+   if($('#'+id_producto).val()>=2){
+   $('#'+id_producto).val(function(i, oldval) {
+      return --oldval;
+  });
+  }
+
+}
+
+function incrementar(id_producto){
+   $('#'+id_producto).val(function(i, oldval) {
+      return ++oldval;
+  });
+}
+
+function añadircarrito(id_producto){
+   cantidad = $('#'+id_producto).val();
+   id_productoAñadir = id_producto;
+   cadena = {
+      "id_producto": id_productoAñadir,
+      "cantidad": cantidad,
+   };
+   console.log(cadena);
+   $.ajax({
+      type: "POST",
+      url: "añadirCarrito.php",
+      data: cadena,
+      success:function(respuesta){
+         if(respuesta == 1){
+            alert("Producto Agregado Al Carrito");
+         }else if (respuesta == 2){
+            alert("Error El Producto ya se encuentra agregado.")
+         }
+      }
+  }) 
+}
+

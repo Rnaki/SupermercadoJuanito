@@ -1,6 +1,7 @@
 <?php 
 
 session_start();
+echo $_SESSION["id_venta"];
 if(isset($_SESSION["rut_persona"])){
 
 
@@ -13,13 +14,20 @@ $gsent = $gbd->prepare($sql);
 $cuenta_col = $gsent->columnCount();
 $data = $gbd->query($sql)->fetchAll();
 
-$sql2 = "SELECT * FROM producto";
+$sql2 = "SELECT * FROM producto
+         join incluye
+         on incluye.id_producto = producto.id_producto
+         where incluye.id_sucursal = '1' ";
 $gsent = $gbd->prepare($sql2);
 $data2 = $gbd->query($sql2)->fetchAll();
 
 if(isset($_GET["idCategoria"])){
   $idCategoria = $_GET["idCategoria"];
-  $sql2 = "SELECT * FROM producto where id_categoria = '".$idCategoria."' ";
+  $sql2 = "SELECT * FROM producto
+          join incluye
+          on incluye.id_producto = producto.id_producto 
+          where id_categoria = '".$idCategoria."' 
+          and incluye.id_sucursal = '1'";
   $gsent = $gbd->prepare($sql2);
   $data2 = $gbd->query($sql2)->fetchAll();
 
@@ -83,20 +91,6 @@ if(isset($_GET["idCategoria"])){
     }
 
   </style>
-
-  <script>
-    function incrementar(n) {
-    valor = document.getElementById("cantidad"+n);
-    if (valor.value < 10)valor.value ++;
-    return false;
-    }
- 
-    function decrementar(n) {
-    valor = document.getElementById("cantidad"+n);
-    if (valor.value > 01)valor.value --;
-    return false;
-    }
-    </script>
 
   <title> Ventas Juanito </title>
 </head>
@@ -186,18 +180,18 @@ if(isset($_GET["idCategoria"])){
                 </div>
                 <div class="card-footer">
                 <?php
-                echo "<form class='form-num' method='POST' action='insertarCarrito.php'>";
+                //echo "<form class='form-num' method='POST' action='insertarCarrito.php'>";
                 echo "<input type='hidden' name='idProducto' value=".$row["id_producto"].">";
                 echo "<div class=' gap-2'>";
 
                 
-                echo "<button class='btn btn-dark-l' onclick='return decrementar(".$n.")'>-</button>";
-                echo "<input class='num' type='text' value='1' id='cantidad".$n."' name='cantidad' disabled>";
-                echo "<button class='btn btn-dark-l' onclick='return incrementar(".$n.")'>+</button>";
+                echo "<button class='btn btn-dark-l' onclick='decrementar(".$row["id_producto"].")'>-</button>";
+                echo "<input class='num' type='text' value='1' id='".$row["id_producto"]."' name='cantidad' disabled>";
+                echo "<button class='btn btn-dark-l' onclick='incrementar(".$row["id_producto"].")'>+</button>";
 
-                echo "<button class='btn btn-dark' type='submit' id=".$row["id_producto"].">Agregar al carrito</button>";
+                echo "<button onclick='añadircarrito(".$row["id_producto"].")'class='btn btn-dark' type='submit'>Agregar al carrito</button>";
                 echo "</div>";
-                echo "</form>";
+                //echo "</form>";
                 $n++;
               ?>
                   <small class="text-muted">&#9733; &#9733; &#9733; &#9733; &#9734;</small>

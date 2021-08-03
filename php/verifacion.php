@@ -31,9 +31,15 @@ foreach ($data2 as $row2){
 // CASO 1: Solo cliente//
 
 if ($cuenta_col == 1 && $contador <= 1){
-    Header("Location: lobby.php");
+    
     session_start();
     $_SESSION["rut_persona"] = $rut;
+
+    $sql10 = "INSERT INTO VENTA (rut_persona) values ('".$rut."')";
+    echo $conn->exec($sql10);
+    $_SESSION["id_venta"] = $conn->lastInsertId();
+    Header("Location: lobby.php");
+
 }else if ($contador > 1){ // CASO 2: Trabajador con Z+1 cargos//
     session_start();
     $_SESSION["rut_persona"] = $rut;
