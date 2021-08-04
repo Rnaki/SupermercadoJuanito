@@ -1,38 +1,46 @@
 <?php
 
+/*session_start();
+$sucursal=$_SESSION["sucursal"];*/
+
 include("conexion.php");
 $gbd = conectar();
 
 //$sql = "SELECT my_function();";
-$sql = "SELECT * FROM bodega";
-
+$sql = "SELECT * FROM venta";
+/*
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 	$idBuscar = $_POST["idBuscar"];
-	$sql = "SELECT * FROM bodega WHERE id_bodega = '$idBuscar' ";
-} else if (isset($_POST["regionBuscar"])) {
-	$regionBuscar = $_POST["regionBuscar"];
-	if ($_POST["regionBuscar"] == '') {       
-        $sql = "SELECT * FROM bodega";
+	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal 
+                where despacho.id_sucursal = '".$sucursal."' and id_despacho = '$idBuscar' ";
+} else if (isset($_POST["estadoBuscar"])) {
+	$estadoBuscar = $_POST["estadoBuscar"];
+	if ($_POST["estadoBuscar"] == "Seleccione...") {       
+        $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+        JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
+        where despacho.id_sucursal = '".$sucursal."' and (proceso_despacho = 'En proceso' or proceso_despacho= 'En camino') ";
 	} else {
-        $sql = "SELECT * FROM bodega WHERE region_bodega = '$regionBuscar'";
+    	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal  
+                where despacho.id_sucursal = '".$sucursal."' and proceso_despacho = '$estadoBuscar'";
 	}
-} else if (isset($_POST["comunaBuscar"])) {
-	$comunaBuscar = $_POST["comunaBuscar"];
-	if ($_POST["comunaBuscar"] == '') {       
-        $sql = "SELECT * FROM bodega";
-	} else {
-        $sql = "SELECT * FROM bodega WHERE comuna_bodega = '$comunaBuscar'";
-    }
-}
+} else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
+	$desde = $_POST["desde"];
+	$hasta = $_POST["hasta"];
+	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+            JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal 
+            where (despacho.id_sucursal = '".$sucursal."' and fecha_limite Between '$desde' and '$hasta') and (proceso_despacho = 'En proceso' or proceso_despacho = 'En camino')";
+} 
 
-
+*/
 
 
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
 
-/* Obtener todas las filas restantes del conjunto de resultados */
+//Obtener todas las filas restantes del conjunto de resultados 
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
@@ -47,7 +55,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bodegas</title>
+    <title>Reporte Ventas</title>
     <link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../css/estilosDaniel.css">
     <!-- JS BOOTSTRAP -->
@@ -69,9 +77,9 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             margin-top: 1%;
         }
 
-        div .col-sm-6 .b1 {
-            margin-left: 73%;
-        }
+        div .primero .col {
+			text-align: right;
+		}
 
         /*Cambio*/
         div .primero {
@@ -175,7 +183,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
     <header class="site-header sticky-top py-1">
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
             <a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
-            <h2 class="letrah2">INFORMACIÓN DE BODEGAS</h2>
+            <h2 class="letrah2">INFO REPORTE DE VENTAS</h2>
             <a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
         </nav>
     </header>
@@ -186,16 +194,15 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                 <div class="table-title">
                     <div class="row primero">
                         <div class="col-sm-6">
-                            <h4>BODEGAS: </h4>
+                            <h4>REPORTE VENTAS: </h4>
                         </div>
                         <div class="col-sm-6 col">
-                            <a class="btn btn-success b1" data-bs-toggle="modal"
-                                data-bs-target="#creacionEmployeeModal"><svg xmlns="http://www.w3.org/2000/svg"
-                                    width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill"
-                                    viewBox="0 0 16 16">
-                                    <path
-                                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
-                            </svg> Añadir Bodega</a>
+                            <a class="btn btn-success b1"  href=" " ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
+                                </svg> Despachos Entregados</a>
+                                <a class="btn btn-danger" href=" "><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+									<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
+								</svg></a>
                         </div> 
                     </div>
 
@@ -211,36 +218,51 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="accordion-body">
                                         <div class="row">
                                             <div class="col-sm-6">
-                                                <h5>ID Bodega: </h5>
+                                                <h5>ID Despacho: </h5>
                                             </div>
                                             <div class="col-sm-6">
-                                                <h5>Región: </h5>
+                                                <h5>Estado: </h5>
                                             </div>
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="bodegaGerente.php" method="POST" class="d-flex">
-                                                    <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Bodega" aria-label="Search">
+                                                <form action="despacho.php" method="POST" class="d-flex">
+                                                    <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Despacho" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                             <div class="col-sm-6">
-                                                <form action="bodegaGerente.php" method="POST" class="d-flex">
-                                                    <input class="form-control me-3" type="search" name="regionBuscar" placeholder="Regón" aria-label="Search">
+                                                <form action="despacho.php" method="POST" class="d-flex">
+                                                    <select class="form-select" name="estadoBuscar">
+                                                        <option selected>Seleccione...</option>
+                                                        <option value="En proceso" >En proceso</option>
+                                                        <option value="En camino" >En camino</option>
+                                                    </select>
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-sm-6">
-                                                <h5>Comuna: </h5>
+                                            <div class="col-sm-4">
+                                                <h5>Fecha Límite: </h5>
                                             </div>
                                         </div>
-                                        <div class="row segundo">
-                                            <div class="col-sm-6">
-                                                <form action="bodegaGerente.php" method="POST" class="d-flex">
-                                                    <input class="form-control me-3" type="search" name="comunaBuscar" placeholder="Comuna" aria-label="Search">
-                                                    <button class="btn btn-success b" type="submit">Buscar</button>
+                                        <div class="row">
+                                            <div class="col-sm-2 buscar">
+                                                <label> Desde: </label>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <form action="despacho.php" method="POST" class="d-flex">
+                                                    <input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
+                                            </div>
+                                            <div class="col-sm-1 buscar">
+                                                <label> Hasta: </label>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <input class="form-control me-2" type="date" name="hasta" placeholder="Fecha" aria-label="Search">
+                                            </div>
+                                            <div class="col-sm-1 colb">
+                                                <button class="btn btn-success" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -254,13 +276,14 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            
-                            <th>ID Bodega</th>
-                            <!--<th>Almacenamiento</th>-->
-                            <th>Región</th>
-                            <th>Comuna</th>
-                            <th>Calle</th>
-                            <th>N° calle</th>
+                            <th></th>
+                            <th>ID Producto</th>
+                            <th>ID Categoria</th>
+                            <th>Rut proveedor</th>
+                            <th>Nombre Producto</th>
+                            <th>Precio</th>
+                            <th>Marca</th>
+                            <th>N° de Ventas</th>
                             <!--Que productos tiene cada, la cantidad, almacenamiento-->
                         </tr>
                     </thead>
@@ -268,22 +291,24 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                         <?php
                             foreach ($resultado as $row){
                             echo '<tr>';
-                            echo  '<td>'.$row["id_bodega"].'</td>';
-                           // echo  '<td>'.$row["almacenamiento"].'</td>';
-                            echo  '<td>'.$row["region_bodega"].'</td>';
-                            echo  '<td>'.$row["comuna_bodega"].'</td>';
-                            echo  '<td>'.$row["calle_bodega"].'</td>';
-                            echo  '<td>'.$row["numero_calle_bodega"].'</td>';
+                            echo '<td>'.$row["id_despacho"].'<a href=""><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                <path
+                                    d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                <path
+                                    d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+                            </svg></a></td>';
+                            echo  '<td>'.$row["id_despacho"].'</td>';                 
 
 
                             echo "<td>
-                            <a href='' onclick='mostrarUpdateBodega(\"".$row['id_bodega']."\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><svg
+                            <a href='' onclick='mostrarUpdateDespacho(\"".$row['id_despacho']."\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><svg
                                     xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
                                     class='bi bi-pencil-fill' viewBox='0 0 16 16'>
                                     <path
                                         d='M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z' />
                                 </svg></a>";
-                            echo "<a href='' onclick='eliminarBodega(\"".$row['id_bodega']."\")' class='delete' data-bs-toggle='modal' ><svg
+                            echo "<a href='' onclick='eliminarDespacho(\"".$row['id_despacho']."\")' class='delete' data-bs-toggle='modal' ><svg
                                     xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor'
                                     class='bi bi-trash-fill' viewBox='0 0 16 16'>
                                     <path
@@ -291,7 +316,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                 </svg></a>
 
                             </td>";
-                            echo "<tr>";
+                            echo "</tr>";
                             }
                         ?>  
                     </tbody>
@@ -417,38 +442,40 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                     <h5 class="modal-title" id="exampleModalLabel">Añadir Despacho</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="InsertarBodega.php">
-                    <div class="modal-body">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>ID Despacho: </label>
+                        <input type="text" class="form-control" required>
                         <div class="form-group">
-                            <label>ID Bodega: </label>
-                            <input type="text" class="form-control" id="id_bodega" name="id_bodega" required>
-                            <div class="form-group">
-                                <label>Almacenamiento: </label>
-                                <input type="text" class="form-control" id="almacenamiento" name="almacenamiento" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Región: </label>
-                                <input type="text" class="form-control" id="region_bodega" name="region_bodega" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Comuna: </label>
-                                <input type="text" class="form-control" id="comuna_bodega" name="comuna_bodega" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Calle: </label>
-                                <input type="text" class="form-control" id="calle_bodega" name="calle_bodega" required>
-                            </div>
-                            <div class="form-group">
-                                <label>N° calle: </label>
-                                <input type="text" class="form-control" id="numero_calle_bodega" name="numero_calle_bodega" required>
-                            </div>
+                            <label>ID Sucursal: </label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Patente: </label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Información de envio: </label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha limite: </label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha entrega: </label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Proceso de despacho: </label>
+                            <input type="text" class="form-control" required>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-success cread">Añadir</button>
-                    </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success cread">Crear</button>
+                </div>
             </div>
         </div>
     </div>
@@ -458,37 +485,46 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header edi">
-                    <h5 class="modal-title" id="exampleModalLabel">Editar Info Bodega</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Editar Despacho</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="updateBodega.php">
+                    <form method="POST" action="updateDespacho.php">
                         <div class="form-group">
-                            <label>ID Bodega: </label>
-                            <input type="text" id="updateIdBodega" class="form-control" disabled>
-                            <input id="updateIdBodega2" class="updateIdBodega" name="updateIdBodega" type="hidden">
+                            <label>ID Despacho: </label>
+                            <input type="text" id="updateIdDespacho" class="form-control" disabled>
+                            <input class="updateIdDespacho" name="updateIdDespacho" type="hidden">
                             <div class="form-group">
-                                <label>Almacenamiento: </label>
-                                <input name="updateAlmacenamiento" type="text" id="updateAlmacenamiento" class="form-control" required>
-                                <!--<input name="updateIdBodega" type="hidden" id="updateIdBodega" value=""> -->
+                                <label>ID Sucursal: </label>
+                                <input name="updateIdSucursal" type="text" id="updateIdSucursal" class="form-control" disabled>
+                                <input name="idUpdateDespacho" type="hidden" id="idUpdateDespacho" value="">
                             </div>
                             <div class="form-group">
-                                <label>Región: </label>
-                                <input name="updateRegionBodega" type="text" id="updateRegionBodega" class="form-control" disabled>
-                                <input name="updateRegionBodega2" type="hidden" id="updateRegionBodega2" class="form-control">
+                                <label>Patente: </label>
+                                <input name="updatePatente" type="text" id="updatePatente" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>Comuna: </label>
-                                <input name="updateComunaBodega" type="text" id="updateComunaBodega" class="form-control" disabled>
-                                <input name="updateComunaBodega2" type="hidden" id="updateComunaBodega2" class="form-control">
+                                <label>Información de envio: </label>
+                                <input name="updateInformacion" type="text" id="updateInformacion" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>Calle: </label>
-                                <input name="updateCalleBodega" type="text" id="updateCalleBodega" class="form-control" required>
+                                <label>Fecha limite: </label>
+                                <input name="updateFechaLimite" type="text" id="updateFechaLimite" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>N° calle: </label>
-                                <input name="updateNumeroCalleBodega" type="text" id="updateNumeroCalleBodega" class="form-control" required>
+                                <label>Fecha entrega: </label>
+                                <input name="updateFechaEntrega" type="text" id="updateFechaEntrega" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Proceso despacho: </label>
+                                <br>
+                                    <select id="UpdateEstadoDespacho" class="form-select" name="updateProcesoDespacho" id="" aria-label="Default select example">
+                                        <option selected>Seleccione...</option>
+                                        <option value="En proceso">En proceso</option>
+                                        <option value="En camino">En camino</option>
+                                        <option value="Entregado">Entregado</option>
+                                    </select>
+                                <br>
                             </div>
                         </div>
                         </div>           
@@ -506,18 +542,18 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header eli">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Bodega</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Despacho</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>¿Estas seguro que quieres eliminar esta bodega? ESTA ACCIÓN NO SE PUEDE DESHACER</label>
+                        <label>¿Estas seguro que quieres archivar el despacho?</label>
                         <div style="height:16px"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button id="eliminarBodega" type="button" class="btn btn-danger">Eliminar</button>
+                    <button id="eliminarDespacho" type="button" class="btn btn-danger">Eliminar</button>
                 </div>
             </div>
         </div>

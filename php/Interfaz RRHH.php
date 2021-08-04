@@ -72,12 +72,76 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
 	<!--Sacado de la carpeta-->
+	<script src="../popper/popper.min.js"></script>
 	<link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
 	<script src="../jquery/jquery.min.v3.6.0.js"></script>
 	<script src="../js/funciones.js"></script>
 	<script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
 
 	<style>
+		/*Header*/
+
+        header {
+
+background: #f5f5f5;
+
+}
+
+
+
+header .juan {
+
+width: 240px;
+
+height: 50px;
+
+color: #566787;
+
+}
+
+
+
+header .row .col-md-3,
+
+header .row .col-md-8 {
+
+padding: 0px 0px;
+
+}
+
+
+
+header .row .card-body {
+
+padding: 3px 0px;
+
+}
+
+
+
+header .row .card-body .card-title {
+
+margin-bottom: 0px;
+
+}
+
+
+
+header .dropdown .dropdown-menu {
+
+width: 100%;
+
+background: #ececec;
+
+}
+
+
+
+header .dropdown .dropdown-menu li {
+
+color: #2196F3;
+
+}
 		body {
 			color: #566787;
 			background: #f5f5f5;
@@ -313,8 +377,28 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
 			<a class="py-2 d-none d-md-inline-block" href="Contratos.php">Contratos</a>
 			<h2>ÁREA RECURSOS HUMANOS</h2>
+			
 			<a class="py-2 d-none d-md-inline-block" href="cliente.php">Clientes</a>
-			<a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
+			<div class="dropdown">
+				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
+					<div class="row juan">
+						<div class="col-md-3 text-center">
+							<img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
+						</div>
+						<div class="col-md-8 text-start">
+							<div class="card-body">
+								<h5 class="card-title">Juan Perez</h5>
+								<p class="card-text">Gerente General</p>
+							</div>
+						</div>
+					</div>
+				</button>
+				<div class="dropdown-menu" aria-labelledby="bd-version">
+					<li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
+					<div class="dropdown-divider"></div>
+					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
+				</div>
+			</div>
 
 		</nav>
 		<h2 class="text-center"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></h2>
@@ -327,6 +411,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 					<div class="row primero">
 						<div class="col-sm-6">
 							<h2>GESTIÓN DE PERSONAL: </h2>
+							
 						</div>
 						<div class="col-sm-6">
 							<a href="#addEmployeeModal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#añadirexampleModal"><i class="material-icons">&#xE147;</i> <span>Añadir nuevo empleado</span></a>

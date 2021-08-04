@@ -243,13 +243,15 @@ function mostrarUpdateCliente(rut_persona){
           $('#updateCalleCliente').val(datos[10]);
           $('#updateNcalleCliente').val(datos[11]);
           $('#updateContraseñaCliente').val(datos[12]);
+          $('#updateDireccionDespacho').val(datos[13]);
+          $('#updateNombreUsuario').val(datos[14]);
          
           
          
           
          
           
-          console.log(datos[0]);
+          console.log(datos[13]);
 
       }
   }) 
@@ -823,3 +825,27 @@ function añadircarrito(id_producto){
   }) 
 }
 
+function mostrarUpdateProducto(idProducto){
+   console.log(idProducto);
+   cadena= {
+      "idProducto": idProducto,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarUpdateProducto.php",
+      data: cadena,
+      success:function(info){
+          datos = JSON.parse(info)
+          $('.updateIdProducto').val(datos[0])
+          $('#updateTipoCategoria').val(datos[1]);
+          $('#updateNombreProducto').val(datos[2]);
+          $('#updateMarca').val(datos[3]);
+          $('#updatePrecio').val(datos[4]);
+          $('#updateDescuento').val(datos[5]);
+          $('#updateDescripcion').val(datos[6]);
+          $('#UpdatetipoCategoria option[id="'+datos[1]+'"]').attr("selected", true);
+          $('#updateNombreProveedor option[id="'+datos[8]+'"]').attr("selected", true);
+          console.log(datos[8]);//importante print
+      }
+  }) 
+}

@@ -163,7 +163,7 @@
 				<input type="text" class="form-control" name="calle" placeholder="Calle" required="required" maxlength="32">
 			</div>
 			<div class="form-group">
-				<input type="text" class="form-control" name="nCalle" placeholder="Nº calle" required="required" maxlength="32">
+				<input type="text" class="form-control" name="nCalle" placeholder="Nº calle" required="required" maxlength="8">
 			</div>
 			<div class="form-group">
 				<input type="date" class="form-control" name="fechaNacimiento" placeholder="Fecha Nacimiento" required="required">

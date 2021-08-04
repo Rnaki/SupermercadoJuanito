@@ -20,14 +20,14 @@ $gbd = conectar();
             $nombreProducto=$row["nombre_producto"];
             $marca=$row["marca"];
             $precio=$row["precio"];
-            $imagen=$row["imagen"];
+            //$imagen=$row["imagen"];
             $descripcion=$row["descripcion"];
             $descuento=$row["descuento"];
             $nombreCategoria=$row["nombre_categoria"];
             $rutProveedor=$row["rut_proveedor"];
         }
 
-        $info = [$idProducto, $idCategoria, $nombreProducto, $marca, $precio, $descuento, $descripcion, $imagen, $nombreCategoria, $rutProveedor];
+        $info = [$idProducto, $idCategoria, $nombreProducto, $marca, $precio, $descuento, $descripcion, $nombreCategoria, $rutProveedor];
         
         echo json_encode($info);
     } catch (Exception $e) {

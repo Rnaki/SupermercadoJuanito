@@ -54,11 +54,11 @@
             }
       ?>
     <div class="form-floating">
-      <input type="text" class="form-control" name="rut" id="floatingInput" placeholder="name@example.com">
+      <input type="text" class="form-control" name="rut" id="floatingInput" placeholder="name@example.com" maxlength="10">
       <label for="floatingInput">Rut</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" name="contraseña" id="floatingPassword" placeholder="Password">
+      <input type="password" class="form-control" name="contraseña" id="floatingPassword" placeholder="Password" maxlength="16">
       <label for="floatingPassword">Contraseña</label>
     </div>
 

@@ -230,7 +230,6 @@ table.table-striped.table-hover tbody a{
 		<h5>SUCURSALES: </h5>'; 
 		echo '<form method="POST" action="menu_trabajador.php">';
 		echo '<select class="form-select" name="sucursal" id="sucursal" required>';
-		echo '<option selected>Seleccione...</option>';
 		foreach ($resultado3 as $row3) {
 			echo "<option id=" . $row3["id_sucursal"] . " value='" . $row3['id_sucursal'] . "'>" . $row3["nombre_sucursal"] . "</option>";
 		}
@@ -261,38 +260,46 @@ table.table-striped.table-hover tbody a{
 		<div class="row" style="height: 100px;">
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-				<a class="link-options link-light" href="/php/infoBodega.php">BODEGA</a>
+					<a class="link-options link-light" href="/php/infoBodega.php">BODEGA</a>
 				</div>
 			</div>
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-				<a class="link-options link-light" href="/php/proveedor.php">PROVEEDORES</a>
+					<a class="link-options link-light" href="/php/proveedor.php">PROVEEDORES</a>
 				</div>
 			</div>
 		</div>
 		<div class="row" style="height: 100px;">
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-				<a class="link-options link-light" href="/php/despacho.php">DESPACHO</a>
+					<a class="link-options link-light" href="/php/despacho.php">DESPACHO</a>
 				</div>
 			</div>
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-				<a class="link-options link-light" href="/php/lobby.php">TIENDA</a>
+					<a class="link-options link-light" href="/php/lobby.php">TIENDA</a>
 				</div>
 			</div>
 		</div>
 		<div class="row" style="height: 100px;">
-		<div class="col-sm-6 text-center h-100 border border-light bg-dark">
-			<div class="inline alinear-central">
-			<a class="link-options link-light" href="sucursalGerente.php">SUCURSALES</a>
+			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+				<div class="inline alinear-central">
+					<a class="link-options link-light" href="sucursalGerente.php">SUCURSALES</a>
+				</div>
+			</div>
+			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+				<div class="inline alinear-central">
+					<a class="link-options link-light" href="bodegaGerente.php">MENU BODEGA</a>
+				</div>
 			</div>
 		</div>
-		<div class="col-sm-6 text-center h-100 border border-light bg-dark">
-			<div class="inline alinear-central">
-			<a class="link-options link-light" href="bodegaGerente.php">MENU BODEGA</a>
+
+		<div class="row" style="height: 100px;">
+			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
+				<div class="inline alinear-central">
+					<a class="link-options link-light" href="reporteVentas.php">REPORTE DE VENTAS</a>
+				</div>
 			</div>
-		</div>
 		</div>';
 		}elseif ($esGerente == 0){
 			

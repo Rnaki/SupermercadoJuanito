@@ -2,6 +2,17 @@
 
 include("conexion.php");
 $gbd = conectar();
+
+if (isset($_GET["error"])) {
+    $error = $_GET["error"];
+    echo '<script>alert("Imagen muy grande")</script>';
+}
+
+if (isset($_GET["error1"])) {
+    $error = $_GET["error1"];
+    echo '<script>alert("Tipo de imagen no permitida")</script>';
+}
+
 /*
 if (isset($_POST["rutBuscar"])) {
 	$rutBuscar = $_POST["rutBuscar"];
@@ -231,7 +242,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 	<header class="site-header sticky-top py-1">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-			<a class="py-2 d-none d-md-inline-block" href="Menu_trabajador.php">Volver</a>
+			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
 			<h2 class="letrah2">ÁREA TRABAJADOR WEB</h2>
 
 			<div class="dropdown">
@@ -413,7 +424,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 					<h5 class="modal-title">Añadir Producto</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<form method="POST" action="insertarProducto.php">
+				<form method="POST" action="insertarProducto.php" enctype="multipart/form-data">
 					<div class="modal-body">
 						<div class="form-group ">
 							<div class="form-group">
@@ -482,7 +493,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<form method="POST" action="updateProducto.php">
+					<form method="POST" action="updateProducto.php" enctype="multipart/form-data">
 						<div class="form-group ">
 							<label>ID Producto: </label>
 							<input type="text" class="form-control updateIdProducto" name="updateIdProducto" disabled>
@@ -536,7 +547,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 							<div class="form-group">
 								<label>Imagen: </label>
-								<input type="file" class="form-control" name="updateImagen" id="updateImagen" required>
+								<input type="file" class="form-control" name="updateImagen" id="updateImagen" accept="image/*" required>
 							</div>
 						</div>
 				</div>

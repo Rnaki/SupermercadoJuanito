@@ -44,10 +44,10 @@ $data2 = $gbd->query($sql2)->fetchAll();
         }
 
         .table-responsive .pedido {
-            background-color: #f0da1a;
+            background-color: #3b9a00;
             color: whitesmoke;
             font-weight: 500;
-            margin-left: 88%;
+            margin-left: 85%;
             margin-top: 10px;
             padding: 8px 8px;
         }
@@ -164,7 +164,11 @@ $data2 = $gbd->query($sql2)->fetchAll();
             background: #ecf0f1;
         }
 
-        
+        /*Color boton delete perfil*/
+        a.delete{
+            color: #ff3333;
+            margin-left: 20px;
+        }
     </style>
 </head>
 
@@ -265,7 +269,7 @@ $data2 = $gbd->query($sql2)->fetchAll();
                         <th>
                             <h5>Contraseña: </h5>
                         </th>
-                        <td class="hidetext"><input type="password" value="<?php echo $row['contrasena']?>" disabled></td>
+                        <td></td>
                         <th></th>
                         <th>
                             <h5>Correo: </h5>
@@ -296,11 +300,22 @@ $data2 = $gbd->query($sql2)->fetchAll();
                         <th></th>
                     </tr>
                 </table>
-                <?php	echo "<a onclick='mostrarUpdateCliente(\"".$row['rut_persona']."\")' href='#edicionexampleModal' class='btn btn-warning pedido' data-bs-toggle='modal' data-backdrop='static' data-keyboard='false' data-bs-target='#edicionexampleModal'>               
-                <svg xmlns='http://www.w3.org/2000/svg' width='19' height='19' fill='currentColor' class='bi bi-pencil-square' viewBox='0 0 16 16'>
+                <?php	
+                    echo "<a onclick='mostrarUpdateCliente(\"".$row['rut_persona']."\")' href='#edicionexampleModal' class='btn btn-warning pedido' data-bs-toggle='modal' data-backdrop='static' data-keyboard='false' data-bs-target='#edicionexampleModal'>               
+                    <svg xmlns='http://www.w3.org/2000/svg' width='19' height='19' fill='currentColor' class='bi bi-pencil-square' viewBox='0 0 16 16'>
                         <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z' />
                         <path fill-rule='evenodd' d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z' />
-                    </svg></i>Editar Perfil</a>";?>
+                        </svg></i>Editar Perfil</a>";
+
+                        echo "<a href='' onclick='eliminarPerfilCliente(\"".$row['rut_persona']."\")' class='delete' data-bs-toggle='modal' ><svg
+                        xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor'
+                        class='bi bi-trash-fill' viewBox='0 0 16 16'>
+                        <path
+                            d='M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z' />
+                    </svg></a>
+
+                </td>";
+                ?>
             </div>
         </div>
     </div>
@@ -458,11 +473,11 @@ $data2 = $gbd->query($sql2)->fetchAll();
                             </div>
                             <div class="form-group">
                                 <label>Nª Calle: </label>
-                                <input type="text" class="form-control c" id="updateNcalleCliente" name="updateNcalleCliente" required value="" maxlength="32">
+                                <input type="text" class="form-control c" id="updateNcalleCliente" name="updateNcalleCliente" required value="" maxlength="8">
                             </div>
                             <div class="form-group">
                                 <label>Fecha Nacimiento: </label>
-                                <input type="text" class="form-control c" id="updateFechaNacimientoCliente" name="updateFechaNacimientoCliente" required value="">
+                                <input type="date" class="form-control c" id="updateFechaNacimientoCliente" name="updateFechaNacimientoCliente" required value="">
                             </div>
                             <label>Sexo: </label>
                             <br>
@@ -502,6 +517,32 @@ $data2 = $gbd->query($sql2)->fetchAll();
             </div>
         </div>
     </div>
+
+     <!-- Modal de Eliminar-->
+     <div class="modal fade" id="eliminarexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header eli">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>¿Estas seguro que quieres eliminar tu cuenta?</label>
+                        <div style="height:16px"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button id="eliminarCliente" type="button" class="btn btn-danger">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </body>
 
 </html>

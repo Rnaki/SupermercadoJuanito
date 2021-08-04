@@ -16,7 +16,9 @@ $gbd = conectar();
                        comuna, 
                        calle, 
                        numero_calle, 
-                       contrasena 
+                       contrasena,
+                       direccion_despacho,
+                       nombre_usuario_cliente 
                        FROM cliente WHERE rut_persona = '".$rut_persona."' ";
         $gsent = $gbd->prepare($sql);
         $gsent->execute();
@@ -37,9 +39,11 @@ $gbd = conectar();
            $calle = $row["calle"];
            $numero_calle = $row["numero_calle"];
            $contrasena = $row["contrasena"];
+           $direccion_despacho = $row["direccion_despacho"];
+           $nombre_usuario_cliente = $row["nombre_usuario_cliente"];
         }
 
-        $info = [$rut_persona, $nombre_persona, $apellidop_persona, $apellidom_persona, $fecha_nacimiento_persona, $sexo, $correo, $fono, $region, $comuna, $calle, $numero_calle, $contrasena];
+        $info = [$rut_persona, $nombre_persona, $apellidop_persona, $apellidom_persona, $fecha_nacimiento_persona, $sexo, $correo, $fono, $region, $comuna, $calle, $numero_calle, $contrasena, $direccion_despacho, $nombre_usuario_cliente];
         
         echo json_encode($info);
     } catch (Exception $e) {

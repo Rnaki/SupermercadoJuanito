@@ -235,7 +235,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
 <body class="body-infoB">
     <header class="site-header sticky-top py-1">
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
-            <a class="py-2 d-none d-md-inline-block" href="Menu_trabajador.php">Volver</a>
+            <a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
             <a class="py-2 d-none d-md-inline-block" href="infoSucursal.php">Sucursal</a>
             <h2 class="letrah2">INFORMACIÓN DE BODEGA</h2>
 

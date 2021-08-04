@@ -1,34 +1,39 @@
 <?php
 
+session_start();
+$sucursal=$_SESSION["sucursal"];
+
 include("conexion.php");
 $gbd = conectar();
 
 //$sql = "SELECT my_function();";
 $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
         JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
-        where proceso_despacho = 'En proceso' or proceso_despacho= 'En camino' ";
+        where despacho.id_sucursal = '".$sucursal."' and (proceso_despacho = 'En proceso' or proceso_despacho= 'En camino') ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 	$idBuscar = $_POST["idBuscar"];
 	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
-                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where id_despacho = '$idBuscar' ";
+                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal 
+                where despacho.id_sucursal = '".$sucursal."' and id_despacho = '$idBuscar' ";
 } else if (isset($_POST["estadoBuscar"])) {
 	$estadoBuscar = $_POST["estadoBuscar"];
 	if ($_POST["estadoBuscar"] == "Seleccione...") {       
         $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
         JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
-        where proceso_despacho = 'En proceso' or proceso_despacho= 'En camino' ";
+        where despacho.id_sucursal = '".$sucursal."' and (proceso_despacho = 'En proceso' or proceso_despacho= 'En camino') ";
 	} else {
-        echo 2;
-        echo	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
-                        JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal  where proceso_despacho = '$estadoBuscar'";
+    	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
+                JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal  
+                where despacho.id_sucursal = '".$sucursal."' and proceso_despacho = '$estadoBuscar'";
 	}
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
 	$desde = $_POST["desde"];
 	$hasta = $_POST["hasta"];
 	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
-            JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal where fecha_limite Between '$desde' and '$hasta' and (proceso_despacho = 'En proceso' or proceso_despacho = 'En camino')";
+            JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal 
+            where (despacho.id_sucursal = '".$sucursal."' and fecha_limite Between '$desde' and '$hasta') and (proceso_despacho = 'En proceso' or proceso_despacho = 'En camino')";
 } 
 
 
@@ -172,6 +177,69 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             background-color: rgb(163, 182, 241);
             border-top: 1px solid black;
         }
+        /*Header*/
+
+        header {
+
+background: #f5f5f5;
+
+}
+
+
+
+header .juan {
+
+width: 240px;
+
+height: 50px;
+
+color: #566787;
+
+}
+
+
+
+header .row .col-md-3,
+
+header .row .col-md-8 {
+
+padding: 0px 0px;
+
+}
+
+
+
+header .row .card-body {
+
+padding: 3px 0px;
+
+}
+
+
+
+header .row .card-body .card-title {
+
+margin-bottom: 0px;
+
+}
+
+
+
+header .dropdown .dropdown-menu {
+
+width: 100%;
+
+background: #ececec;
+
+}
+
+
+
+header .dropdown .dropdown-menu li {
+
+color: #2196F3;
+
+}
     </style>
 
 </head>
@@ -181,7 +249,26 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
             <a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
             <h2 class="letrah2">INFORMACIÓN DE DESPACHO</h2>
-            <a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
+            <div class="dropdown">
+				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
+					<div class="row juan">
+						<div class="col-md-3 text-center">
+							<img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
+						</div>
+						<div class="col-md-8 text-start">
+							<div class="card-body">
+								<h5 class="card-title">Juan Perez</h5>
+								<p class="card-text">Gerente General</p>
+							</div>
+						</div>
+					</div>
+				</button>
+				<div class="dropdown-menu" aria-labelledby="bd-version">
+					<li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
+					<div class="dropdown-divider"></div>
+					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
+				</div>
+			</div>
         </nav>
     </header>
     <div style="height:50px"></div>
@@ -241,7 +328,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-4">
-                                                <h5>Fecha de Entrega: </h5>
+                                                <h5>Fecha Límite: </h5>
                                             </div>
                                         </div>
                                         <div class="row">
