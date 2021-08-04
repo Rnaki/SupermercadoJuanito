@@ -247,12 +247,12 @@ table.table-striped.table-hover tbody a{
 			<div class="row" style="height: 100px;">	
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-				  <a class="link-options link-light"  href="/php/Interfaz RRHH.php">RECURSO HUMANOS</a>
+				  <a class="link-options link-light"  href="Interfaz RRHH.php">RECURSO HUMANOS</a>
 				</div>
 			</div>
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-				<a class="link-options link-light" href="/php/Interfaz Trabajador web.php">TRABAJADOR WEB</a>
+				<a class="link-options link-light" href="Interfaz Trabajador web.php">TRABAJADOR WEB</a>
 				</div>
 			</div>	
 		</div>
@@ -260,24 +260,24 @@ table.table-striped.table-hover tbody a{
 		<div class="row" style="height: 100px;">
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-					<a class="link-options link-light" href="/php/infoBodega.php">BODEGA</a>
+					<a class="link-options link-light" href="infoBodega.php">BODEGA</a>
 				</div>
 			</div>
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-					<a class="link-options link-light" href="/php/proveedor.php">PROVEEDORES</a>
+					<a class="link-options link-light" href="proveedor.php">PROVEEDORES</a>
 				</div>
 			</div>
 		</div>
 		<div class="row" style="height: 100px;">
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-					<a class="link-options link-light" href="/php/despacho.php">DESPACHO</a>
+					<a class="link-options link-light" href="despacho.php">DESPACHO</a>
 				</div>
 			</div>
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-					<a class="link-options link-light" href="/php/lobby.php">TIENDA</a>
+					<a class="link-options link-light" href="lobby.php">TIENDA</a>
 				</div>
 			</div>
 		</div>
@@ -309,7 +309,7 @@ table.table-striped.table-hover tbody a{
 				}	
 			echo '<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 					<div class="inline alinear-central">
-              		<a class="link-options link-light"  href="/php/'.$pagina_web[$i].'">'.$funcion[$i].'</a>
+              		<a class="link-options link-light"  href="'.$pagina_web[$i].'">'.$funcion[$i].'</a>
 					</div>
 				</div>';
 

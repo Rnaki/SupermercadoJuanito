@@ -58,7 +58,7 @@ if($updateTamanoImagen <= 1000000){
         Header("Location: Interfaz Trabajador web.php?error1=2");
     }
 }else{
-    Header("Location: Interfaz Trabajador web.php?error=2");
+   Header("Location: Interfaz Trabajador web.php?error=2");
 }
 
 ?>
