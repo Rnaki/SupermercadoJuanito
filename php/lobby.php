@@ -2,6 +2,10 @@
 
 session_start();
 echo $_SESSION["id_venta"];
+
+if(isset($_POST["sucursal"])){
+  $sucursal = $_POST["sucursal"];
+}
 if(isset($_SESSION["rut_persona"])){
 
 
@@ -17,7 +21,7 @@ $data = $gbd->query($sql)->fetchAll();
 $sql2 = "SELECT * FROM producto
          join incluye
          on incluye.id_producto = producto.id_producto
-         where incluye.id_sucursal = '1' ";
+         where incluye.id_sucursal = '".$sucursal."' ";
 $gsent = $gbd->prepare($sql2);
 $data2 = $gbd->query($sql2)->fetchAll();
 
@@ -27,11 +31,18 @@ if(isset($_GET["idCategoria"])){
           join incluye
           on incluye.id_producto = producto.id_producto 
           where id_categoria = '".$idCategoria."' 
-          and incluye.id_sucursal = '1'";
+          and incluye.id_sucursal = '".$sucursal."'";
   $gsent = $gbd->prepare($sql2);
   $data2 = $gbd->query($sql2)->fetchAll();
 
 }
+
+$sql3 = "SELECT nombre_sucursal from sucursal
+
+        where id_sucursal = '".$sucursal."'";
+
+$gsent3 = $gbd->prepare($sql3);
+$resultado = $gbd->query($sql3)->fetchAll();
 
 
 
@@ -98,7 +109,7 @@ if(isset($_GET["idCategoria"])){
 <body>
   <header class="site-header sticky-top py-1">
     <nav class="bg-dark container d-flex flex-column flex-md-row justify-content-between">
-
+      <a class="py-2 d-none d-md-inline-block text-white " href="seleccionSucursal.php">Sucursales</a>
       <a class="py-2 d-none d-md-inline-block text-white " href="lobby.php">Inicio</a>
       <a class="py-2 d-none d-md-inline-block text-white " href="carrito.php">Carrito</a>
       <a class="py-2 d-none d-md-inline-block text-white " href="perfil.php">Perfil</a>
@@ -109,6 +120,7 @@ if(isset($_GET["idCategoria"])){
   <main>
     <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
       <div class="col-md-5 p-lg-5 mx-auto my-5">
+        <h1><?php foreach($resultado as $row){ echo $row["nombre_sucursal"];} ?></h1>
         <h1 class="display-4 fw-normal">¡Bienvenido al Supermecado online de Juanito!</h1>
         <p class="lead fw-normal"> Ofrecemos los mejores productos del mercado y te lo enviamos lo más pronto posible </p>
       </div>
