@@ -35,7 +35,7 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
 		JOIN categoria ON producto.id_categoria = categoria.id_categoria
         JOIN contiene ON producto.id_producto = contiene.id_producto
-		where estado_producto = true and contiene.id_bodega = '".$idBodega."';";
+		where estado_producto = true and contiene.id_bodega = '".$idBodega."' ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
@@ -43,19 +43,19 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
     $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
             JOIN categoria ON producto.id_categoria = categoria.id_categoria
             JOIN contiene ON producto.id_producto = contiene.id_producto
-            where estado_producto = true and producto.id_producto = '$idBuscar' and contiene.id_bodega = '".$idBodega."';";
+            where estado_producto = true and producto.id_producto = '$idBuscar' and contiene.id_bodega = '".$idBodega."' ";
 } else if (isset($_POST["nombreBuscar"])) {
     $nombreBuscar = $_POST["nombreBuscar"];
     if ($_POST["nombreBuscar"] == "") {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and contiene.id_bodega = '".$idBodega."';";
+                where estado_producto = true and contiene.id_bodega = '".$idBodega."' ";
     } else {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%') and contiene.id_bodega = '".$idBodega."';";
+                where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%') and contiene.id_bodega = '".$idBodega."' ";
     }
 } else if (isset($_POST["nombreCategoria"]) && isset($_POST["marca"]) && $_POST["nombreCategoria"] !== " " && $_POST["marca"] !== " ") {
     $idCategoria = $_POST["nombreCategoria"];
@@ -64,17 +64,17 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and categoria.id_categoria = '$idCategoria' and contiene.id_bodega = '".$idBodega."';";
+                where estado_producto = true and categoria.id_categoria = '$idCategoria' and contiene.id_bodega = '".$idBodega."' ";
     } else if ($_POST["nombreCategoria"] == "Seleccione..." && $_POST["marca"] != "Seleccione...") {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and marca = '$marca' and contiene.id_bodega = '".$idBodega."';";
+                where estado_producto = true and marca = '$marca' and contiene.id_bodega = '".$idBodega."' ";
     } else if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] != "Seleccione...") {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, contiene.stock as tstock FROM producto 
                 JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN contiene ON producto.id_producto = contiene.id_producto
-                where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca' and contiene.id_bodega = '".$idBodega."';";
+                where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca' and contiene.id_bodega = '".$idBodega."' ";
     }
 }
 
@@ -93,10 +93,35 @@ $gsent5 = $gbd->prepare($sql5);
 $gsent5->execute();
 $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 
-$sql6 = "SELECT distinct marca FROM producto where estado_producto = true order by marca";
+$sql6 = "SELECT distinct marca FROM producto
+        join contiene on contiene.id_producto = producto.id_producto 
+        where estado_producto = true order by marca;";
 $gsent6 = $gbd->prepare($sql6);
 $gsent6->execute();
 $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
+
+//paginador
+$xpaginas = 5;
+$paginas = $gsent3->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+
+if(!$_GET){
+	header('Location: infoBodega.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: infoBodega.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql3.'LIMIT :nArticulos OFFSET :iniciar;';
+$gsent7 = $gbd->prepare($sqlGuardar);
+$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+$gsent7->execute();
+$resultado7 = $gsent7->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
@@ -256,7 +281,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                 <div class="dropdown-menu" aria-labelledby="bd-version">
                     <li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
                     <div class="dropdown-divider"></div>
-                    <li><a class="dropdown-item" aria-current="true" href="../index.php">Cerrar sesión</a></li>
+                    <li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
                 </div>
             </div>
 
@@ -298,13 +323,13 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="infoBodega.php" method="POST" class="d-flex">
+                                                <form action="infoBodega.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Producto" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                             <div class="col-sm-6">
-                                                <form action="infoBodega.php" method="POST" class="d-flex">
+                                                <form action="infoBodega.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="nombreBuscar" placeholder="Nombre" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -315,7 +340,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                                 <label> Tipo: </label>
                                             </div>
                                             <div class="col-sm-4">
-                                                <form action="infoBodega.php" method="POST" class="d-flex">
+                                                <form action="infoBodega.php?pagina=1" method="POST" class="d-flex">
                                                     <select class="form-select" name="nombreCategoria" id="nombreCategoria" required>
                                                         <option selected>Seleccione...</option>
                                                         <?php
@@ -460,26 +485,26 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php
-                        foreach ($resultado3 as $row3) {
+                        foreach ($resultado7 as $row7) {
                             echo '<tr>';
-                            echo '<td>' . $row3["id_producto"] . '</td>';
-                            echo  '<td>' . $row3["nombre_producto"] . '</td>';
-                            echo  '<td>' . $row3["tnombre_categoria"] . '</td>';
-                            echo  '<td>' . $row3["marca"] . '</td>';
-                            echo  '<td>' . $row3["tstock"] . '</td>';
+                            echo '<td>' . $row7["id_producto"] . '</td>';
+                            echo  '<td>' . $row7["nombre_producto"] . '</td>';
+                            echo  '<td>' . $row7["tnombre_categoria"] . '</td>';
+                            echo  '<td>' . $row7["marca"] . '</td>';
+                            echo  '<td>' . $row7["tstock"] . '</td>';
                             echo "<td>
-                            <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row3['id_producto'] . "\",\"" . $row3['id_bodega'] . "\")' class='envio' data-bs-toggle='modal' data-bs-target='#envioEmployeeModal' data-backdrop='static' data-keyboard='false' ><svg 
+                            <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row7['id_producto'] . "\",\"" . $row7['id_bodega'] . "\")' class='envio' data-bs-toggle='modal' data-bs-target='#envioEmployeeModal' data-backdrop='static' data-keyboard='false' ><svg 
                                     xmlns='http://www.w3.org/2000/svg' width='17' height='17' fill='currentColor' 
                                     class='bi bi-check-circle-fill' viewBox='0 0 16 16'>
                                     <path d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z'/>
                                 </svg></a>
-                                <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row3['id_producto'] . "\",\"" . $row3['id_bodega'] . "\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal' data-backdrop='static' data-keyboard='false' ><svg
+                                <a href='' onclick='mostrarUpdateInfoBodega(\"" . $row7['id_producto'] . "\",\"" . $row7['id_bodega'] . "\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal' data-backdrop='static' data-keyboard='false' ><svg
                                     xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
                                     class='bi bi-pencil-fill' viewBox='0 0 16 16'>
                                     <path
                                         d='M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z' />
                                 </svg></a>";
-                            echo "<a href='' onclick='eliminarInfoBodega(\"" . $row3['id_producto'] . "\")' class='delete' data-bs-toggle='modal' ><svg
+                            echo "<a href='' onclick='eliminarInfoBodega(\"" . $row7['id_producto'] . "\")' class='delete' data-bs-toggle='modal' ><svg
                                     xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor'
                                     class='bi bi-trash-fill' viewBox='0 0 16 16'>
                                     <path
@@ -492,17 +517,17 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                     </tbody>
                 </table>
                 <div class="clearfix">
-                    <div class="hint-text">Mostrando <b>5</b> de <b>25</b> entradas</div>
-                    <ul class="pagination">
-                        <li class="page-item"><a href="#" class="page-link">Anterior</a></li>
-                        <li class="page-item"><a href="#" class="page-link">1</a></li>
-                        <li class="page-item"><a href="#" class="page-link">2</a></li>
-                        <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                        <li class="page-item"><a href="#" class="page-link">4</a></li>
-                        <li class="page-item"><a href="#" class="page-link">5</a></li>
-                        <li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
-                    </ul>
-                </div>
+                <div class="hint-text">Mostrando <b><?php echo $xpaginas?></b> de <b><?php echo $paginasElevado?></b> entradas</div>
+					<ul class="pagination">
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="infoBodega.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="infoBodega.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="infoBodega.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
+					</ul>
+				</div>
             </div>
         </div>
     </div>
@@ -521,7 +546,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                             <label>Nombre Producto: </label>
                             <br>
                             <select class="form-select" name="id_producto" id="id_producto" required>
-                                <option selected>Seleccione...</option>
+                                <option value="">Seleccione...</option>
                                 <?php
                                 foreach ($resultado2 as $row2) {
                                     echo "<option id=" . $row2["id_producto"] . " value=" . $row2['id_producto'] . ">" . $row2["nombre_producto"] . "</option>";
@@ -567,12 +592,6 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                 <label>Nombre Producto: </label>
                                 <input type="text" class="form-control" id="NombreProducto" disabled>
                             </div>
-                            <!-- Stock visto
-                            <div class="form-group">
-                                <label>Stock: </label>
-                                
-                                <input class="form-control" name="actualStock" id="actualStock" type="hidden">
-                            </div> -->
                             <div class="form-group">
                                 <label>Stock a enviar a Sucursal: </label>
                                 <input type="text" class="form-control" name="envioStock" id="stock" required>

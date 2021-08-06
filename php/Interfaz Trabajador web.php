@@ -45,24 +45,24 @@ if(isset($_GET["error"])){
 
 $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 		JOIN categoria ON producto.id_categoria = categoria.id_categoria
-		where estado_producto = true;";
+		where estado_producto = true ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 	$idBuscar = $_POST["idBuscar"];
 	$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 			JOIN categoria ON producto.id_categoria = categoria.id_categoria
-			where estado_producto = true and id_producto = '$idBuscar';";
+			where estado_producto = true and id_producto = '$idBuscar' ";
 } else if (isset($_POST["nombreBuscar"])) {
 	$nombreBuscar = $_POST["nombreBuscar"];
 	if ($_POST["nombreBuscar"] == "") {
 		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = true;";
+				where estado_producto = true ";
 	} else {
 		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%');";
+				where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%') ";
 	}
 } else if (isset($_POST["nombreCategoria"]) && isset($_POST["marca"]) && $_POST["nombreCategoria"] !== " " && $_POST["marca"] !== " ") {
 	$idCategoria = $_POST["nombreCategoria"];
@@ -70,21 +70,23 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 	if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] == "Seleccione...") {
 		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = true and categoria.id_categoria = '$idCategoria';";
+				where estado_producto = true and categoria.id_categoria = '$idCategoria' ";
 	} else if ($_POST["nombreCategoria"] == "Seleccione..." && $_POST["marca"] != "Seleccione...") {
 		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = true and marca = '$marca';";
+				where estado_producto = true and marca = '$marca' ";
 	} else if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] != "Seleccione...") {
 		$sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca';";
+				where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca' ";
 	}
 }
+
 
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
+
 
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
@@ -94,20 +96,45 @@ $gsent2 = $gbd->prepare($sql2);
 $gsent2->execute();
 $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 
-$sql3 = "SELECT * FROM proveedor";
+$sql3 = "SELECT * FROM proveedor where estado_proveedor = true;";
 $gsent3 = $gbd->prepare($sql3);
 $gsent3->execute();
 $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 
-$sql4 = "SELECT imagen FROM producto where id_producto = '3'";
+$sql4 = "SELECT distinct marca FROM producto where estado_producto = true order by marca";
 $gsent4 = $gbd->prepare($sql4);
 $gsent4->execute();
 $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
 
-$sql5 = "SELECT distinct marca FROM producto where estado_producto = true order by marca";
-$gsent5 = $gbd->prepare($sql5);
+//paginador
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+$paginas = $gsent->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
+
+
+if(!$_GET){
+	header('Location: Interfaz Trabajador web.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: Interfaz Trabajador web.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
+$gsent5 = $gbd->prepare($sqlGuardar);
+$gsent5->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent5->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
 $gsent5->execute();
 $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 ?>
 
@@ -262,7 +289,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 				<div class="dropdown-menu" aria-labelledby="bd-version">
 					<li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
 					<div class="dropdown-divider"></div>
-					<li><a class="dropdown-item" aria-current="true" href="../index.php">Cerrar sesión</a></li>
+					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
 				</div>
 			</div>
 
@@ -308,13 +335,13 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="Interfaz Trabajador web.php" method="POST" class="d-flex">
+												<form action="Interfaz Trabajador web.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Producto" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="Interfaz Trabajador web.php" method="POST" class="d-flex">
+												<form action="Interfaz Trabajador web.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="nombreBuscar" placeholder="Nombre" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
@@ -325,7 +352,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 												<label> Tipo: </label>
 											</div>
 											<div class="col-sm-4">
-												<form action="Interfaz Trabajador web.php" method="POST" class="d-flex">
+												<form action="Interfaz Trabajador web.php?pagina=1" method="POST" class="d-flex">
 													<select class="form-select" name="nombreCategoria" id="nombreCategoria" required>
 														<option selected>Seleccione...</option>
 														<?php
@@ -342,7 +369,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 												<select class="form-select" name="marca" id="marca" required>
 													<option selected>Seleccione...</option>
 													<?php
-													foreach ($resultado5 as $row5) {
+													foreach ($resultado4 as $row5) {
 														echo "<option id=" . $row5["id_producto"] . " value=" . $row5['marca'] . ">" . $row5["marca"] . "</option>";
 													}
 													?>
@@ -373,7 +400,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 					</thead>
 					<tbody>
 						<?php
-						foreach ($resultado as $row) {
+						foreach ($resultado5 as $row) {
 							echo '<tr>';
 							echo '<td>' . $row["id_producto"] . '</td>';
 							echo  '<td>' . $row["nombre_producto"] . '</td>';
@@ -401,15 +428,15 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 					</tbody>
 				</table>
 				<div class="clearfix">
-					<div class="hint-text">Mostrar <b>5</b> de <b>25</b> entradas</div>
+				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
 					<ul class="pagination">
-						<li class="page-item"><a href="#" class="page-link">Anterior</a></li>
-						<li class="page-item"><a href="#" class="page-link">1</a></li>
-						<li class="page-item"><a href="#" class="page-link">2</a></li>
-						<li class="page-item active"><a href="#" class="page-link">3</a></li>
-						<li class="page-item"><a href="#" class="page-link">4</a></li>
-						<li class="page-item"><a href="#" class="page-link">5</a></li>
-						<li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="Interfaz Trabajador web.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="Interfaz Trabajador web.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="Interfaz Trabajador web.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
 					</ul>
 				</div>
 			</div>
@@ -430,7 +457,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 							<div class="form-group">
 								<label>Categoria: </label>
 								<select class="form-select" name="tipoCategoria" id="tipoCategoria" required>
-									<option selected>Seleccione...</option>
+									<option value="">Seleccione...</option>
 									<?php
 									foreach ($resultado2 as $row2) {
 										echo "<option id=" . $row2["id_categoria"] . " value=" . $row2['nombre_categoria'] . ">" . $row2["nombre_categoria"] . "</option>";
@@ -441,7 +468,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 							<div class="form-group">
 								<label>Nombre Proveedor: </label>
 								<select class="form-select" name="nombreProveedor" id="nombreProveedor" required>
-									<option selected>Seleccione...</option>
+									<option value="">Seleccione...</option>
 									<?php
 									foreach ($resultado3 as $row3) {
 										echo "<option id=" . $row3["rut_proveedor"] . " value=" . $row3['nombre_proveedor'] . ">" . $row3["nombre_proveedor"] . "</option>";
@@ -471,7 +498,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 							<div class="form-group">
 								<label>Imagen: </label>
-								<input type="file" class="form-control" name="imagen" required>
+								<input type="file" class="form-control" name="imagen" accept="image/*" required>
 							</div>
 						</div>
 					</div>
@@ -502,7 +529,6 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 								<label>Categoria: </label>
 								<br>
 								<select class="form-select" name="UpdatetipoCategoria" id="UpdatetipoCategoria" required>
-									<option id="test">Seleccione...</option>
 									<?php
 									foreach ($resultado2 as $row2) {
 										echo "<option id=" . $row2["id_categoria"] . " value=" . $row2['nombre_categoria'] . ">" . $row2["nombre_categoria"] . "</option>";
@@ -516,7 +542,6 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 								<label>Nombre Proveedor: </label>
 								<br>
 								<select class="form-select" name="updateNombreProveedor" id="updateNombreProveedor" required>
-									<option selected>Seleccione...</option>
 									<?php
 									foreach ($resultado3 as $row3) {
 										echo "<option id=" . $row3["rut_proveedor"] . " value=" . $row3['nombre_proveedor'] . ">" . $row3["nombre_proveedor"] . "</option>";

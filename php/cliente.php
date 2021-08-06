@@ -1,4 +1,12 @@
 <?php
+
+session_start();
+echo $_SESSION["sucursal"];
+
+if(isset($_GET["error"]) && $_GET["error"] == 2){
+	echo "<script>alert('El rut ya se encuentra registrado')</script>";
+}
+
 include("conexion.php");
 $gbd = conectar();
 
@@ -17,7 +25,7 @@ if (isset($_POST["rutBuscar"])) {
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
 	$desde = $_POST["desde"];
 	$hasta = $_POST["hasta"];
-	$sql = "SELECT * from cliente where fecha_nacimiento_persona Between '$desde' and '$hasta'";
+	$sql = "SELECT * from cliente where fecha_nacimiento_persona Between '$desde' and '$hasta' and (estado_persona=true)";
 } else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["desde"] == "" || $_POST["hasta"] == "") {
 	$sql = "SELECT * FROM cliente where estado_persona = true";
 }
@@ -31,11 +39,14 @@ if(isset($_GET["error"])){
 	} 
 }
 
-
 //$data = $conn->query($sql)->fetchAll();
 $gsent = $gbd->prepare($sql);
 $cuenta_col = $gsent->columnCount();
 $data = $gbd->query($sql)->fetchAll();
+
+$sql1 = "SELECT sucursal.nombre_sucursal from sucursal where id_sucursal = '".$_SESSION["sucursal"]."'";
+$gsent = $gbd->prepare($sql1);
+$resultado1 = $gbd->query($sql1)->fetchAll();
 
 ?>
 <!DOCTYPE html>
@@ -55,13 +66,49 @@ $data = $gbd->query($sql)->fetchAll();
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 	
 	<!--Sacado de la carpeta-->
+	<script src="../popper/popper.min.js"></script>
 	<link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
     <script src="../jquery/jquery.min.v3.6.0.js"></script>
     <script src="../js/funciones.js"></script>
     <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
-
+	
 	
 	<style>
+		/*Header*/
+    	header {
+		background: #f5f5f5;
+		}
+
+		header .juan {
+		width: 240px;
+		height: 50px;
+		color: #566787;
+		}
+
+		header .row .col-md-3,
+		header .row .col-md-8 {
+		padding: 0px 0px;
+		}
+
+		header .row .card-body {
+		padding: 3px 0px;
+		}
+
+		header .row .card-body .card-title {
+
+		margin-bottom: 0px;
+
+		}
+
+		header .dropdown .dropdown-menu {
+		width: 100%;
+		background: #ececec;
+		}
+
+		header .dropdown .dropdown-menu li {
+		color: #2196F3;
+		}
+
 		body {
 			color: #566787;
 			background: #f5f5f5;
@@ -286,6 +333,11 @@ $data = $gbd->query($sql)->fetchAll();
 		div .accordion-body h5{
 			font-size: 19px;
 		}
+		/*Color azul boton recuperar*/
+		a.btn.btn-success.b2{
+			background: #167bde;
+		}
+		
 	</style>
 </head>
 
@@ -295,10 +347,33 @@ $data = $gbd->query($sql)->fetchAll();
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
 			<a class="py-2 d-none d-md-inline-block" href="Interfaz RRHH.php">Volver</a>
+			
+			
 			<h2>CLIENTES</h2>
-			<a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
+			<div class="dropdown">
+				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
+					<div class="row juan">
+						<div class="col-md-3 text-center">
+							<img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
+						</div>
+						<div class="col-md-8 text-start">
+							<div class="card-body">
+								<h5 class="card-title">Juan Perez</h5>
+								<p class="card-text">Gerente General</p>
+							</div>
+						</div>
+					</div>
+				</button>
+				<div class="dropdown-menu" aria-labelledby="bd-version">
+					<li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
+					<div class="dropdown-divider"></div>
+					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
+				</div>
+			</div>
 
 		</nav>
+		<h2 class="text-center"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></h2>
+
 	</header>
 
 	<div class="container-fluid">
@@ -310,6 +385,9 @@ $data = $gbd->query($sql)->fetchAll();
 							<h2>GESTIÓN DE CLIENTES: </h2>
 						</div>
 						<div class="col-sm-6">
+							<a class="btn btn-success b2"  href="clienteRecuperar.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+								<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
+                                </svg> Recuperar Clientes</a>
 							<a href="#addEmployeeModal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#añadirexampleModal"><i class="material-icons">&#xE147;</i> <span>Añadir nuevo cliente</span></a>
 						</div>
 					</div>
@@ -494,6 +572,7 @@ $data = $gbd->query($sql)->fetchAll();
         font-size: 16px;
         margin-top: 8px;
     }
+	
 </style>
 
 <div class="modal fade" id="añadirexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -690,7 +769,9 @@ $data = $gbd->query($sql)->fetchAll();
         color: #212529;
         font-size: 15px;
     }
+	
 </style>
+
 
 <div class="modal fade" id="eliminarexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">

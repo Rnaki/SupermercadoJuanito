@@ -1,6 +1,6 @@
 <?php
-
 session_start();
+
 echo $_SESSION["sucursal"];
 
 if(isset($_GET["error"]) && $_GET["error"] == 2){
@@ -14,20 +14,22 @@ $gbd = conectar();
 if (isset($_POST["rutBuscar"])) {
 	$rutBuscar = $_POST["rutBuscar"];
 	$sql = "SELECT * from trabajador
-	join trabaja on trabaja.rut_persona = trabajador.rut_persona 
+	join trabaja
+	on trabaja.rut_persona = trabajador.rut_persona 
 	where trabajador.rut_persona like '$rutBuscar%'
-	and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+	and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = false";
 } else if (isset($_POST["apellidoPBuscar"])) {
 	$apellidoPBuscar = $_POST["apellidoPBuscar"];
 	if ($_POST["apellidoPBuscar"] == "") {
 		$sql = "SELECT * FROM trabajador
-		join trabaja on trabaja.rut_persona = trabajador.rut_persona
-		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+		join trabaja
+		on trabaja.rut_persona = trabajador.rut_persona
+		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = false";
 	} else {
 		$sql = "SELECT * from trabajador 
 		join trabaja on trabaja.rut_persona = trabajador.rut_persona 
 		where apellidop_persona like '$apellidoPBuscar%' 
-		and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+		and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = false";
 	}
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
 	$desde = $_POST["desde"];
@@ -35,11 +37,11 @@ if (isset($_POST["rutBuscar"])) {
 	$sql = "SELECT * from trabajador
 			join trabaja on trabaja.rut_persona = trabajador.rut_persona 
 			where fecha_nacimiento_persona Between '$desde' and '$hasta' and (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' 
-			and trabajador.estado_persona = true)";
+			and trabajador.estado_persona = false)";
 } else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["desde"] == "" || $_POST["hasta"] == "") {
 	$sql = "SELECT * FROM trabajador
 			join trabaja on trabaja.rut_persona = trabajador.rut_persona
-			where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+			where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = false";
 }
 
 
@@ -60,7 +62,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Gestion de personal</title>
+	<title>Recuperar empleado</title>
 	<!--Sacado de por otra via-->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -77,9 +79,9 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 	<script src="../js/funciones.js"></script>
 	<script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
 
-	<style>	
+	<style>
 		/*Header*/
-    	header {
+        header {
 		background: #f5f5f5;
 		}
 
@@ -90,6 +92,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		}
 
 		header .row .col-md-3,
+
 		header .row .col-md-8 {
 		padding: 0px 0px;
 		}
@@ -99,10 +102,8 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		}
 
 		header .row .card-body .card-title {
-
 		margin-bottom: 0px;
-
-		}
+		}	
 
 		header .dropdown .dropdown-menu {
 		width: 100%;
@@ -112,24 +113,24 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		header .dropdown .dropdown-menu li {
 		color: #2196F3;
 		}
-		
+
 		body {
-		color: #566787;
-		background: #f5f5f5;
-		font-family: 'Varela Round', sans-serif;
-		font-size: 13px;
+			color: #566787;
+			background: #f5f5f5;
+			font-family: 'Varela Round', sans-serif;
+			font-size: 13px;
 		}
 
 		.table-responsive {
-		margin: 30px 0;
+			margin: 30px 0;
 		}
 
 		.table-wrapper {
-		background: #fff;
-		padding: 20px 25px;
-		border-radius: 3px;
-		min-width: 1000px;
-		box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+			background: #fff;
+			padding: 20px 25px;
+			border-radius: 3px;
+			min-width: 1000px;
+			box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 		}
 
 		.table-title {
@@ -337,9 +338,6 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		div .accordion-body h5{
 			font-size: 19px;
 		}
-		a.btn.btn-success.b2{
-			background: #167bde;
-		}
 	</style>
 </head>
 
@@ -348,7 +346,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 	<header class="site-header sticky-top py-1">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
+			<a class="py-2 d-none d-md-inline-block" href="Interfaz RRHH.php">Volver</a>
 			<a class="py-2 d-none d-md-inline-block" href="Contratos.php">Contratos</a>
 			<h2>ÁREA RECURSOS HUMANOS</h2>
 			
@@ -384,14 +382,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 				<div class="table-title">
 					<div class="row primero">
 						<div class="col-sm-6">
-							<h2>GESTIÓN DE PERSONAL: </h2>	
-						</div>
-						<div class="col-sm-6">
-							<a class="btn btn-success b2"  href="trabajadorRecuperar.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
-								<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
-                                </svg> Recuperar Empleados</a>
-							<a href="#addEmployeeModal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#añadirexampleModal"><i class="material-icons">&#xE147;</i> <span>Añadir nuevo empleado</span></a>
-							<?php //include("modalAñadirPersonal.php"); ?>
+							<h2>RECUPERAR EMPLEADO: </h2>	
 						</div>
 					</div>
 
@@ -415,13 +406,13 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="trabajadorRecuperar.php" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="rutBuscar" placeholder="RUT" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="trabajadorRecuperar.php" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="apellidoPBuscar" placeholder="Apellido Paterno" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
@@ -438,7 +429,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 											</div>
 
 											<div class="col-sm-4">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="trabajadorRecuperar.php" method="POST" class="d-flex">
 													<input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
 
 											</div>
@@ -628,8 +619,8 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                     <input type="email" class="form-control mb-3 c" required="required" name="Correo" placeholder="Correo" maxlength="64">
                     <label>Teléfono: </label>
                     <input type="text" class="form-control mb-3 c" required="required" name="Telefono" placeholder="Telefono" maxlength="16">
-					<!--<label>Cargo: </label>-->
-                    <input type="hidden" class="form-control mb-3 c" required="required" name="Cargo" placeholder="Cargo" maxlength="16">
+					<label>Cargo: </label>
+                    <input type="text" class="form-control mb-3 c" required="required" name="Cargo" placeholder="Cargo" maxlength="16">
 					<label>Acceso: </label>
 					<br>
 					<input type="checkbox" id="RRHH" name="RRHH" value="1" >
@@ -758,10 +749,8 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                             <label>Teléfono: </label>
                             <input type="text" class="form-control c" id="editTelefono" name="Telefono" required value="">
                         </div>
-					<!--
 						<label>Cargo: </label>
                     <input type="text" class="form-control mb-3 c" required="required" id="editCargo" name="Cargo" placeholder="Cargo" maxlength="16">
-					-->
 					<label>Acceso: </label>
 					<br>
 					<input type="checkbox" id="accesoEdit1" name="RRHH" value="1" >

@@ -10,7 +10,7 @@ echo $conn->exec($sql);
 $sql2="SELECT eliminarcliente('".$rut_persona."')";
 echo $conn->exec($sql2);
 if($conn){
-    Header("Location: cliente.php");
+   Header("Location: cliente.php");
 }else{
     
 }

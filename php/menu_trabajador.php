@@ -277,7 +277,7 @@ table.table-striped.table-hover tbody a{
 			</div>
 			<div class="col-sm-6 text-center h-100 border border-light bg-dark">
 				<div class="inline alinear-central">
-					<a class="link-options link-light" href="lobby.php">TIENDA</a>
+					<a class="link-options link-light" href="seleccionSucursal.php">TIENDA</a>
 				</div>
 			</div>
 		</div>

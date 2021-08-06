@@ -3,51 +3,42 @@
 session_start();
 echo $_SESSION["sucursal"];
 
-if(isset($_GET["error"]) && $_GET["error"] == 2){
-	echo "<script>alert('El rut ya se encuentra registrado')</script>";
-}
-
-
 include("conexion.php");
 $gbd = conectar();
 
 if (isset($_POST["rutBuscar"])) {
 	$rutBuscar = $_POST["rutBuscar"];
-	$sql = "SELECT * from trabajador
-	join trabaja on trabaja.rut_persona = trabajador.rut_persona 
-	where trabajador.rut_persona like '$rutBuscar%'
-	and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+	$sql = "SELECT * from cliente where rut_persona like '$rutBuscar%' and estado_persona = false";
 } else if (isset($_POST["apellidoPBuscar"])) {
 	$apellidoPBuscar = $_POST["apellidoPBuscar"];
 	if ($_POST["apellidoPBuscar"] == "") {
-		$sql = "SELECT * FROM trabajador
-		join trabaja on trabaja.rut_persona = trabajador.rut_persona
-		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+		$sql = "SELECT * FROM cliente where estado_persona = false";
 	} else {
-		$sql = "SELECT * from trabajador 
-		join trabaja on trabaja.rut_persona = trabajador.rut_persona 
-		where apellidop_persona like '$apellidoPBuscar%' 
-		and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+		$sql = "SELECT * from cliente where apellidop_persona like CONCAT('$apellidoPBuscar','%') and estado_persona = false";
+		
+		//var_dump($apellidoPBuscar);
 	}
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
 	$desde = $_POST["desde"];
 	$hasta = $_POST["hasta"];
-	$sql = "SELECT * from trabajador
-			join trabaja on trabaja.rut_persona = trabajador.rut_persona 
-			where fecha_nacimiento_persona Between '$desde' and '$hasta' and (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' 
-			and trabajador.estado_persona = true)";
+	$sql = "SELECT * from cliente where (fecha_nacimiento_persona Between '$desde' and '$hasta' and estado_persona = false)";
 } else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["desde"] == "" || $_POST["hasta"] == "") {
-	$sql = "SELECT * FROM trabajador
-			join trabaja on trabaja.rut_persona = trabajador.rut_persona
-			where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+	$sql = "SELECT * FROM cliente where estado_persona = false";
 }
 
+if(isset($_GET["error"])){
+	$tipoError = $_GET["error"];
+	if($tipoError ==2){
+		echo "<script>
+				alert('Rut ya existente');
+			</script>";
+	} 
+}
 
 //$data = $conn->query($sql)->fetchAll();
 $gsent = $gbd->prepare($sql);
 $cuenta_col = $gsent->columnCount();
 $data = $gbd->query($sql)->fetchAll();
-
 
 $sql1 = "SELECT sucursal.nombre_sucursal from sucursal where id_sucursal = '".$_SESSION["sucursal"]."'";
 $gsent = $gbd->prepare($sql1);
@@ -60,7 +51,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Gestion de personal</title>
+	<title>Gestion de clientes</title>
 	<!--Sacado de por otra via-->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -69,16 +60,17 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-
+	
 	<!--Sacado de la carpeta-->
-	<script src="../popper/popper.min.js"></script>
+    <script src="../popper/popper.min.js"></script>
 	<link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
-	<script src="../jquery/jquery.min.v3.6.0.js"></script>
-	<script src="../js/funciones.js"></script>
-	<script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
+    <script src="../jquery/jquery.min.v3.6.0.js"></script>
+    <script src="../js/funciones.js"></script>
+    <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
 
-	<style>	
-		/*Header*/
+	
+	<style>
+        /*Header*/
     	header {
 		background: #f5f5f5;
 		}
@@ -112,24 +104,24 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		header .dropdown .dropdown-menu li {
 		color: #2196F3;
 		}
-		
+
 		body {
-		color: #566787;
-		background: #f5f5f5;
-		font-family: 'Varela Round', sans-serif;
-		font-size: 13px;
+			color: #566787;
+			background: #f5f5f5;
+			font-family: 'Varela Round', sans-serif;
+			font-size: 13px;
 		}
 
 		.table-responsive {
-		margin: 30px 0;
+			margin: 30px 0;
 		}
 
 		.table-wrapper {
-		background: #fff;
-		padding: 20px 25px;
-		border-radius: 3px;
-		min-width: 1000px;
-		box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+			background: #fff;
+			padding: 20px 25px;
+			border-radius: 3px;
+			min-width: 1000px;
+			box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 		}
 
 		.table-title {
@@ -337,22 +329,17 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		div .accordion-body h5{
 			font-size: 19px;
 		}
-		a.btn.btn-success.b2{
-			background: #167bde;
-		}
 	</style>
 </head>
 
 <body>
 
-	<header class="site-header sticky-top py-1">
+    <header class="site-header sticky-top py-1">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
-			<a class="py-2 d-none d-md-inline-block" href="Contratos.php">Contratos</a>
-			<h2>ÁREA RECURSOS HUMANOS</h2>
+			<a class="py-2 d-none d-md-inline-block" href="cliente.php">Volver</a>
 			
-			<a class="py-2 d-none d-md-inline-block" href="cliente.php">Clientes</a>
+			<h2>CLIENTES</h2>
 			<div class="dropdown">
 				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
 					<div class="row juan">
@@ -376,6 +363,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 
 		</nav>
 		<h2 class="text-center"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></h2>
+
 	</header>
 
 	<div class="container-fluid">
@@ -384,14 +372,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 				<div class="table-title">
 					<div class="row primero">
 						<div class="col-sm-6">
-							<h2>GESTIÓN DE PERSONAL: </h2>	
-						</div>
-						<div class="col-sm-6">
-							<a class="btn btn-success b2"  href="trabajadorRecuperar.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
-								<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
-                                </svg> Recuperar Empleados</a>
-							<a href="#addEmployeeModal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#añadirexampleModal"><i class="material-icons">&#xE147;</i> <span>Añadir nuevo empleado</span></a>
-							<?php //include("modalAñadirPersonal.php"); ?>
+							<h2>GESTIÓN DE CLIENTES: </h2>
 						</div>
 					</div>
 
@@ -415,13 +396,13 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="clienteRecuperar.php" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="rutBuscar" placeholder="RUT" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="clienteRecuperar.php" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="apellidoPBuscar" placeholder="Apellido Paterno" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
@@ -438,7 +419,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 											</div>
 
 											<div class="col-sm-4">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="clienteRecuperar.php" method="POST" class="d-flex">
 													<input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
 
 											</div>
@@ -459,7 +440,6 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 						</div>
 					</div>
 
-
 				</div>
 				<table class="table table-striped table-hover">
 					<thead>
@@ -478,15 +458,12 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 							<th>Contraseña</th>
 							<th>Correo</th>
 							<th>Telefono</th>
-							<th>Supervisor</th>
-							<th>Cargo</th>
-							<th>Area de trabajo</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
 					<tbody>
 						<?php
-						foreach ($data as $row) {
+						foreach ($data as $row){
 						?>
 							<tr>
 								<td></td>
@@ -503,17 +480,12 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 								<td><?php echo $row['contrasena'] ?></td>
 								<td><?php echo $row['correo'] ?></td>
 								<td><?php echo $row['fono'] ?></td>
-
-								<td><?php echo $row['tra_rut_persona'] ?></td>
-								<td><?php echo $row['cargo'] ?></td>
-								<td><?php echo $row['area_trabajo'] ?></td>
 								<td>
-						<?php	echo "<a onclick='mostrarUpdateTrabajador(\"" . $row['rut_persona'] . "\")' href='#edicionexampleModal' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><i class='material-icons' data-toggle='tooltip' title='Editar'>&#xE254;</i></a> "?>
-						<?php 	echo "<a onclick='mostrarEliminarTrabajador(\"" . $row['rut_persona'] . "\")' href='#eliminarexampleModal' class='delete' data-bs-toggle='modal' data-bs-target='#eliminarexampleModal'><i class='material-icons' data-toggle='tooltip' title='Eliminar'>&#xE872;</i></a>" ?>
+						<?php	echo "<a onclick='mostrarUpdateCliente(\"".$row['rut_persona']."\")' href='#edicionexampleModal' class='edit' data-bs-toggle='modal' data-backdrop='static' data-keyboard='false' data-bs-target='#edicionexampleModal'><i class='material-icons' data-toggle='tooltip' title='Editar' >&#xE254;</i></a>"; ?>
+						<?php   echo "<a onclick='mostrarEliminarCliente(\"".$row['rut_persona']."\")' href='eliminarexampleModal' class='delete' data-bs-toggle='modal' data-bs-target='#eliminarexampleModal'><i class='material-icons' data-toggle='tooltip' title='Eliminar'>&#xE872;</i></a>"; ?>
 								</td>
 							</tr>
-							<?php //include("modalEditarPersonal.php"); ?>
-							<?php //include("modalEliminarPersonal.php"); ?>
+							
 						<?php
 						}
 						?>
@@ -535,8 +507,8 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 			</div>
 		</div>
 	</div>
-
 </body>
+
 <style>
     .modal-content {
         max-width: 85%;
@@ -590,10 +562,10 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header aña">
-                <h5 class="modal-title" id="exampleModalLabel">Añadir Usuario</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Añadir Cliente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="insertarTrabajador.php" method="POST">
+            <form action="insertarCliente.php" method="POST">
                 <div>
                     <label>Rut: </label>
                     <input type="text" class="form-control mb-3 c" required="required" id="rutAgregar" name="rut" placeholder="Rut" maxlength="10">
@@ -628,20 +600,6 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                     <input type="email" class="form-control mb-3 c" required="required" name="Correo" placeholder="Correo" maxlength="64">
                     <label>Teléfono: </label>
                     <input type="text" class="form-control mb-3 c" required="required" name="Telefono" placeholder="Telefono" maxlength="16">
-					<!--<label>Cargo: </label>-->
-                    <input type="hidden" class="form-control mb-3 c" required="required" name="Cargo" placeholder="Cargo" maxlength="16">
-					<label>Acceso: </label>
-					<br>
-					<input type="checkbox" id="RRHH" name="RRHH" value="1" >
-					<label for="RRHH"> Recursos Humanos</label><br>
-					<input type="checkbox" id="Tweb" name="Tweb" value="2">
-					<label for="Tweb"> Trabajador Web</label><br>
-					<input type="checkbox" id="Bodega" name="Bodega" value="3">
-					<label for="Bodega"> Bodega</label><br>
-					<input type="checkbox" id="Proveedor" name="Proveedor" value="4">
-					<label for="Proveedor"> Proveedor</label><br>
-					<input type="checkbox" id="Despacho" name="Despacho" value="5">
-					<label for="Despacho">Despacho</label><br>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary b1" data-bs-dismiss="modal">
@@ -691,96 +649,82 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
     }
 </style>
 
-<div class="modal fade" id="edicionexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header edi">
-                <h5 class="modal-title" id="exampleModalLabel">Editar Usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="updateTrabajador.php" method="POST">
-                <input type="hidden" id="editRut" name="rut" value="">
-                <div class="modal-body">
-                    <div class="form-group form">
-                        <div class="form-group">
-                            <label>Rut: </label>
-                            <input type="text" class="form-control c" id="editRut2" name="Rut" required value="" disabled>
+
+    <div class="modal fade" id="edicionexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header edi">
+                    <h5 class="modal-title" id="exampleModalLabel">Editar Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="updateCliente.php" method="POST">
+					<div class="modal-body">
+                        <div class="form-group form">
+                            <div class="form-group">
+                                <label>Rut: </label>
+                                <input type="text" class="form-control c updateRutCliente" name="" value="" disabled>
+								<input type="hidden" class="form-control c updateRutCliente" id ="updateRutCliente" name="updateRutCliente" required value="" >
+                            </div>
+                            <div class="form-group">
+                                <label>Nombre: </label>
+                                <input type="text" class="form-control c" id="updateNombreCliente" name="updateNombreCliente" required value="" maxlength="32">
+                            </div>
+                            <div class="form-group">
+                                <label>Apellido Paterno: </label>
+                                <input type="text" class="form-control c" id="updateApellidoPCliente" name="updateApellidoPCliente" required value="" maxlength="32">
+                            </div>
+                            <div class="form-group">
+                                <label>Apellido Materno: </label>
+                                <input type="text" class="form-control c" id="updateApellidoMCliente" name="updateApellidoMCliente" required value="" maxlength="32">
+                            </div>
+                            <div class="form-group">
+                                <label>Region: </label>
+                                <input type="text" class="form-control c" id="updateRegionCliente" name="updateRegionCliente" required value="" maxlength="32">
+                            </div>
+                            <div class="form-group">
+                                <label>Comuna: </label>
+                                <input type="text" class="form-control c" id="updateComunaCliente" name="updateComunaCliente" required value="" maxlength="32">
+                            </div>
+                            <div class="form-group">
+                                <label>Calle: </label>
+                                <input type="text" class="form-control c" id="updateCalleCliente" name="updateCalleCliente" required value="" maxlength="32">
+                            </div>
+                            <div class="form-group">
+                                <label>Nª Calle: </label>
+                                <input type="text" class="form-control c" id="updateNcalleCliente" name="updateNcalleCliente" required value="" maxlength="32">
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha Nacimiento: </label>
+                                <input type="text" class="form-control c" id="updateFechaNacimientoCliente" name="updateFechaNacimientoCliente" required value="">
+                            </div>
+                            <label>Sexo: </label>
+                            <br>
+                            <select class="form-select" id="updateSexoCliente" name="updateSexoCliente" id="sexoupdate">
+                                <option value="Hombre" id="Hombre">Hombre</option>
+                                <option value="Mujer" id="Mujer">Mujer</option>
+                                <option value="Otros" id="Otros">Otros</option>
+                            </select>
+                            <br>
+                            <div class="form-group">
+                                <label>Contraseña: </label>
+                                <input type="text" class="form-control c" id="updateContraseñaCliente" name="updateContraseñaCliente" required value="" maxlength="12">
+                            </div>
+                            <div class="form-group">
+                                <label>Correo: </label>
+                                <input type="text" class="form-control c" id="updateCorreoCliente" name="updateCorreoCliente" required value="" maxlength="64">
+                            </div>
+                            <div class="form-group">
+                                <label>Teléfono: </label>
+                                <input type="text" class="form-control c" id="updateTelefonoCliente" name="updateTelefonoCliente" required value="" maxlength="16">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Nombre: </label>
-                            <input type="text" class="form-control c" id="editNombre" name="nombre" required value="">
-                        </div>
-                        <div class="form-group">
-                            <label>Apellido Paterno: </label>
-                            <input type="text" class="form-control c" id="editApellidoP" name="apellidoP" required value="">
-                        </div>
-                        <div class="form-group">
-                            <label>Apellido Materno: </label>
-                            <input type="text" class="form-control c" id="editApellidoM" name="apellidoM" required value="">
-                        </div>
-                        <div class="form-group">
-                            <label>Region: </label>
-                            <input type="text" class="form-control c" id="editRegion" name="region" required value="" maxlength="32">
-                        </div>
-                        <div class="form-group">
-                            <label>Comuna: </label>
-                            <input type="text" class="form-control c" id="editComuna" name="comuna" required value="" maxlength="32">
-                        </div>
-                        <div class="form-group">
-                            <label>Calle: </label>
-                            <input type="text" class="form-control c" id="editCalle" name="calle" required value="" maxlength="32">
-                        </div>
-                        <div class="form-group">
-                            <label>Nª Calle: </label>
-                            <input type="text" class="form-control c" id="editNCalle" name="ncalle" required value="" maxlength="32">
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha Nacimiento: </label>
-                            <input type="text" class="form-control c" id="editFechaNacimiento" name="fechaNacimiento" required value="">
-                        </div>
-                        <label>Sexo: </label>
-                        <br>
-                        <select class="form-select" id="editSexo" name="sexo" id="sexoupdate">
-                            <option value="Hombre" id="Hombre">Hombre</option>
-                            <option value="Mujer" id="Mujer">Mujer</option>
-                            <option value="Otros" id="Otros">Otros</option>
-                        </select>
-                        <br>
-                        <div class="form-group">
-                            <label>Contraseña: </label>
-                            <input type="text" class="form-control c" id="editContraseña" name="Contraseña" required value="">
-                        </div>
-                        <div class="form-group">
-                            <label>Correo: </label>
-                            <input type="text" class="form-control c" id="editCorreo" name="Correo" required value="">
-                        </div>
-                        <div class="form-group">
-                            <label>Teléfono: </label>
-                            <input type="text" class="form-control c" id="editTelefono" name="Telefono" required value="">
-                        </div>
-					<!--
-						<label>Cargo: </label>
-                    <input type="text" class="form-control mb-3 c" required="required" id="editCargo" name="Cargo" placeholder="Cargo" maxlength="16">
-					-->
-					<label>Acceso: </label>
-					<br>
-					<input type="checkbox" id="accesoEdit1" name="RRHH" value="1" >
-					<label for="RRHH"> Recursos Humanos</label><br>
-					<input type="checkbox" id="accesoEdit2" name="Tweb" value="2">
-					<label for="Tweb"> Trabajador Web</label><br>
-					<input type="checkbox" id="accesoEdit3" name="Bodega" value="3">
-					<label for="Bodega"> Bodega</label><br>
-					<input type="checkbox" id="accesoEdit4" name="Proveedor" value="4">
-					<label for="Proveedor"> Proveedor</label><br>
-					<input type="checkbox" id="accesoEdit5" name="Despacho" value="5">
-					<label for="Despacho">Despacho</label><br>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning">Guardar Cambios</button>
-                </div>
-            </form>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -788,8 +732,6 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
         //$('#sexoupdate<?php //echo $row['rut'] ?> option[id="<?php //echo $row['sexo'] ?>"]').attr("selected", true);
         //$('#sexoupdate option[id="'+$info['compañia']+'"]').attr("selected", true);
     </script>
-</div>
-
 <style>
     div .modal-dialog .eli{
         padding: 20px 30px;
@@ -817,23 +759,22 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header eli">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Empleado</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Cliente</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body cuadro">
                     <div class="form-group fuente">
-                        <label>¿Estas seguro que quieres eliminar al Trabajador <b></b>?</label>
-						<input type="hidden" id="eliminarRutTrabajador" value="">
-						<h5 id="EliminarNombreTrabajador"></h5>
-                        <div style="height:16px"></div>
+                        <label>¿Estas seguro que quieres eliminar al cliente ?<b></b></label>
+						<input type="hidden" id="eliminarRutCliente" value="">
+						<h5 id="EliminarNombreCliente"></h5>
+						<div style="height:16px"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button onclick="eliminarTrabajador()"  class="btn btn-danger" data-bs-dismiss="modal">Eliminar</button>
+                    <button onclick="eliminarCliente()"  class="btn btn-danger" data-bs-dismiss="modal">Eliminar</button>
                 </div>
             </div>
         </div>
     </div>
-
 </html>

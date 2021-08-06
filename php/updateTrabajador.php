@@ -15,7 +15,7 @@ $Sexo=$_POST["sexo"];
 $Contraseña=$_POST["Contraseña"];
 $Correo=$_POST["Correo"];
 $Telefono=$_POST["Telefono"];
-$Cargo=$_POST["Cargo"];
+//$Cargo=$_POST["Cargo"];
 
 $trabaja_en = "";
 if(isset($_POST["RRHH"])){
@@ -39,8 +39,36 @@ if(isset($_POST["Despacho"])){
     $trabaja_en = $trabaja_en."Despacho ";
 }
 
+$sql1="UPDATE cliente SET nombre_persona='".$nombre."',
+                          apellidop_persona='".$apellidoP."',
+                          apellidom_persona='".$apellidoM."',
+                          fecha_nacimiento_persona='".$fechaNacimiento."',
+                          sexo='".$Sexo."',
+                          correo='".$Correo."',
+                          fono='".$Telefono."',
+                          region='".$region."',
+                          comuna='".$comuna."',
+                          calle='".$calle."',
+                          numero_calle='".$ncalle."',
+                          contrasena='".$Contraseña."'
+                          WHERE rut_persona='".$rut."'";
+echo $conn->exec($sql1);
+/*$sql0="SELECT updateclienterrhh('".$rut."',
+                              '".$nombre."',
+                              '".$apellidoP."',
+                              '".$apellidoM."',
+                              '".$region."',
+                              '".$comuna."',
+                              '".$calle."',
+                              '".$ncalle."',
+                              '".$fechaNacimiento."',
+                              '".$Sexo."',
+                              '".$Contraseña."'                              
+                              '".$Correo."',
+                              '".$Telefono."')";*/
+/*echo $conn->exec($sql0);*/
 
-$sql="SELECT updateTrabajador('".$rut."',
+$sql0="SELECT updateTrabajador('".$rut."',
                               '".$nombre."',
                               '".$apellidoP."',
                               '".$apellidoM."',
@@ -53,9 +81,39 @@ $sql="SELECT updateTrabajador('".$rut."',
                               '".$calle."',
                               '".$ncalle."',
                               '".$Contraseña."',
-                              '".$Cargo."',
+                              
                               '".$trabaja_en."')";
-echo $conn->exec($sql);
+echo $conn->exec($sql0);
+
+/*$sql2="SELECT updateclienterrhh('".$rut."',
+                              '".$nombre."',
+                              '".$apellidoP."',
+                              '".$apellidoM."',
+                              '".$region."',
+                              '".$comuna."',
+                              '".$calle."',
+                              '".$ncalle."',
+                              '".$fechaNacimiento."',
+                              '".$Sexo."',
+                              '".$Contraseña."'                              
+                              '".$Correo."',
+                              '".$Telefono."')";
+echo $conn->exec($sql2);*/
+
+$sql3="UPDATE persona SET nombre_persona='".$nombre."',
+                          apellidop_persona='".$apellidoP."',
+                          apellidom_persona='".$apellidoM."',
+                          fecha_nacimiento_persona='".$fechaNacimiento."',
+                          sexo='".$Sexo."',
+                          correo='".$Correo."',
+                          fono='".$Telefono."',
+                          region='".$region."',
+                          comuna='".$comuna."',
+                          calle='".$calle."',
+                          numero_calle='".$ncalle."',
+                          contrasena='".$Contraseña."'
+                          WHERE rut_persona='".$rut."'";
+echo $conn->exec($sql3);
 
 $sql1 = "DELETE FROM controla where rut_persona = '".$rut."'";
 echo $conn->exec($sql1);

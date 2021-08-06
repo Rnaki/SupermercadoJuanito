@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-echo $_SESSION["sucursal"];
+$_SESSION["sucursal"];
 
 include("conexion.php");
 $gbd = conectar();
@@ -23,7 +23,7 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
 		JOIN categoria ON producto.id_categoria = categoria.id_categoria
         JOIN incluye ON producto.id_producto = incluye.id_producto
-		where estado_producto = true and id_sucursal = '".$_SESSION["sucursal"]."';";
+		where estado_producto = true and id_sucursal = '".$_SESSION["sucursal"]."' ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
@@ -31,19 +31,19 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
     $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
             JOIN categoria ON producto.id_categoria = categoria.id_categoria
             JOIN incluye ON producto.id_producto = incluye.id_producto
-            where estado_producto = true and producto.id_producto = '$idBuscar' and id_sucursal = '".$_SESSION["sucursal"]."';";
+            where estado_producto = true and producto.id_producto = '$idBuscar' and id_sucursal = '".$_SESSION["sucursal"]."' ";
 } else if (isset($_POST["nombreBuscar"])) {
     $nombreBuscar = $_POST["nombreBuscar"];
     if ($_POST["nombreBuscar"] == "") {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
 		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN incluye ON producto.id_producto = incluye.id_producto
-		        where estado_producto = true and id_sucursal = '".$_SESSION["sucursal"]."';";
+		        where estado_producto = true and id_sucursal = '".$_SESSION["sucursal"]."' ";
     } else {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
 		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN incluye ON producto.id_producto = incluye.id_producto
-		        where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%') and id_sucursal = '".$_SESSION["sucursal"]."';";
+		        where estado_producto = true and upper(producto.nombre_producto) like upper('%$nombreBuscar%') and id_sucursal = '".$_SESSION["sucursal"]."' ";
     }
 } else if (isset($_POST["nombreCategoria"]) && isset($_POST["marca"]) && $_POST["nombreCategoria"] !== " " && $_POST["marca"] !== " ") {
     $idCategoria = $_POST["nombreCategoria"];
@@ -52,17 +52,17 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
 		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN incluye ON producto.id_producto = incluye.id_producto
-		        where estado_producto = true and categoria.id_categoria = '$idCategoria' and id_sucursal = '".$_SESSION["sucursal"]."';";
+		        where estado_producto = true and categoria.id_categoria = '$idCategoria' and id_sucursal = '".$_SESSION["sucursal"]."' ";
     } else if ($_POST["nombreCategoria"] == "Seleccione..." && $_POST["marca"] != "Seleccione...") {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
 		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN incluye ON producto.id_producto = incluye.id_producto
-		        where estado_producto = true and marca = '$marca' and id_sucursal = '".$_SESSION["sucursal"]."';";
+		        where estado_producto = true and marca = '$marca' and id_sucursal = '".$_SESSION["sucursal"]."' ";
     } else if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] != "Seleccione...") {
         $sql3 = "SELECT *, categoria.nombre_categoria as tnombre_categoria, incluye.stock_sucursal as tstock FROM producto 
 		        JOIN categoria ON producto.id_categoria = categoria.id_categoria
                 JOIN incluye ON producto.id_producto = incluye.id_producto
-		        where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca' and id_sucursal = '".$_SESSION["sucursal"]."';";
+		        where estado_producto = true and categoria.id_categoria = '$idCategoria' and marca = '$marca' and id_sucursal = '".$_SESSION["sucursal"]."' ";
     }
 }
 $gsent3 = $gbd->prepare($sql3);
@@ -74,10 +74,34 @@ $gsent4 = $gbd->prepare($sql4);
 $gsent4->execute();
 $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
 
-$sql6 = "SELECT distinct marca FROM producto where estado_producto = true order by marca";
+$sql6 = "SELECT distinct marca FROM producto
+        join contiene on contiene.id_producto = producto.id_producto 
+        where estado_producto = true order by marca;";
 $gsent6 = $gbd->prepare($sql6);
 $gsent6->execute();
 $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
+
+//paginador
+$xpaginas = 5;
+$paginas = $gsent3->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+
+if(!$_GET){
+	header('Location: infoSucursal.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: infoSucursal.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql3.'LIMIT :nArticulos OFFSET :iniciar;';
+$gsent7 = $gbd->prepare($sqlGuardar);
+$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+$gsent7->execute();
+$resultado7 = $gsent7->fetchAll(PDO::FETCH_ASSOC);
+
 
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
@@ -216,7 +240,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
 <body class="body-infoB">
     <header class="site-header sticky-top py-1">
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
-            <a class="py-2 d-none d-md-inline-block" href="infoBodega.php">Volver</a>
+            <a class="py-2 d-none d-md-inline-block" href="infoBodega.php">Bodega</a>
             
             <?php
             foreach ($resultado as $row) {
@@ -241,7 +265,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                 <div class="dropdown-menu" aria-labelledby="bd-version">
                     <li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
                     <div class="dropdown-divider"></div>
-                    <li><a class="dropdown-item" aria-current="true" href="../index.php">Cerrar sesión</a></li>
+                    <li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
                 </div>
             </div>
 
@@ -278,13 +302,13 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="infoSucursal.php" method="POST" class="d-flex">
+                                                <form action="infoSucursal.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Producto" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                             <div class="col-sm-6">
-                                                <form action="infoSucursal.php" method="POST" class="d-flex">
+                                                <form action="infoSucursal.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="nombreBuscar" placeholder="Nombre" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -295,7 +319,7 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                                                 <label> Tipo: </label>
                                             </div>
                                             <div class="col-sm-4">
-                                                <form action="infoSucursal.php" method="POST" class="d-flex">
+                                                <form action="infoSucursal.php?pagina=1" method="POST" class="d-flex">
                                                 <select class="form-select" name="nombreCategoria" id="nombreCategoria" required>
                                                         <option selected>Seleccione...</option>
                                                         <?php
@@ -468,15 +492,15 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php
-                        foreach ($resultado3 as $row3) {
+                        foreach ($resultado7 as $row7) {
                             echo '<tr>';
-                            echo '<td>' . $row3["id_producto"] . '</td>';
-                            echo  '<td>' . $row3["nombre_producto"] . '</td>';
-                            echo  '<td>' . $row3["tnombre_categoria"] . '</td>';
-                            echo  '<td>' . $row3["marca"] . '</td>';
-                            echo  '<td>' . $row3["tstock"] . '</td>';
+                            echo '<td>' . $row7["id_producto"] . '</td>';
+                            echo  '<td>' . $row7["nombre_producto"] . '</td>';
+                            echo  '<td>' . $row7["tnombre_categoria"] . '</td>';
+                            echo  '<td>' . $row7["marca"] . '</td>';
+                            echo  '<td>' . $row7["tstock"] . '</td>';
                             echo "<td>
-                                <a href='' onclick='mostrarEnvioSucursal(\"" . $row3['id_producto'] . "\",\"" . $row3['id_sucursal'] . "\")' class='envio' data-bs-toggle='modal' data-bs-target='#envioEmployeeModal' data-backdrop='static' data-keyboard='false' ><svg 
+                                <a href='' onclick='mostrarEnvioSucursal(\"" . $row7['id_producto'] . "\",\"" . $row7['id_sucursal'] . "\")' class='envio' data-bs-toggle='modal' data-bs-target='#envioEmployeeModal' data-backdrop='static' data-keyboard='false' ><svg 
                                     xmlns='http://www.w3.org/2000/svg' width='19' height='19' fill='currentColor' 
                                     class='bi bi-reply-fill' viewBox='0 0 16 16'>
                                     <path d='M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z'/>
@@ -488,17 +512,17 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
                     </tbody>
                 </table>
                 <div class="clearfix">
-                    <div class="hint-text">Mostrando <b>5</b> de <b>25</b> entradas</div>
-                    <ul class="pagination">
-                        <li class="page-item"><a href="#" class="page-link">Anterior</a></li>
-                        <li class="page-item"><a href="#" class="page-link">1</a></li>
-                        <li class="page-item"><a href="#" class="page-link">2</a></li>
-                        <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                        <li class="page-item"><a href="#" class="page-link">4</a></li>
-                        <li class="page-item"><a href="#" class="page-link">5</a></li>
-                        <li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
-                    </ul>
-                </div>
+					<div class="hint-text">Mostrando <b><?php echo $xpaginas?></b> de <b><?php echo $paginasElevado?></b> entradas</div>
+					<ul class="pagination">
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="infoSucursal.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="infoSucursal.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="infoSucursal.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
+					</ul>
+				</div>
             </div>
         </div>
     </div>
