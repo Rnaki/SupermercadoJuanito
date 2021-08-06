@@ -849,3 +849,119 @@ function mostrarUpdateProducto(idProducto){
       }
   }) 
 }
+
+function decrementarcarrito(id_producto){
+   if($('#'+id_producto).val()>=2){
+   $('#'+id_producto).val(function(i, oldval) {
+      return --oldval;
+  });
+  
+      idProducto = id_producto;
+      cantidad = $('#'+id_producto).val();
+      cadena= {
+         "idProducto": idProducto,
+         "cantidad": cantidad,
+      };
+      console.log(cadena);
+      $.ajax({
+         type: "POST",
+         url: "updateCarrito.php",
+         data: cadena,
+         success:function(info){
+            datos = JSON.parse(info)
+            $('#subtotal'+id_producto).val(datos[0])
+            $('#total0').val(datos[1])
+            $('#subtotalCompra').text(datos[1]);
+            totalCompra = parseInt(datos[1]) + parseInt($('#envio').val());
+            $('#totalCompra').text(totalCompra);
+         }
+      })
+   }
+}
+
+function incrementarcarrito(id_producto){
+   $('#'+id_producto).val(function(i, oldval) {
+      return ++oldval;
+  });
+  idProducto = id_producto;
+      cantidad = $('#'+id_producto).val();
+      cadena= {
+         "idProducto": idProducto,
+         "cantidad": cantidad,
+      };
+      console.log(cadena);
+      $.ajax({
+         type: "POST",
+         url: "updateCarrito.php",
+         data: cadena,
+         success:function(info){
+            datos = JSON.parse(info)
+            $('#subtotal'+id_producto).val(datos[0]);
+            $('#total0').val(datos[1])
+            $('#subtotalCompra').text(datos[1])
+            totalCompra = parseInt(datos[1]) + parseInt($('#envio').val());
+            $('#totalCompra').text(totalCompra);
+         }
+      })
+   }
+
+function borrarCarrito(id_producto){
+   idProducto = id_producto;
+   cadena= {
+      "idProducto": idProducto,
+   };
+   console.log(cadena);
+   $.ajax({
+      type: "POST",
+      url: "borrarCarrito.php",
+      data: cadena,
+      success:function(info){
+         datos = JSON.parse(info)
+         location.reload();
+      }
+   })
+
+}
+
+
+function mostrarUpdateContrato(idContrato){
+   cadena= {
+      "idContrato": idContrato,
+  };
+  $.ajax({
+      type: "POST",
+      url: "mostrarUpdateContrato.php",
+      data: cadena,
+      success:function(info){
+          datos = JSON.parse(info)
+          $('.updateIdContrato').val(datos[0])
+          $('#updateNombreCompleto').val(datos[1]);
+          $('#updateCargo').val(datos[2]);
+          $('#updateSueldo').val(datos[3]);
+          $('#updateFechaInicio').val(datos[4]);
+          $('#updateFechaTermino').val(datos[5]);
+          $('#updateEstado').val(datos[6]);
+          $('#updateEstado option[id="'+datos[6]+'"]').attr("selected", true);
+          console.log(datos[0]);//importante print
+      }
+  }) 
+}
+
+function eliminarContrato(idContrato){
+   $('#eliminarexampleModal').modal('show');
+   cadena= {
+      "idContrato": idContrato,
+      };
+   $('#eliminarContrato').click(function() {
+      $.ajax({
+         type: "POST",
+         url: "eliminarContrato.php",
+         data: cadena,
+         success:function(){
+            location.reload();
+            $('#eliminarexampleModal').modal('hide');
+         }
+      }) 
+   } );
+}
+
