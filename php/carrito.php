@@ -207,12 +207,15 @@
             <h5>Total Compra </h5>
           </div>
           <div class="col">
-            <h5 id="totalCompra"></h5>
+          <form method="POST" action="../php/transaccion/index.php" >
+            <input type="text" name="totalCompra" id="totalCompra" class="totalCompra" value="" size="5" disabled>
+            <input type="hidden" name="totalCompraTransbank" id="totalCompra" class="totalCompra" value="" size="5" >
           </div>
         </div>
           <div class="d-grid gap-2">
-          <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#creacionDespachoModal" type="button">Comprar</button>
+          <button  class="btn btn-primary btn-lg" type="submit">Comprar</button>
           </div>
+         </form>
         </div>
         </section>
       </div>
@@ -260,7 +263,7 @@
 
 <script>
   totalCompra = parseInt( $('#subtotalCompra').text()) + parseInt(2000);
-    $('#totalCompra').text(totalCompra);
+    $('.totalCompra').val(totalCompra);
 $('#checkBoxLocal').on('change', function() {
   var x = document.getElementById("checkBoxLocal").checked;
     if(x == false){
@@ -272,7 +275,7 @@ $('#checkBoxLocal').on('change', function() {
     $('#checkBoxTienda').not(this).prop('checked', false); 
     $('#envio').val(2000);
     totalCompra = parseInt( $('#subtotalCompra').text()) + parseInt(2000);
-    $('#totalCompra').text(totalCompra);
+    $('.totalCompra').val(totalCompra);
 });
 
 $('#checkBoxTienda').on('change', function() {
@@ -285,7 +288,7 @@ $('#checkBoxTienda').on('change', function() {
     $('#checkBoxLocal').not(this).prop('checked', false);  
     $('#envio').val(0);
     totalCompra = parseInt($('#subtotalCompra').text())+parseInt(0);
-    $('#totalCompra').text(totalCompra);
+    $('.totalCompra').val(totalCompra);
     
 
 });

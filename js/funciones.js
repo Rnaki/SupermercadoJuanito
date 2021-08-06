@@ -873,7 +873,7 @@ function decrementarcarrito(id_producto){
             $('#total0').val(datos[1])
             $('#subtotalCompra').text(datos[1]);
             totalCompra = parseInt(datos[1]) + parseInt($('#envio').val());
-            $('#totalCompra').text(totalCompra);
+            $('.totalCompra').val(totalCompra);
          }
       })
    }
@@ -900,7 +900,7 @@ function incrementarcarrito(id_producto){
             $('#total0').val(datos[1])
             $('#subtotalCompra').text(datos[1])
             totalCompra = parseInt(datos[1]) + parseInt($('#envio').val());
-            $('#totalCompra').text(totalCompra);
+            $('.totalCompra').val(totalCompra);
          }
       })
    }
