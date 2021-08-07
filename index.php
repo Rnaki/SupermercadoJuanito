@@ -62,6 +62,7 @@
       <label for="floatingPassword">Contraseña</label>
     </div>
 
+
     <input class="w-100 btn btn-lg btn-primary" type="submit" value="Entrar"></input>
     <div><a href="php/Registro.php" class="h6 mb-3 fw-normal">Registrarse</a></div>
     <p class="mt-5 mb-3 text-muted">&copy; 2021</p>

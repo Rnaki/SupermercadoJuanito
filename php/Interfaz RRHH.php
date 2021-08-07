@@ -1,15 +1,20 @@
 <?php
 
 session_start();
-echo $_SESSION["sucursal"];
+$_SESSION["sucursal"];
+$_SESSION["rut_persona"];
 
 if(isset($_GET["error"]) && $_GET["error"] == 2){
 	echo "<script>alert('El rut ya se encuentra registrado')</script>";
 }
-
-
 include("conexion.php");
 $gbd = conectar();
+
+$sql0 = "SELECT * FROM trabajador where rut_persona = '".$_SESSION["rut_persona"]."'";
+$gsent0 = $gbd->prepare($sql0);
+$gsent0->execute();
+$resultado0 = $gsent0->fetchAll(PDO::FETCH_ASSOC);
+
 
 if (isset($_POST["rutBuscar"])) {
 	$rutBuscar = $_POST["rutBuscar"];
@@ -70,6 +75,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
+	<link rel="stylesheet" href="../css/estilosDaniel.css">
 	<!--Sacado de la carpeta-->
 	<script src="../popper/popper.min.js"></script>
 	<link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
@@ -77,227 +83,38 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 	<script src="../js/funciones.js"></script>
 	<script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
 
-	<style>	
-		/*Header*/
-    	header {
-		background: #f5f5f5;
-		}
-
-		header .juan {
-		width: 240px;
-		height: 50px;
-		color: #566787;
-		}
-
-		header .row .col-md-3,
-		header .row .col-md-8 {
-		padding: 0px 0px;
-		}
-
-		header .row .card-body {
-		padding: 3px 0px;
-		}
-
-		header .row .card-body .card-title {
-
-		margin-bottom: 0px;
-
-		}
-
-		header .dropdown .dropdown-menu {
-		width: 100%;
-		background: #ececec;
-		}
-
-		header .dropdown .dropdown-menu li {
-		color: #2196F3;
-		}
-		
+	<style>
 		body {
-		color: #566787;
-		background: #f5f5f5;
-		font-family: 'Varela Round', sans-serif;
-		font-size: 13px;
-		}
-
-		.table-responsive {
-		margin: 30px 0;
-		}
-
-		.table-wrapper {
-		background: #fff;
-		padding: 20px 25px;
-		border-radius: 3px;
-		min-width: 1000px;
-		box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
-		}
-
-		.table-title {
-			padding-bottom: 15px;
-			background: #435d7d;
-			color: #fff;
-			padding: 16px 30px;
-			min-width: 100%;
-			margin: -20px -25px 10px;
-			border-radius: 3px 3px 0 0;
-		}
-
-		.table-title h2 {
-			margin: 5px 0 0;
-			font-size: 24px;
-		}
-
-		.table-title .btn-group {
-			float: right;
-		}
-
-		.table-title .btn {
-			color: #fff;
-			float: right;
-			font-size: 13px;
-			border: none;
-			min-width: 50px;
-			border-radius: 2px;
-			border: none;
-			outline: none !important;
-			margin-left: 10px;
-		}
-
-		.table-title .btn i {
-			float: left;
-			font-size: 21px;
-			margin-right: 5px;
-		}
-
-		.table-title .btn span {
-			float: left;
-			margin-top: 2px;
-		}
-
-		table.table tr th,
-		table.table tr td {
-			border-color: #e9e9e9;
-			padding: 12px 15px;
-			vertical-align: middle;
-		}
-
-		table.table tr th:first-child {
-			width: 60px;
-		}
-
-		table.table tr th:last-child {
-			width: 100px;
-		}
-
-		table.table-striped tbody tr:nth-of-type(odd) {
-			background-color: #fcfcfc;
-		}
-
-		table.table-striped.table-hover tbody tr:hover {
 			background: #f5f5f5;
 		}
 
-		table.table th i {
-			font-size: 13px;
-			margin: 0 5px;
-			cursor: pointer;
+		div .col-sm-6 h4 {
+			font-family: 'Varela Round', sans-serif;
 		}
 
-		table.table td:last-child i {
-			opacity: 0.9;
-			font-size: 22px;
-			margin: 0 5px;
+		div .primero .col {
+			text-align: right;
 		}
-
-		table.table td a {
-			font-weight: bold;
-			color: #566787;
-			display: inline-block;
-			text-decoration: none;
-			outline: none !important;
+		/*
+		.container-xl .primero .col-sm-1{
+			padding-left: 0px 0px;
 		}
-
-		table.table td a:hover {
-			color: #2196F3;
-		}
-
-		table.table td a.edit {
-			color: #FFC107;
-		}
-
-		table.table td a.delete {
-			color: #F44336;
-		}
-
-		table.table td i {
-			font-size: 19px;
-		}
-
-		table.table .avatar {
-			border-radius: 50%;
-			vertical-align: middle;
-			margin-right: 10px;
-		}
-
-		.pagination {
-			float: right;
-			margin: 0 0 5px;
-		}
-
-		.pagination li a {
-			border: none;
-			font-size: 13px;
-			min-width: 30px;
-			min-height: 30px;
-			color: #999;
-			margin: 0 2px;
-			line-height: 30px;
-			border-radius: 2px !important;
-			text-align: center;
-			padding: 0 6px;
-		}
-
-		.pagination li a:hover {
-			color: #666;
-		}
-
-		.pagination li.active a,
-		.pagination li.active a.page-link {
-			background: #03A9F4;
-		}
-
-		.pagination li.active a:hover {
-			background: #0397d6;
-		}
-
-		.pagination li.disabled i {
-			color: #ccc;
-		}
-
-		.pagination li i {
-			font-size: 16px;
-			padding-top: 6px
-		}
-
-		.hint-text {
-			float: left;
-			margin-top: 10px;
-			font-size: 13px;
-		}
-
-		/*----Cambio----*/
+		*/
+		/*Cambio*/
 		div .primero {
 			margin-bottom: 12px;
 		}
 
-		div .col-sm-6 .btn {
-			padding: 8px 12px;
-			border-radius: 4px;
-			font-size: 15px;
+		div .primero .btn .bi {
+			margin-bottom: 3%;
 		}
 
 		div .segundo {
-			padding-bottom: 14px;
+			padding-bottom: 23px;
+		}
+
+		div .accordion-collapse .segundo .form-control {
+			width: 100%;
 		}
 
 		div .accordion-item .accordion-button {
@@ -317,30 +134,60 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 
 		div .col-sm-6 .b {
 			background-color: #198754;
-			margin-right: 1%;
-			padding-right: 4%;
+			font-size: 15px;
+			padding: 1% 3%;
 		}
 
-		div .col-sm-1 .b {
+		div .col-sm-1 .btn-success {
 			background-color: #198754;
-			padding: 10% 20%;
+			float: right;
 			font-size: 15px;
-			border-radius: 4px;
+			padding: 12% 18%;
 		}
 
 		div .row .buscar label {
 			font-size: 19px;
-			padding-bottom: 0%;
-			padding-top: 4px;
+			font-weight: 500;
 		}
 
-		div .accordion-body h5{
+		div .accordion-body h5 {
 			font-size: 19px;
 		}
-		a.btn.btn-success.b2{
-			background: #167bde;
+
+		/*Header*/
+		header {
+			background: #f5f5f5;
+		}
+
+		header .juan {
+			width: 240px;
+			height: 50px;
+			color: #566787;
+		}
+
+		header .row .col-md-3,
+		header .row .col-md-8 {
+			padding: 0px 0px;
+		}
+
+		header .row .card-body {
+			padding: 3px 0px;
+		}
+
+		header .row .card-body .card-title {
+			margin-bottom: 0px;
+		}
+
+		header .dropdown .dropdown-menu {
+			width: 100%;
+			background: #ececec;
+		}
+
+		header .dropdown .dropdown-menu li {
+			color: #2196F3;
 		}
 	</style>
+	
 </head>
 
 <body>
@@ -350,19 +197,27 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 
 			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
 			<a class="py-2 d-none d-md-inline-block" href="Contratos.php">Contratos</a>
-			<h2>ÁREA RECURSOS HUMANOS</h2>
+			<h2 class="letrah2">ÁREA RECURSOS HUMANOS</h2>
 			
 			<a class="py-2 d-none d-md-inline-block" href="cliente.php">Clientes</a>
 			<div class="dropdown">
 				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
 					<div class="row juan">
 						<div class="col-md-3 text-center">
-							<img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
+								<?php
+                                foreach ($resultado0 as $row0) {
+                                    echo '<img src="../imagenes/'.$row0["foto"].'" width="40px" height="50px" class="rounded-circle">';
+                                }
+                                ?>
 						</div>
 						<div class="col-md-8 text-start">
 							<div class="card-body">
-								<h5 class="card-title">Juan Perez</h5>
-								<p class="card-text">Gerente General</p>
+								<?php
+                                foreach ($resultado0 as $row0) {
+                                    echo '<h5 class="card-title">'.$row0["nombre_persona"].' '.$row0["apellidop_persona"].'</h5>';
+									echo '<p class="card-text">'.$row0["cargo"].'</p>';
+                                }
+                                ?>
 							</div>
 						</div>
 					</div>
@@ -375,7 +230,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 			</div>
 
 		</nav>
-		<h2 class="text-center"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></h2>
+		<h2 class="text-center letrah2"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></h2>
 	</header>
 
 	<div class="container-fluid">
@@ -384,13 +239,13 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 				<div class="table-title">
 					<div class="row primero">
 						<div class="col-sm-6">
-							<h2>GESTIÓN DE PERSONAL: </h2>	
+							<h3>GESTIÓN DE PERSONAL: </h3>	
 						</div>
-						<div class="col-sm-6">
-							<a class="btn btn-success b2"  href="trabajadorRecuperar.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+						<div class="col-sm-6 col">
+							<a href="#addEmployeeModal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#añadirexampleModal"><i class="material-icons">&#xE147;</i> <span>Añadir nuevo empleado</span></a>
+							<a class="btn btn-primary"  href="trabajadorRecuperar.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
 								<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
                                 </svg> Recuperar Empleados</a>
-							<a href="#addEmployeeModal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#añadirexampleModal"><i class="material-icons">&#xE147;</i> <span>Añadir nuevo empleado</span></a>
 							<?php //include("modalAñadirPersonal.php"); ?>
 						</div>
 					</div>
@@ -484,7 +339,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 							<th>Acciones</th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody">
 						<?php
 						foreach ($data as $row) {
 						?>
@@ -537,6 +392,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 	</div>
 
 </body>
+<!--
 <style>
     .modal-content {
         max-width: 85%;
@@ -585,16 +441,16 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
         margin-top: 8px;
     }
 </style>
-
+-->
 <div class="modal fade" id="añadirexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header aña">
+            <div class="modal-header cread">
                 <h5 class="modal-title" id="exampleModalLabel">Añadir Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="insertarTrabajador.php" method="POST">
-                <div>
+            <form action="insertarTrabajador.php" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
                     <label>Rut: </label>
                     <input type="text" class="form-control mb-3 c" required="required" id="rutAgregar" name="rut" placeholder="Rut" maxlength="10">
                     <label>Nombre: </label>
@@ -628,6 +484,8 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                     <input type="email" class="form-control mb-3 c" required="required" name="Correo" placeholder="Correo" maxlength="64">
                     <label>Teléfono: </label>
                     <input type="text" class="form-control mb-3 c" required="required" name="Telefono" placeholder="Telefono" maxlength="16">
+					<label>Foto: </label>
+                    <input type="file" class="form-control mb-3 c" required="required" name="foto" accept="image/*">
 					<!--<label>Cargo: </label>-->
                     <input type="hidden" class="form-control mb-3 c" required="required" name="Cargo" placeholder="Cargo" maxlength="16">
 					<label>Acceso: </label>
@@ -644,10 +502,10 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 					<label for="Despacho">Despacho</label><br>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary b1" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <h6>Cancelar</h6>
                     </button>
-                    <button type="submit" onclick="return validarRut();" class="btn btn-success b1">
+                    <button type="submit" onclick="return validarRut();" class="btn btn-success cread">
                         <h6>Añadir</h6>
                     </button>
                 </div>
@@ -655,7 +513,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
         </div>
     </div>
 </div>
-
+<!--
 <style>
     .modal-content {
         max-width: 85%;
@@ -690,7 +548,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
         background: #ecf0f1;
     }
 </style>
-
+-->
 <div class="modal fade" id="edicionexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -698,7 +556,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                 <h5 class="modal-title" id="exampleModalLabel">Editar Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="updateTrabajador.php" method="POST">
+            <form action="updateTrabajador.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" id="editRut" name="rut" value="">
                 <div class="modal-body">
                     <div class="form-group form">
@@ -758,6 +616,8 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                             <label>Teléfono: </label>
                             <input type="text" class="form-control c" id="editTelefono" name="Telefono" required value="">
                         </div>
+						<label>Foto: </label>
+                    <input type="file" class="form-control mb-3 c" name="editFoto" accept="image/*">
 					<!--
 						<label>Cargo: </label>
                     <input type="text" class="form-control mb-3 c" required="required" id="editCargo" name="Cargo" placeholder="Cargo" maxlength="16">
@@ -789,7 +649,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
         //$('#sexoupdate option[id="'+$info['compañia']+'"]').attr("selected", true);
     </script>
 </div>
-
+<!--
 <style>
     div .modal-dialog .eli{
         padding: 20px 30px;
@@ -811,7 +671,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
         font-size: 15px;
     }
 </style>
-
+-->
 <div class="modal fade" id="eliminarexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">

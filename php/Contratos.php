@@ -5,20 +5,10 @@ $_SESSION["sucursal"];
 include("conexion.php");
 $gbd = conectar();
 
-if (isset($_GET["error"])) {
-	$error = $_GET["error"];
-	echo '<script>alert("Imagen muy grande")</script>';
-}
-
-if (isset($_GET["error1"])) {
-	$error = $_GET["error1"];
-	echo '<script>alert("Tipo de imagen no permitida")</script>';
-}
-
 $sql = "SELECT *, trabajador.cargo, trabajador.nombre_persona FROM contrato
 		join trabaja on trabaja.rut_persona = contrato.rut_persona 
 		JOIN trabajador ON trabajador.rut_persona = contrato.rut_persona
-		where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "';";
+		where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "' ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
@@ -26,19 +16,19 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 	$sql = "SELECT *, trabajador.cargo, trabajador.nombre_persona FROM contrato
 			join trabaja on trabaja.rut_persona = contrato.rut_persona 
 			JOIN trabajador ON trabajador.rut_persona = contrato.rut_persona
-			where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "' and id_contrato = '$idBuscar';";
+			where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "' and id_contrato = '$idBuscar' ";
 } else if (isset($_POST["apellidoPBuscar"])) {
 	$apellidoPBuscar = $_POST["apellidoPBuscar"];
 	if ($_POST["apellidoPBuscar"] == "") {
 		$sql = "SELECT *, trabajador.cargo, trabajador.nombre_persona FROM contrato
 				join trabaja on trabaja.rut_persona = contrato.rut_persona 
 				JOIN trabajador ON trabajador.rut_persona = contrato.rut_persona
-				where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "';";
+				where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "' ";
 	} else {
 		$sql = "SELECT *, trabajador.cargo, trabajador.nombre_persona FROM contrato
 				join trabaja on trabaja.rut_persona = contrato.rut_persona 
 				JOIN trabajador ON trabajador.rut_persona = contrato.rut_persona
-				where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "' and upper(apellidop_persona) like upper('%$apellidoPBuscar%');";
+				where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "' and upper(apellidop_persona) like upper('%$apellidoPBuscar%') ";
 	}
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
 	$desde = $_POST["desde"];
@@ -46,7 +36,7 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 	$sql = "SELECT *, trabajador.cargo, trabajador.nombre_persona FROM contrato
 			join trabaja on trabaja.rut_persona = contrato.rut_persona 
 			JOIN trabajador ON trabajador.rut_persona = contrato.rut_persona
-			where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "' and fecha_inicio_contrato Between '$desde' and '$hasta';";
+			where trabajador.estado_persona = true and trabaja.id_sucursal = '" . $_SESSION["sucursal"] . "' and fecha_inicio_contrato Between '$desde' and '$hasta' ";
 } 
 
 $gsent = $gbd->prepare($sql);
@@ -62,6 +52,38 @@ $sql2 = "SELECT * FROM trabajador
 $gsent2 = $gbd->prepare($sql2);
 $gsent2->execute();
 $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
+
+//paginador
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+$paginas = $gsent->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+    $encontrado = $totalquery-($paginas*$xpaginas);
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
+
+if(!$_GET){
+	header('Location: Contratos.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: Contratos.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
+$gsent3 = $gbd->prepare($sqlGuardar);
+$gsent3->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent3->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+$gsent3->execute();
+$resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 
 ?>
@@ -261,13 +283,13 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="Contratos.php" method="POST" class="d-flex">
+												<form action="Contratos.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Contrato" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="Contratos.php" method="POST" class="d-flex">
+												<form action="Contratos.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="apellidoPBuscar" placeholder="Apellido Paterno" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
@@ -283,7 +305,7 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 												<label> Desde: </label>
 											</div>
 											<div class="col-sm-4">
-												<form action="Contratos.php" method="POST" class="d-flex">
+												<form action="Contratos.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
 											</div>
 											<div class="col-sm-1 buscar">
@@ -319,28 +341,28 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 					</thead>
 					<tbody>
 						<?php
-						foreach ($resultado as $row) {
-							if ($row["estado_contrato"] == true) {
+						foreach ($resultado3 as $row3) {
+							if ($row3["estado_contrato"] == true) {
 								$estado = 'Vigente';
 							} else {
 								$estado = 'No vigente';
 							}
 							echo '<tr>';
-							echo '<td>' . $row["id_contrato"] . '</td>';
-							echo  '<td>' . $row["nombre_persona"] . ' ' . $row["apellidop_persona"] . ' ' . $row["apellidom_persona"] . '</td>';
-							echo  '<td>' . $row["cargo"] . '</td>';
-							echo  '<td>$' . $row["sueldo"] . '</td>';
-							echo  '<td>' . $row["fecha_inicio_contrato"] . '</td>';
-							echo  '<td>' . $row["fecha_termino_contrato"] . '</td>';
+							echo '<td>' . $row3["id_contrato"] . '</td>';
+							echo  '<td>' . $row3["nombre_persona"] . ' ' . $row3["apellidop_persona"] . ' ' . $row3["apellidom_persona"] . '</td>';
+							echo  '<td>' . $row3["cargo"] . '</td>';
+							echo  '<td>$' . $row3["sueldo"] . '</td>';
+							echo  '<td>' . $row3["fecha_inicio_contrato"] . '</td>';
+							echo  '<td>' . $row3["fecha_termino_contrato"] . '</td>';
 							echo  '<td>' . $estado . '</td>';
 							echo "<td>
-                            <a href='' onclick='mostrarUpdateContrato(\"" . $row['id_contrato'] . "\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal' data-backdrop='static' data-keyboard='false' ><svg
+                            <a href='' onclick='mostrarUpdateContrato(\"" . $row3['id_contrato'] . "\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal' data-backdrop='static' data-keyboard='false' ><svg
                                     xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
                                     class='bi bi-pencil-fill' viewBox='0 0 16 16'>
                                     <path
                                         d='M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z' />
                                 </svg></a>";
-							echo "<a href='' onclick='eliminarContrato(\"" . $row['id_contrato'] . "\")' class='delete' data-bs-toggle='modal'><svg
+							echo "<a href='' onclick='eliminarContrato(\"" . $row3['id_contrato'] . "\")' class='delete' data-bs-toggle='modal'><svg
                                     xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor'
                                     class='bi bi-trash-fill' viewBox='0 0 16 16'>
                                     <path
@@ -355,15 +377,15 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 
 				</table>
 				<div class="clearfix">
-					<div class="hint-text">Mostrar <b>5</b> de <b>25</b> entradas</div>
+				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
 					<ul class="pagination">
-						<li class="page-item disabled"><a href="#">Anterior</a></li>
-						<li class="page-item"><a href="#" class="page-link">1</a></li>
-						<li class="page-item"><a href="#" class="page-link">2</a></li>
-						<li class="page-item active"><a href="#" class="page-link">3</a></li>
-						<li class="page-item"><a href="#" class="page-link">4</a></li>
-						<li class="page-item"><a href="#" class="page-link">5</a></li>
-						<li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="Contratos.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="Contratos.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="Contratos.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
 					</ul>
 				</div>
 			</div>

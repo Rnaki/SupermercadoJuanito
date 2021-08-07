@@ -4,11 +4,13 @@ session_start();
 echo $_SESSION["id_venta"];
 
 if(isset($_POST["sucursal"])){
-  $sucursal = $_POST["sucursal"];
+  $_SESSION["sucursal"] = $_POST["sucursal"];
+  
+
 }
 if(isset($_SESSION["rut_persona"])){
 
-
+  $sucursal = $_SESSION["sucursal"];
 
 include("conexion.php");
 $gbd=conectar();
@@ -187,7 +189,9 @@ $resultado = $gbd->query($sql3)->fetchAll();
                     <a ><td><?php echo $row['nombre_producto'] ?></td></a>
                   
                   </h4>
-                  <h5><td>$<?php echo $row['precio'] ?></h5>
+                  <h5>$<?php echo round($row['precio']-(($row['precio']*$row['descuento'])/100)) ?></h5>
+
+                  <h6 style="color:dimgrey;">-<?php echo $row['descuento'] ?>%</h6>
                   <p class="card-text"><td><?php echo $row['descripcion'] ?></p>
                 </div>
                 <div class="card-footer">

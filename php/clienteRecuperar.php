@@ -51,7 +51,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Gestion de clientes</title>
+	<title>Recuperar clientes</title>
 	<!--Sacado de por otra via-->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -329,6 +329,14 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		div .accordion-body h5{
 			font-size: 19px;
 		}
+		/*Boton recuperar*/
+		a.btn.btn-success.b2{
+			background: #167bde;
+			margin-left: 15px;
+		}
+		svg.bi.bi-plus-circle-fill{
+			color: #B0D7FD;
+		}
 	</style>
 </head>
 
@@ -337,7 +345,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
     <header class="site-header sticky-top py-1">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-			<a class="py-2 d-none d-md-inline-block" href="cliente.php">Volver</a>
+			<a class="py-2 d-none d-md-inline-block" href="cliente.php">Volver a Gestión de Clientes</a>
 			
 			<h2>CLIENTES</h2>
 			<div class="dropdown">
@@ -372,7 +380,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 				<div class="table-title">
 					<div class="row primero">
 						<div class="col-sm-6">
-							<h2>GESTIÓN DE CLIENTES: </h2>
+							<h2>RECUPERAR CLIENTES: </h2>
 						</div>
 					</div>
 
@@ -481,8 +489,9 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 								<td><?php echo $row['correo'] ?></td>
 								<td><?php echo $row['fono'] ?></td>
 								<td>
-						<?php	echo "<a onclick='mostrarUpdateCliente(\"".$row['rut_persona']."\")' href='#edicionexampleModal' class='edit' data-bs-toggle='modal' data-backdrop='static' data-keyboard='false' data-bs-target='#edicionexampleModal'><i class='material-icons' data-toggle='tooltip' title='Editar' >&#xE254;</i></a>"; ?>
-						<?php   echo "<a onclick='mostrarEliminarCliente(\"".$row['rut_persona']."\")' href='eliminarexampleModal' class='delete' data-bs-toggle='modal' data-bs-target='#eliminarexampleModal'><i class='material-icons' data-toggle='tooltip' title='Eliminar'>&#xE872;</i></a>"; ?>
+						<?php   echo "<a href='' onclick='recuperarCliente(\"".$row['rut_persona']."\")' class='btn btn-success b2' data-bs-toggle='modal' ><svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-plus-circle-fill' viewBox='0 0 16 16'>
+								<path d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z' />
+                                </svg></a>"; ?>
 								</td>
 							</tr>
 							
@@ -754,25 +763,23 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
     }
 </style>
 
-<div class="modal fade" id="eliminarexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+	<!-- Modal de Recuperar-->
+	<div class="modal fade" id="eliminarexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header eli">
-                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Cliente</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Recuperar Cliente</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body cuadro">
-                    <div class="form-group fuente">
-                        <label>¿Estas seguro que quieres eliminar al cliente ?<b></b></label>
-						<input type="hidden" id="eliminarRutCliente" value="">
-						<h5 id="EliminarNombreCliente"></h5>
-						<div style="height:16px"></div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>¿Desea recuperar este cliente?</label>
+                        <div style="height:16px"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button onclick="eliminarCliente()"  class="btn btn-danger" data-bs-dismiss="modal">Eliminar</button>
+                    <button id="recuperarCliente" type="button" class="btn btn-danger">Recuperar</button>
                 </div>
             </div>
         </div>

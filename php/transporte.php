@@ -132,6 +132,11 @@ $resultado1 = $gsent1->fetchAll(PDO::FETCH_ASSOC);
 		div .accordion-body h5{
 			font-size: 19px;
 		}
+        /*Color azul boton recuperar*/
+		a.btn.btn-success.b2{
+			background: #167bde;
+        
+		}
     </style>
 
 </head>
@@ -139,7 +144,7 @@ $resultado1 = $gsent1->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <header class="site-header sticky-top py-1">
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
-            <a class="py-2 d-none d-md-inline-block" href="despacho.php">Despacho</a>
+            <a class="py-2 d-none d-md-inline-block" href="despacho.php">Volver a Despachos</a>
             <?php
                 foreach ($resultado1 as $row1) {
                     echo '<h2 class="letrah2" style="text-transform: uppercase;">TRANSPORTE '.$row1["nombre_sucursal"].'</h2>';
@@ -162,13 +167,16 @@ $resultado1 = $gsent1->fetchAll(PDO::FETCH_ASSOC);
                                 ?>
                         </div>
                         <div class="col-sm-6 col">
-                        <a class="btn btn-success b1" data-bs-toggle="modal"
-                                data-bs-target="#creacionEmployeeModal"><svg xmlns="http://www.w3.org/2000/svg"
+                                <a class="btn btn-success b1" data-bs-toggle="modal"
+                                    data-bs-target="#creacionEmployeeModal"><svg xmlns="http://www.w3.org/2000/svg"
                                     width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill"
                                     viewBox="0 0 16 16">
                                     <path
                                         d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
                                 </svg> Añadir Transporte</a>
+                                <a class="btn btn-success b2" href="asignarTransporte.php"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+									<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
+								</svg> Asignar transporte </a>
                         </div> 
                     </div>
 

@@ -3,7 +3,7 @@
 include("conexion.php");
 $gbd = conectar();
 
-if (isset($_GET["error"])) {
+if(isset($_GET["error"])) {
     $error = $_GET["error"];
     echo '<script>alert("Imagen muy grande")</script>';
 }
@@ -113,10 +113,12 @@ $paginas = $gsent->rowCount()/$xpaginas;
 $paginasElevado = ceil($paginas);
 if($totalquery < $xpaginas){
 	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+    $encontrado = $totalquery-($paginas*$xpaginas);
 }else if ($totalquery >= $xpaginas){
 	$encontrado = $xpaginas;
 }
-
 
 if(!$_GET){
 	header('Location: Interfaz Trabajador web.php?pagina=1');
@@ -262,6 +264,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 			color: #2196F3;
 		}
 	</style>
+	
 </head>
 
 <body>
@@ -471,7 +474,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 									<option value="">Seleccione...</option>
 									<?php
 									foreach ($resultado3 as $row3) {
-										echo "<option id=" . $row3["rut_proveedor"] . " value=" . $row3['nombre_proveedor'] . ">" . $row3["nombre_proveedor"] . "</option>";
+										echo "<option id=" . $row3["rut_proveedor"] . " value=" . $row3['rut_proveedor'] . ">" . $row3["nombre_proveedor"] . "</option>";
 									}
 									?>
 								</select>
@@ -486,15 +489,15 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 							<div class="form-group">
 								<label>Precio: </label>
-								<input type="text" class="form-control" name="precio" required>
+								<input type="number" class="form-control" name="precio" required>
+							</div>
+							<div class="form-group">
+								<label>Descuento: </label>
+								<input type="number" class="form-control" name="descuento" required>
 							</div>
 							<div class="form-group">
 								<label>Descripción: </label>
 								<textarea class="form-control" name="descripcion" required></textarea>
-							</div>
-							<div class="form-group">
-								<label>Descuento: </label>
-								<input type="text" class="form-control" name="descuento" required>
 							</div>
 							<div class="form-group">
 								<label>Imagen: </label>
@@ -537,14 +540,13 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 								</select>
 								<br>
 							</div>
-
 							<div class="form-group">
 								<label>Nombre Proveedor: </label>
 								<br>
 								<select class="form-select" name="updateNombreProveedor" id="updateNombreProveedor" required>
 									<?php
 									foreach ($resultado3 as $row3) {
-										echo "<option id=" . $row3["rut_proveedor"] . " value=" . $row3['nombre_proveedor'] . ">" . $row3["nombre_proveedor"] . "</option>";
+										echo "<option id=" . $row3["rut_proveedor"] . " value=" . $row3['rut_proveedor'] . ">" . $row3["nombre_proveedor"] . "</option>";
 									}
 									?>
 								</select>
@@ -560,11 +562,11 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 							<div class="form-group">
 								<label>Precio: </label>
-								<input type="text" class="form-control" name="updatePrecio" id="updatePrecio" required>
+								<input type="number" class="form-control" name="updatePrecio" id="updatePrecio" required>
 							</div>
 							<div class="form-group">
 								<label>Descuento: </label>
-								<input type="text" class="form-control" name="updateDescuento" id="updateDescuento" required>
+								<input type="number" class="form-control" name="updateDescuento" id="updateDescuento" required>
 							</div>
 							<div class="form-group">
 								<label>Descripcion: </label>
@@ -572,7 +574,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 							</div>
 							<div class="form-group">
 								<label>Imagen: </label>
-								<input type="file" class="form-control" name="updateImagen" id="updateImagen" accept="image/*" required>
+								<input type="file" class="form-control" name="updateImagen" id="updateImagen" accept="image/*">
 							</div>
 						</div>
 				</div>

@@ -9,7 +9,7 @@ $gbd = conectar();
         $sql0 = "UPDATE Pertenece set cantidad = '".$cantidad."' where id_producto = '".$idProducto."' and id_venta = '".$id_venta."';";
         $gsent0 = $gbd->prepare($sql0);
         $gsent0->execute();
-        $sql1 = "SELECT (producto.precio*pertenece.cantidad) as subtotal from pertenece 
+        $sql1 = "SELECT ((producto.precio- producto.precio*producto.descuento/100)*pertenece.cantidad) as subtotal from pertenece 
                 join producto 
                 on producto.id_producto = pertenece.id_producto
                 where pertenece.id_producto = '".$idProducto."' and id_venta = '".$id_venta."';";

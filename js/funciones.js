@@ -980,3 +980,88 @@ function TransbankPost(){
          }
       }) 
 }
+
+function recuperarTrabajador(rutPersona){
+   $('#eliminarexampleModal').modal('show');
+   cadena= {
+      "rutPersona": rutPersona,
+      };
+   $('#recuperarTrabajador').click(function() {
+      $.ajax({
+         type: "POST",
+         url: "recuperarTrabajador.php",
+         data: cadena,
+         success:function(){
+            location.reload();
+            $('#eliminarexampleModal').modal('hide');
+         }
+      }) 
+   } );
+}
+
+
+
+function recuperarCliente(rutPersona){
+   $('#eliminarexampleModal').modal('show');
+   cadena= {
+      "rutPersona": rutPersona,
+      };
+   $('#recuperarCliente').click(function() {
+      $.ajax({
+         type: "POST",
+         url: "recuperarCliente.php",
+         data: cadena,
+         success:function(){
+            location.reload();
+            $('#eliminarexampleModal').modal('hide');
+         }
+      }) 
+   } );
+}
+
+function completarVenta(){
+//RICARDO
+
+   cadena0= {
+     
+      };
+   
+      $.ajax({
+         type: "POST",
+         url: "tablaVenta.php",
+         data: cadena0,
+         success:function(){
+         }
+      }) 
+
+
+//MATIAS
+   cadena1= {
+     
+      };
+   
+      $.ajax({
+         type: "POST",
+         url: "tablaDespacho.php",
+         data: cadena1,
+         success:function(){
+         }
+      }) 
+
+//CRISTIAN
+   cadena2= {
+     
+      };
+   
+      $.ajax({
+         type: "POST",
+         url: "tablaCupon.php",
+         data: cadena2,
+         success:function(){
+         }
+      }) 
+
+
+}
+
+

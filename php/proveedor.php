@@ -7,28 +7,28 @@ include("conexion.php");
 $gbd = conectar();
 
 //$sql = "SELECT my_function();";
-$sql = "SELECT * FROM proveedor where estado_proveedor = true;";
+$sql = "SELECT * FROM proveedor where estado_proveedor = true ";
 
 //BUSCADOR
 if (isset($_POST["rutBuscar"]) && ($_POST["rutBuscar"] != '')) {
     $rutBuscar = $_POST["rutBuscar"];
-    $sql = "SELECT * FROM proveedor where estado_proveedor = true and rut_proveedor like '$rutBuscar%';";
+    $sql = "SELECT * FROM proveedor where estado_proveedor = true and rut_proveedor like '$rutBuscar%' ";
 } else if (isset($_POST["nombreBuscar"])) {
     $nombreBuscar = $_POST["nombreBuscar"];
     if ($_POST["nombreBuscar"] == "") {
-        $sql = "SELECT * FROM proveedor where estado_proveedor = true;";
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true ";
     } else {
-        $sql = "SELECT * FROM proveedor where estado_proveedor = true and upper(nombre_proveedor) like upper('%$nombreBuscar%');";
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true and upper(nombre_proveedor) like upper('%$nombreBuscar%') ";
     }
 } else if (isset($_POST["tipo"]) && isset($_POST["marca"]) && $_POST["tipo"] !== " " && $_POST["marca"] !== " ") {
     $tipo = $_POST["tipo"];
     $marca = $_POST["marca"];
     if ($_POST["tipo"] != "Seleccione..." && $_POST["marca"] == "Seleccione...") {
-        $sql = "SELECT * FROM proveedor where estado_proveedor = true and tipo_proveedor = '$tipo';";
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true and tipo_proveedor = '$tipo' ";
     } else if ($_POST["tipo"] == "Seleccione..." && $_POST["marca"] != "Seleccione...") {
-        $sql = "SELECT * FROM proveedor where estado_proveedor = true and marca_proveedor = '$marca';";
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true and marca_proveedor = '$marca' ";
     } else if ($_POST["tipo"] != "Seleccione..." && $_POST["marca"] != "Seleccione...") {
-        $sql = "SELECT * FROM proveedor where estado_proveedor = true and tipo_proveedor = '$tipo' and marca_proveedor = '$marca';";
+        $sql = "SELECT * FROM proveedor where estado_proveedor = true and tipo_proveedor = '$tipo' and marca_proveedor = '$marca' ";
     }
 }
 
@@ -54,6 +54,39 @@ $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
+
+//paginador
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+$paginas = $gsent->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+    $encontrado = $totalquery-($paginas*$xpaginas);
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
+
+if(!$_GET){
+	header('Location: proveedor.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: proveedor.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
+$gsent5 = $gbd->prepare($sqlGuardar);
+$gsent5->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent5->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+$gsent5->execute();
+$resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
+
+
+
 
 ?>
 
@@ -143,6 +176,39 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 		div .accordion-body h5{
 			font-size: 19px;
 		}
+
+        /*Header*/
+		header {
+			background: #f5f5f5;
+		}
+
+		header .juan {
+			width: 240px;
+			height: 50px;
+			color: #566787;
+		}
+
+		header .row .col-md-3,
+		header .row .col-md-8 {
+			padding: 0px 0px;
+		}
+
+		header .row .card-body {
+			padding: 3px 0px;
+		}
+
+		header .row .card-body .card-title {
+			margin-bottom: 0px;
+		}
+
+		header .dropdown .dropdown-menu {
+			width: 100%;
+			background: #ececec;
+		}
+
+		header .dropdown .dropdown-menu li {
+			color: #2196F3;
+		}
     </style>
 
 </head>
@@ -216,13 +282,13 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="proveedor.php" method="POST" class="d-flex">
+												<form action="proveedor.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="rutBuscar" placeholder="RUT" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="proveedor.php" method="POST" class="d-flex">
+												<form action="proveedor.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="nombreBuscar" placeholder="Nombre" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
@@ -233,7 +299,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 												<label> Tipo: </label>
 											</div>
 											<div class="col-sm-4">
-												<form action="proveedor.php" method="POST" class="d-flex">
+												<form action="proveedor.php?pagina=1" method="POST" class="d-flex">
                                                 <select class="form-select" name="tipo" id="tipo" required>
                                                         <option selected>Seleccione...</option>
                                                         <?php
@@ -282,27 +348,27 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php
-                            foreach ($resultado as $row){
+                            foreach ($resultado5 as $row5){
                             echo '<tr>';
-                            echo '<td>'.$row["rut_proveedor"].'<a href="compraProv.php"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                            echo '<td>'.$row5["rut_proveedor"].'<a href="compraProv.php"><svg xmlns="http://www.w3.org/2000/svg" width="16"
                                 height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
                                 <path
                                     d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
                                 <path
                                     d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
                             </svg></a></td>';
-                            echo  '<td>'.$row["nombre_proveedor"].'</td>';
-                            echo  '<td>'.$row["tipo_proveedor"].'</td>';
-                            echo  '<td>'.$row["marca_proveedor"].'</td>';
-                            echo  '<td>'.$row["fono_proveedor"].'</td>';
+                            echo  '<td>'.$row5["nombre_proveedor"].'</td>';
+                            echo  '<td>'.$row5["tipo_proveedor"].'</td>';
+                            echo  '<td>'.$row5["marca_proveedor"].'</td>';
+                            echo  '<td>'.$row5["fono_proveedor"].'</td>';
                             echo "<td>
-                            <a href='' onclick='mostrarUpdateProveedor(\"".$row['rut_proveedor']."\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><svg
+                            <a href='' onclick='mostrarUpdateProveedor(\"".$row5['rut_proveedor']."\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><svg
                                     xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
                                     class='bi bi-pencil-fill' viewBox='0 0 16 16'>
                                     <path
                                         d='M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z' />
                                 </svg></a>";
-                            echo "<a href='' onclick='EliminarProveedor(\"".$row['rut_proveedor']."\")' class='delete' data-bs-toggle='modal' ><svg
+                            echo "<a href='' onclick='EliminarProveedor(\"".$row5['rut_proveedor']."\")' class='delete' data-bs-toggle='modal' ><svg
                                     xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor'
                                     class='bi bi-trash-fill' viewBox='0 0 16 16'>
                                     <path
@@ -316,17 +382,17 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                     </tbody>
                 </table>
                 <div class="clearfix">
-                    <div class="hint-text">Mostrando <b>5</b> de <b>25</b> entradas</div>
-                    <ul class="pagination">
-                        <li class="page-item"><a href="#" class="page-link">Anterior</a></li>
-                        <li class="page-item"><a href="#" class="page-link">1</a></li>
-                        <li class="page-item"><a href="#" class="page-link">2</a></li>
-                        <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                        <li class="page-item"><a href="#" class="page-link">4</a></li>
-                        <li class="page-item"><a href="#" class="page-link">5</a></li>
-                        <li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
-                    </ul>
-                </div>
+				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
+					<ul class="pagination">
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="proveedor.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="proveedor.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="proveedor.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
+					</ul>
+				</div>
             </div>
         </div>
     </div>

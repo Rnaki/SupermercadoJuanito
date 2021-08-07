@@ -8,7 +8,7 @@ session_start();
     include("conexion.php");
     $gbd = conectar();
 
-    $sql = "SELECT pertenece.id_producto, pertenece.cantidad, nombre_producto, precio, imagen FROM pertenece 
+    $sql = "SELECT pertenece.id_producto, pertenece.cantidad, nombre_producto, (precio - precio*descuento/100) as test, imagen FROM pertenece 
             join producto
             on pertenece.id_producto = producto.id_producto
             where pertenece.id_venta = '".$id_venta."'";
@@ -133,8 +133,8 @@ session_start();
                             echo '<td> <a href="#"><img class="card-img-top" src="../imagenes/'.$row["imagen"].'" width="20px" height="40px" alt=""></a></td>';
                             echo  '<td>'.$row["nombre_producto"].'</td>';
                             echo  "<td><button type='button' class='btn btn-outline-warning' onclick='decrementarcarrito(".$row['id_producto'].")'>-</button><input class='num' type='text' value='".$row["cantidad"]."' id='".$row["id_producto"]."' size='1' disabled><button type='button' class='btn btn-outline-info' onclick='incrementarcarrito(".$row['id_producto'].")'>+</button></td>";
-                            echo  "<td><input value='".$row["precio"]."' size='3' disabled id=precio".$row['id_producto']."></td>";
-                            echo  "<td><input value='".$row["precio"]*$row["cantidad"]."' size='3' disabled id=subtotal".$row['id_producto']."></td>";
+                            echo  "<td><input value='".$row["test"]."' size='3' disabled id=precio".$row['id_producto']."></td>";
+                            echo  "<td><input value='".$row["test"]*$row["cantidad"]."' size='3' disabled id=subtotal".$row['id_producto']."></td>";
                             echo  "<td><button onclick='borrarCarrito(".$row['id_producto'].")' type='buton' class='btn btn-danger'> <svg
                             xmlns='http://www.w3.org/2000/svg' width='15' height='15' fill='currentColor'
                             class='bi bi-trash-fill' viewBox='0 0 16 16'>
@@ -208,13 +208,13 @@ session_start();
             <h5>Total Compra </h5>
           </div>
           <div class="col">
-          <form method="POST" action="../php/transaccion/index.php" >
-            <input type="text" name="totalCompra" id="totalCompra" class="totalCompra" value="" size="5" disabled>
+          <!--<form method="POST" action="../php/transaccion/index.php" >-->
+            <input type="text"   name="totalCompra" id="totalCompra" class="totalCompra" value="" size="5" disabled>
             <input type="hidden" name="totalCompraTransbank" id="totalCompra" class="totalCompra" value="" size="5" >
           </div>
         </div>
           <div class="d-grid gap-2">
-          <button  class="btn btn-primary btn-lg" type="submit">Comprar</button>
+          <button onclick="completarVenta()" class="btn btn-primary btn-lg" type="submit">Comprar</button>
           </div>
          </form>
         </div>

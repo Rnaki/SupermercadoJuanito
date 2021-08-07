@@ -1,11 +1,8 @@
 <?php
-session_start();
 
+session_start();
 echo $_SESSION["sucursal"];
 
-if(isset($_GET["error"]) && $_GET["error"] == 2){
-	echo "<script>alert('El rut ya se encuentra registrado')</script>";
-}
 
 
 include("conexion.php");
@@ -14,34 +11,30 @@ $gbd = conectar();
 if (isset($_POST["rutBuscar"])) {
 	$rutBuscar = $_POST["rutBuscar"];
 	$sql = "SELECT * from trabajador
-	join trabaja
-	on trabaja.rut_persona = trabajador.rut_persona 
+	join trabaja on trabaja.rut_persona = trabajador.rut_persona 
 	where trabajador.rut_persona like '$rutBuscar%'
-	and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = false";
+	and (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true) and area_trabajo like '%Despacho%'";
 } else if (isset($_POST["apellidoPBuscar"])) {
 	$apellidoPBuscar = $_POST["apellidoPBuscar"];
 	if ($_POST["apellidoPBuscar"] == "") {
 		$sql = "SELECT * FROM trabajador
-		join trabaja
-		on trabaja.rut_persona = trabajador.rut_persona
-		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = false";
+		join trabaja on trabaja.rut_persona = trabajador.rut_persona
+		where (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true) and area_trabajo like '%Despacho%'";
 	} else {
 		$sql = "SELECT * from trabajador 
 		join trabaja on trabaja.rut_persona = trabajador.rut_persona 
 		where apellidop_persona like '$apellidoPBuscar%' 
-		and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = false";
+		and (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true) and area_trabajo like '%Despacho%'";
 	}
-} else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
-	$desde = $_POST["desde"];
-	$hasta = $_POST["hasta"];
+} else if (isset($_POST["patenteBuscar"]) && $_POST["patenteBuscar"] !== "") { //NO FUNCIONA EL BUSCAR PATENTE
+	$patenteB = $_POST["patenteBuscar"];
 	$sql = "SELECT * from trabajador
 			join trabaja on trabaja.rut_persona = trabajador.rut_persona 
-			where fecha_nacimiento_persona Between '$desde' and '$hasta' and (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' 
-			and trabajador.estado_persona = false)";
-} else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["desde"] == "" || $_POST["hasta"] == "") {
+			where (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona=true) and (UPPER(patente) like UPPER('".$patenteB."%') and area_trabajo like '%Despacho%')";
+} else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["patenteBuscar"] == "" ) {
 	$sql = "SELECT * FROM trabajador
 			join trabaja on trabaja.rut_persona = trabajador.rut_persona
-			where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = false";
+			where (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true) and area_trabajo like '%Despacho%'";
 }
 
 
@@ -55,6 +48,13 @@ $sql1 = "SELECT sucursal.nombre_sucursal from sucursal where id_sucursal = '".$_
 $gsent = $gbd->prepare($sql1);
 $resultado1 = $gbd->query($sql1)->fetchAll();
 
+
+$sql2 = "SELECT * FROM transporte WHERE id_sucursal = '".$_SESSION["sucursal"]."'";
+$gsent2 = $gbd->prepare($sql2);
+$gsent2->execute();
+$resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,7 +62,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Recuperar empleado</title>
+	<title>Asignar transporte</title>
 	<!--Sacado de por otra via-->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -79,9 +79,9 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 	<script src="../js/funciones.js"></script>
 	<script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
 
-	<style>
+	<style>	
 		/*Header*/
-        header {
+    	header {
 		background: #f5f5f5;
 		}
 
@@ -92,7 +92,6 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		}
 
 		header .row .col-md-3,
-
 		header .row .col-md-8 {
 		padding: 0px 0px;
 		}
@@ -102,8 +101,10 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		}
 
 		header .row .card-body .card-title {
+
 		margin-bottom: 0px;
-		}	
+
+		}
 
 		header .dropdown .dropdown-menu {
 		width: 100%;
@@ -113,24 +114,24 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		header .dropdown .dropdown-menu li {
 		color: #2196F3;
 		}
-
+		
 		body {
-			color: #566787;
-			background: #f5f5f5;
-			font-family: 'Varela Round', sans-serif;
-			font-size: 13px;
+		color: #566787;
+		background: #f5f5f5;
+		font-family: 'Varela Round', sans-serif;
+		font-size: 13px;
 		}
 
 		.table-responsive {
-			margin: 30px 0;
+		margin: 30px 0;
 		}
 
 		.table-wrapper {
-			background: #fff;
-			padding: 20px 25px;
-			border-radius: 3px;
-			min-width: 1000px;
-			box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+		background: #fff;
+		padding: 20px 25px;
+		border-radius: 3px;
+		min-width: 1000px;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 		}
 
 		.table-title {
@@ -338,13 +339,8 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 		div .accordion-body h5{
 			font-size: 19px;
 		}
-		/*Boton recuperar*/
 		a.btn.btn-success.b2{
 			background: #167bde;
-			margin-left: 15px;
-		}
-		svg.bi.bi-plus-circle-fill{
-			color: #B0D7FD;
 		}
 	</style>
 </head>
@@ -354,11 +350,9 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 	<header class="site-header sticky-top py-1">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-			<a class="py-2 d-none d-md-inline-block" href="Interfaz RRHH.php">Volver</a>
-			<a class="py-2 d-none d-md-inline-block" href="Contratos.php">Contratos</a>
-			<h2>ÁREA RECURSOS HUMANOS</h2>
+			<a class="py-2 d-none d-md-inline-block" href="transporte.php">Volver a Transporte</a>
+			<h2>ASIGNAR TRANSPORTE A EMPLEADO</h2>
 			
-			<a class="py-2 d-none d-md-inline-block" href="cliente.php">Clientes</a>
 			<div class="dropdown">
 				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
 					<div class="row juan">
@@ -390,8 +384,9 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 				<div class="table-title">
 					<div class="row primero">
 						<div class="col-sm-6">
-							<h2>RECUPERAR EMPLEADO: </h2>	
+							<h2>ASIGNAR TRANSPORTE: </h2>	
 						</div>
+						
 					</div>
 
 					<div class="row">
@@ -414,13 +409,13 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="trabajadorRecuperar.php" method="POST" class="d-flex">
+												<form action="asignarTransporte.php" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="rutBuscar" placeholder="RUT" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="trabajadorRecuperar.php" method="POST" class="d-flex">
+												<form action="asignarTransporte.php" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="apellidoPBuscar" placeholder="Apellido Paterno" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
@@ -428,27 +423,14 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 										</div>
 										<div class="row">
 											<div class="col-sm-4">
-												<h5>Fecha Nacimiento: </h5>
+												<h5>Patente: </h5>
 											</div>
 										</div>
 										<div class="row">
-											<div class="col-sm-2 buscar">
-												<label> Desde: </label>
-											</div>
-
-											<div class="col-sm-4">
-												<form action="trabajadorRecuperar.php" method="POST" class="d-flex">
-													<input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
-
-											</div>
-											<div class="col-sm-1 buscar">
-												<label> Hasta: </label>
-											</div>
-											<div class="col-sm-4">
-												<input class="form-control me-2" type="date" name="hasta" placeholder="Fecha" aria-label="Search">
-											</div>
-											<div class="col-sm-1">
-												<button class="btn btn-success b" type="submit">Buscar</button>
+                                        <div class="col-sm-6">
+												<form action="asignarTransporte.php" method="POST" class="d-flex">
+													<input class="form-control me-3" type="search" name="patenteBuscar" placeholder="Patente" aria-label="Search">
+													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 										</div>
@@ -470,16 +452,9 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 							<th>Apellido Materno</th>
 							<th>Región</th>
 							<th>Comuna</th>
-							<th>Calle</th>
-							<th>Nº Calle</th>
-							<th>Fecha Nacimiento</th>
-							<th>Sexo</th>
-							<th>Contraseña</th>
+							<th>Patente</th>
 							<th>Correo</th>
 							<th>Telefono</th>
-							<th>Supervisor</th>
-							<th>Cargo</th>
-							<th>Area de trabajo</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
@@ -495,21 +470,13 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 								<td><?php echo $row['apellidom_persona'] ?></td>
 								<td><?php echo $row['region'] ?></td>
 								<td><?php echo $row['comuna'] ?></td>
-								<td><?php echo $row['calle'] ?></td>
-								<td><?php echo $row['numero_calle'] ?></td>
-								<td><?php echo $row['fecha_nacimiento_persona'] ?></td>
-								<td><?php echo $row['sexo'] ?></td>
-								<td><?php echo $row['contrasena'] ?></td>
+								<td><?php echo $row['patente'] ?></td>
 								<td><?php echo $row['correo'] ?></td>
 								<td><?php echo $row['fono'] ?></td>
 
-								<td><?php echo $row['tra_rut_persona'] ?></td>
-								<td><?php echo $row['cargo'] ?></td>
-								<td><?php echo $row['area_trabajo'] ?></td>
 								<td>
-						<?php echo "<a href='' onclick='recuperarTrabajador(\"".$row['rut_persona']."\")' class='btn btn-success b2' data-bs-toggle='modal' ><svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-plus-circle-fill' viewBox='0 0 16 16'>
-								<path d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z' />
-                                </svg></a>"?>		
+						<?php	echo "<a onclick='mostrarUpdateTrabajador(\"" . $row['rut_persona'] . "\")' href='#edicionexampleModal' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><i class='material-icons' data-toggle='tooltip' title='Editar'>&#xE254;</i></a> "?>
+						<?php 	echo "<a onclick='mostrarEliminarTrabajador(\"" . $row['rut_persona'] . "\")' href='#eliminarexampleModal' class='delete' data-bs-toggle='modal' data-bs-target='#eliminarexampleModal'><i class='material-icons' data-toggle='tooltip' title='Eliminar'>&#xE872;</i></a>" ?>
 								</td>
 							</tr>
 							<?php //include("modalEditarPersonal.php"); ?>
@@ -586,6 +553,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
     }
 </style>
 
+
 <style>
     .modal-content {
         max-width: 85%;
@@ -621,6 +589,48 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
     }
 </style>
 
+<div class="modal fade" id="edicionexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header edi">
+                <h5 class="modal-title" id="exampleModalLabel">Editar Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="updatePatente.php" method="POST">
+                <input type="hidden" id="editRut" name="rut" value="">
+                <div class="modal-body">
+                    <div class="form-group form">
+                        <div class="form-group">
+                            <label>Rut: </label>
+                            <input type="text" class="form-control c" id="editRut2" name="Rut" required value="" disabled>
+                        </div>
+                        <div class="form-group">
+                        <label>Patente: </label>
+                            <br>
+                            <select class="form-select" name="patente" id="patente" required>
+                                <option value="">Seleccione...</option>
+                                <?php
+                                foreach ($resultado2 as $row2) {
+                                    echo "<option id=" . $row2["patente"] . " value=" . $row2['patente'] . ">" . $row2["patente"] . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div> 
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        //$('#sexoupdate<?php //echo $row['rut'] ?> option[id="<?php //echo $row['sexo'] ?>"]').attr("selected", true);
+        //$('#sexoupdate option[id="'+$info['compañia']+'"]').attr("selected", true);
+    </script>
+</div>
+
 <style>
     div .modal-dialog .eli{
         padding: 20px 30px;
@@ -643,23 +653,25 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
     }
 </style>
 
-	<!-- Modal de Recuperar-->
-	<div class="modal fade" id="eliminarexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="eliminarexampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header eli">
-                    <h5 class="modal-title" id="exampleModalLabel">Recuperar Trabajador</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Empleado</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>¿Desea recuperar este Trabajador?</label>
+                <div class="modal-body cuadro">
+                    <div class="form-group fuente">
+                        <label>¿Estas seguro que quieres eliminar al Trabajador <b></b>?</label>
+						<input type="hidden" id="eliminarRutTrabajador" value="">
+						<h5 id="EliminarNombreTrabajador"></h5>
                         <div style="height:16px"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button id="recuperarTrabajador" type="button" class="btn btn-danger">Recuperar</button>
+                    <button onclick="eliminarTrabajador()"  class="btn btn-danger" data-bs-dismiss="modal">Eliminar</button>
                 </div>
             </div>
         </div>

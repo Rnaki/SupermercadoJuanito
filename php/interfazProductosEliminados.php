@@ -34,24 +34,24 @@ if(isset($_GET["error"])){
 
 $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 		JOIN categoria ON producto.id_categoria = categoria.id_categoria
-		where estado_producto = false;";
+		where estado_producto = false ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
     $idBuscar = $_POST["idBuscar"];
     $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 			JOIN categoria ON producto.id_categoria = categoria.id_categoria
-			where estado_producto = false and id_producto = '$idBuscar';";
+			where estado_producto = false and id_producto = '$idBuscar' ";
 } else if (isset($_POST["nombreBuscar"])) {
     $nombreBuscar = $_POST["nombreBuscar"];
     if ($_POST["nombreBuscar"] == "") {
         $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = false;";
+				where estado_producto = false ";
     } else {
         $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = false and upper(producto.nombre_producto) like upper('%$nombreBuscar%');";
+				where estado_producto = false and upper(producto.nombre_producto) like upper('%$nombreBuscar%') ";
     }
 } else if (isset($_POST["nombreCategoria"]) && isset($_POST["marca"]) && $_POST["nombreCategoria"] !== " " && $_POST["marca"] !== " ") {
     $idCategoria = $_POST["nombreCategoria"];
@@ -59,15 +59,15 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
     if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] == "Seleccione...") {
         $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = false and categoria.id_categoria = '$idCategoria';";
+				where estado_producto = false and categoria.id_categoria = '$idCategoria' ";
     } else if ($_POST["nombreCategoria"] == "Seleccione..." && $_POST["marca"] != "Seleccione...") {
         $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = false and marca = '$marca';";
+				where estado_producto = false and marca = '$marca' ";
     } else if ($_POST["nombreCategoria"] != "Seleccione..." && $_POST["marca"] != "Seleccione...") {
         $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 				JOIN categoria ON producto.id_categoria = categoria.id_categoria
-				where estado_producto = false and categoria.id_categoria = '$idCategoria' and marca = '$marca';";
+				where estado_producto = false and categoria.id_categoria = '$idCategoria' and marca = '$marca' ";
     }
 }
 
@@ -83,15 +83,41 @@ $gsent2 = $gbd->prepare($sql2);
 $gsent2->execute();
 $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 
-$sql3 = "SELECT * FROM proveedor";
+$sql3 = "SELECT distinct marca FROM producto where estado_producto = false order by marca";
 $gsent3 = $gbd->prepare($sql3);
 $gsent3->execute();
 $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 
-$sql4 = "SELECT distinct marca FROM producto where estado_producto = false order by marca";
-$gsent4 = $gbd->prepare($sql4);
+//paginador
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+$paginas = $gsent->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+    $encontrado = $totalquery-($paginas*$xpaginas);
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
+
+if(!$_GET){
+	header('Location: interfazProductosEliminados.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: interfazProductosEliminados.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
+$gsent4 = $gbd->prepare($sqlGuardar);
+$gsent4->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent4->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
 $gsent4->execute();
 $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
+
 
 ?>
 
@@ -282,13 +308,13 @@ $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="interfazProductosEliminados.php" method="POST" class="d-flex">
+                                                <form action="interfazProductosEliminados.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Producto" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                             <div class="col-sm-6">
-                                                <form action="interfazProductosEliminados.php" method="POST" class="d-flex">
+                                                <form action="interfazProductosEliminados.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="nombreBuscar" placeholder="Nombre" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -299,7 +325,7 @@ $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
                                                 <label> Tipo: </label>
                                             </div>
                                             <div class="col-sm-4">
-                                                <form action="interfazProductosEliminados.php" method="POST" class="d-flex">
+                                                <form action="interfazProductosEliminados.php?pagina=1" method="POST" class="d-flex">
                                                     <select class="form-select" name="nombreCategoria" id="nombreCategoria" required>
                                                         <option selected>Seleccione...</option>
                                                         <?php
@@ -316,8 +342,8 @@ $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
                                                 <select class="form-select" name="marca" id="marca" required>
                                                     <option selected>Seleccione...</option>
                                                     <?php
-                                                    foreach ($resultado4 as $row4) {
-                                                        echo "<option id=" . $row4["id_producto"] . " value=" . $row4['marca'] . ">" . $row4["marca"] . "</option>";
+                                                    foreach ($resultado3 as $row3) {
+                                                        echo "<option id=" . $row3["id_producto"] . " value=" . $row3['marca'] . ">" . $row3["marca"] . "</option>";
                                                     }
                                                     ?>
                                                 </select>
@@ -347,15 +373,15 @@ $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php
-                        foreach ($resultado as $row) {
+                        foreach ($resultado4 as $row4) {
                             echo '<tr>';
-                            echo '<td>' . $row["id_producto"] . '</td>';
-                            echo  '<td>' . $row["nombre_producto"] . '</td>';
-                            echo  '<td>' . $row["tnombre_categoria"] . '</td>';
-                            echo  '<td>' . $row["marca"] . '</td>';
-                            echo  '<td>$' . $row["precio"] . '</td>';
+                            echo '<td>' . $row4["id_producto"] . '</td>';
+                            echo  '<td>' . $row4["nombre_producto"] . '</td>';
+                            echo  '<td>' . $row4["tnombre_categoria"] . '</td>';
+                            echo  '<td>' . $row4["marca"] . '</td>';
+                            echo  '<td>$' . $row4["precio"] . '</td>';
                             echo "<td>
-                                <a href='' onclick='devolverProducto(\"" . $row['id_producto'] . "\")' class='envio' data-bs-toggle='modal'><svg
+                                <a href='' onclick='devolverProducto(\"" . $row4['id_producto'] . "\")' class='envio' data-bs-toggle='modal'><svg
                                     xmlns='http://www.w3.org/2000/svg' width='19' height='19' fill='currentColor' 
                                     class='bi bi-reply-fill' viewBox='0 0 16 16'>
                                     <path d='M5.921 11.9 1.353 8.62a.719.719 0 0 1 0-1.238L5.921 4.1A.716.716 0 0 1 7 4.719V6c1.5 0 6 0 7 8-2.5-4.5-7-4-7-4v1.281c0 .56-.606.898-1.079.62z'/>
@@ -367,17 +393,17 @@ $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
                     </tbody>
                 </table>
                 <div class="clearfix">
-                    <div class="hint-text">Mostrar <b>5</b> de <b>25</b> entradas</div>
-                    <ul class="pagination">
-                        <li class="page-item"><a href="#" class="page-link">Anterior</a></li>
-                        <li class="page-item"><a href="#" class="page-link">1</a></li>
-                        <li class="page-item"><a href="#" class="page-link">2</a></li>
-                        <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                        <li class="page-item"><a href="#" class="page-link">4</a></li>
-                        <li class="page-item"><a href="#" class="page-link">5</a></li>
-                        <li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
-                    </ul>
-                </div>
+				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
+					<ul class="pagination">
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="interfazProductosEliminados.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="interfazProductosEliminados.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="interfazProductosEliminados.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
+					</ul>
+				</div>
             </div>
         </div>
     </div>

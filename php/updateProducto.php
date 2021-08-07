@@ -4,6 +4,7 @@ $conn=conectar();
 
 $updateIdProducto=$_POST["updateIdProducto"];
 $UpdatetipoCategoria=$_POST["UpdatetipoCategoria"];
+$updateRutProveedor=$_POST["updateNombreProveedor"];
 $updateNombreProducto=$_POST["updateNombreProducto"];
 $updatePrecio=$_POST["updatePrecio"];
 
@@ -25,16 +26,21 @@ foreach ($data as $row){
     //var_dump($updateIdCategoria);
 }
 
-$sql1 = "SELECT imagen FROM producto WHERE imagen = '".$updateNombreImagen."';";
-$conn->exec($sql1);
-$data1 = $conn->query($sql1)->fetchAll();
-foreach ($data1 as $row1){
-    $imagen = $row1["imagen"];
+if($updateNombreImagen == ''){
+    $sql1 = "SELECT imagen FROM producto WHERE id_producto = '".$updateIdProducto."';";
+    $conn->exec($sql1);
+    $data1 = $conn->query($sql1)->fetchAll();
+    foreach ($data1 as $row1){
+        $updateNombreImagen = $row1["imagen"];
+    }
+    $updateTipoImagen = "image/jpg";
+}else{
+    $time = strtotime(date('Y-m-d H:1:s'));
+    $updateNombreImagen= $time."."."jpg";
 }
-if(isset($imagen) == isset($updateNombreImagen)){
-    
-    "holaaaa";
-}
+
+
+
 
 if($updateTamanoImagen <= 1000000){
     if($updateTipoImagen == "image/jpg" || $updateTipoImagen == "image/png" || $updateTipoImagen == "image/jpeg"){
@@ -44,18 +50,20 @@ if($updateTamanoImagen <= 1000000){
         //echo $carpetaDestino=$_SERVER['DOCUMENT_ROOT'] . '/imagenes/';
         //echo "<br>";
         //move_uploaded_file($_FILES['updateImagen']['tmp_name'], '/imagenes/' . $_FILES['updateImagen']['name']);
-        echo $carpetaDestino = dirname(getcwd()).'/imagenes/';
+
+    
+
+        $carpetaDestino = dirname(getcwd()).'/imagenes/';
         //move_uploaded_file($_FILES['updateImagen']['tmp_name'],$carpetaDestino.$updateNombreImagen);
         move_uploaded_file($_FILES['updateImagen']['tmp_name'],$carpetaDestino.$updateNombreImagen);
 
-        $sql = "SELECT updateProducto2('".$updateIdProducto."', '$updateIdCategoria', '".$updateNombreProducto."', '$updatePrecio', '".$updateNombreImagen."', '".$updateDescripcion."','$updateDescuento', '".$updateMarca."')";
+        $sql = "SELECT updateproducto2('".$updateIdProducto."', '$updateIdCategoria', '".$updateNombreProducto."', '$updatePrecio', '".$updateNombreImagen."', '".$updateDescripcion."','$updateDescuento', '".$updateMarca."','".$updateRutProveedor."')";
         echo $conn->exec($sql);
         if($conn){
             Header("Location: Interfaz Trabajador web.php");
         }
-
     }else{
-        Header("Location: Interfaz Trabajador web.php?error1=2");
+       Header("Location: Interfaz Trabajador web.php?error1=2");
     }
 }else{
    Header("Location: Interfaz Trabajador web.php?error=2");

@@ -154,7 +154,7 @@ table.table-striped.table-hover tbody a{
 					<a class="py-2 d-none d-md-inline-block link-light" href="#">Quienes Somos</a>
 				</div>
 				<div class="col-sm-2">
-					<a class="py-2 d-none d-md-inline-block link-light" href="../index.php">Cerrar sesión</a>
+					<a class="py-2 d-none d-md-inline-block link-light" href="cerrar_session.php">Cerrar sesión</a>
 				</div>
 					
 				</div>
@@ -200,7 +200,7 @@ table.table-striped.table-hover tbody a{
 
 			<div class="row">
 				<div class="col-sm-12 text-center">
-					<img src="../imagenes/foto.jpg" alt="foto" width="80px" height="120px">
+					<img src="../imagenes/'.$row["foto"].'" alt="foto" width="110px" height="120px">
 				</div>
 			</div>
 
