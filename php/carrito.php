@@ -1,6 +1,7 @@
 <?php   
+session_start();
 
- session_start();
+
  $id_venta = $_SESSION["id_venta"];
  if(isset($_SESSION["rut_persona"])){
 

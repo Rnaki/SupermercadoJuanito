@@ -965,3 +965,18 @@ function eliminarContrato(idContrato){
    } );
 }
 
+function TransbankPost(){
+   direccion = $('#url').val();
+   token_ws = $('#token_ws').val();
+   cadena= {
+      "token_ws": token_ws,
+      };
+   
+      $.ajax({
+         type: "POST",
+         url: direccion,
+         data: cadena,
+         success:function(){
+         }
+      }) 
+}

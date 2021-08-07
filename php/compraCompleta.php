@@ -1,24 +1,3 @@
-<?php
-
-require '../../transbank/vendor/autoload.php';
-
-/*
-|--------------------------------------------------------------------------
-| Inicializamos el objeto Transaction
-|--------------------------------------------------------------------------
-*/
-
-session_start();
-use Transbank\Webpay\WebpayPlus\Transaction;
-$amount = $_POST["totalCompraTransbank"];
-//$transaction = new \Transbank\Webpay\WebpayPlus\Transaction();
-$transaction = new Transaction();
-// Por simplicidad de este ejemplo, este es nuestro "controlador" que define que vamos a hacer dependiendo del parametro ?action= de la URL.
-$response = $transaction->create('ordertest', $_SESSION["id_venta"], $amount, 'http://test2.local/php/compraCompleta.php');
-$_SESSION["transa"]= $transaction;
- $url= $response->getUrl();
- $token = $response->getToken();
-?>
 <html>
 <head>
 
@@ -64,36 +43,15 @@ $_SESSION["transa"]= $transaction;
     
     <main class="form-signin">
     
-        <h1 class="h3 mb-3 fw-normal">¡Bienvenido a SuperMercado Juanito!</h1>
+        <h1 class="h3 mb-3 fw-normal">¡Gracias por comprar en Super Mercado Juanito!</h1>
         <img class="mb-4" src="../../imagenes/logo manzana.jfif" alt="" width="300" height="300">
-        <h1 class="h3 mb-3 fw-normal">A UN SOLO CLICK DE TERMINAR LA COMPRA</h1>
+        <h1 class="h3 mb-3 fw-normal">REDIRIGIENDO A LA TIENDA</h1>
     <div class="row inline-block">
-    <?php
-      
-  
-        
-        echo "<form method='post' action=$url>
-        
-          <input type='hidden' id='token_ws' name='token_ws' value='$token' />
-          <input class='btn btn-primary btn-lg btn-block'type='submit' value='Ir a pagar' />
-        </form>";
-            
-      
-    
-    ?>
     </div>
-    
-    
-    
-    
         <p class="mt-5 mb-3 text-muted">&copy; 2021</p>
-    
     </main>
-    
-    
-        
       </body>
-
-
 </html>
-
+<?php
+    Header("refresh:5; url=seleccionSucursal.php");
+?>
