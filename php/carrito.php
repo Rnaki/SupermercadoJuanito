@@ -177,11 +177,12 @@ session_start();
         </div>
         <div class="row">
           <div class="col">
-            <h5>Retiro En Local</h5>
-            <input id="checkBoxLocal" type="checkbox" checked>
+            <h5>Despacho a domicilio</h5>
+            <input id="checkBoxDespacho" type="checkbox" checked>
           </div>
           <div class="col">
           <h5>Retiro En Tienda</h5>
+          <br>
           <input id="checkBoxTienda" type="checkbox">
           </div>
         </div>
@@ -265,10 +266,10 @@ session_start();
 <script>
   totalCompra = parseInt( $('#subtotalCompra').text()) + parseInt(2000);
     $('.totalCompra').val(totalCompra);
-$('#checkBoxLocal').on('change', function() {
-  var x = document.getElementById("checkBoxLocal").checked;
+$('#checkBoxDespacho').on('change', function() {
+  var x = document.getElementById("checkBoxDespacho").checked;
     if(x == false){
-      $('#checkBoxLocal').prop('checked', true);
+      $('#checkBoxDespacho').prop('checked', true);
     }
 
 
@@ -286,7 +287,7 @@ $('#checkBoxTienda').on('change', function() {
       $('#checkBoxTienda').prop('checked', true);
     }
 
-    $('#checkBoxLocal').not(this).prop('checked', false);  
+    $('#checkBoxDespacho').not(this).prop('checked', false);  
     $('#envio').val(0);
     totalCompra = parseInt($('#subtotalCompra').text())+parseInt(0);
     $('.totalCompra').val(totalCompra);

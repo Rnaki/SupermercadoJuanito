@@ -1021,16 +1021,31 @@ function recuperarCliente(rutPersona){
 
 function completarVenta(){
 //RICARDO
+   Despacho = document.getElementById("checkBoxDespacho").checked;
+   if (Despacho == true){
+      metodo_envio = true;
+   }else if(Despacho == false){
+      metodo_envio = false;
+   }
+   
+   precio_boleta = parseInt($('#subtotalCompra').text());
+   precio_despacho = $('#envio').val();
+   console.log(precio_boleta, precio_despacho, metodo_envio);
 
    cadena0= {
-     
+     "metodo_envio" : metodo_envio,
+     "precio_boleta" : precio_boleta,
+     "precio_despacho" : precio_despacho,
       };
    
       $.ajax({
          type: "POST",
          url: "tablaVenta.php",
          data: cadena0,
-         success:function(){
+         success:function(respuesta){
+            if(respuesta ==1){
+               alert("Tabla Venta actualizada");
+            }
          }
       }) 
 
