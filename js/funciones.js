@@ -1019,6 +1019,8 @@ function recuperarCliente(rutPersona){
    } );
 }
 
+
+
 function completarVenta(){
 //RICARDO
    Despacho = document.getElementById("checkBoxDespacho").checked;
