@@ -4,9 +4,14 @@ session_start();
 if(isset($_SESSION["rut_persona"])){
 
 
-
+$_SESSION["rut_persona"];
  include("conexion.php");
 $gbd=conectar();
+
+    $sql0 = "SELECT * FROM trabajador where rut_persona = '" . $_SESSION["rut_persona"] . "'";
+	$gsent0 = $gbd->prepare($sql0);
+	$gsent0->execute();
+	$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
 
 $sql2 = "SELECT * FROM trabajador";
 $gsent = $gbd->prepare($sql2);
@@ -32,6 +37,7 @@ $data2 = $gbd->query($sql2)->fetchAll();
     <title>Perfil Trabajador</title>
 
     <!--Sacado de la carpeta-->
+    <script src="../popper/popper.min.js"></script>
     <link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
     <script src="../jquery/jquery.min.v3.6.0.js"></script>
     <script src="../js/funciones.js"></script>
@@ -169,6 +175,35 @@ $data2 = $gbd->query($sql2)->fetchAll();
             color: #ff3333;
             margin-left: 20px;
         }
+
+        /*Header*/
+		header .juan {
+			width: 240px;
+			height: 50px;
+			color: #566787;
+		}
+
+		header .row .col-md-3,
+		header .row .col-md-8 {
+			padding: 0px 0px;
+		}
+
+		header .row .card-body {
+			padding: 3px 0px;
+		}
+
+		header .row .card-body .card-title {
+			margin-bottom: 0px;
+		}
+
+		header .dropdown .dropdown-menu {
+			width: 100%;
+			background: #ececec;
+		}
+
+		header .dropdown .dropdown-menu li {
+			color: #2196F3;
+		}
     </style>
 </head>
 
@@ -177,25 +212,31 @@ $data2 = $gbd->query($sql2)->fetchAll();
     <header class="site-header sticky-top py-1">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-			<a class="py-2 d-none d-md-inline-block" href="Interfaz RRHH.php">Volver a RRHH</a>
-			<h2>PERFIL TRABAJADOR</h2>
+			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver a Menu Trabajador</a>
+			<h2 class="letrah2">PERFIL TRABAJADOR</h2>
 			<div class="dropdown">
 				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
-					<div class="row juan">
-						<div class="col-md-3 text-center">
-							<img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
-						</div>
-						<div class="col-md-8 text-start">
-							<div class="card-body">
-								<h5 class="card-title">Juan Perez</h5>
-								<p class="card-text">Gerente General</p>
+                <div class="row juan">
+							<div class="col-md-3 text-center">
+								<?php
+								foreach ($perfil as $row0) {
+									echo '<img src="../imagenes/' . $row0["foto"] . '" width="40px" height="50px" class="rounded-circle">';
+								}
+								?>
+							</div>
+							<div class="col-md-8 text-start">
+								<div class="card-body">
+									<?php
+									foreach ($perfil as $row0) {
+										echo '<h5 class="card-title">' . $row0["nombre_persona"] . ' ' . $row0["apellidop_persona"] . '</h5>';
+										echo '<p class="card-text">' . $row0["cargo"] . '</p>';
+									}
+									?>
+								</div>
 							</div>
 						</div>
-					</div>
 				</button>
 				<div class="dropdown-menu" aria-labelledby="bd-version">
-					<li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
-					<div class="dropdown-divider"></div>
 					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
 				</div>
 			</div>
@@ -269,6 +310,7 @@ $data2 = $gbd->query($sql2)->fetchAll();
                             <h5>Nº Calle: </h5>
                         </th>
                         <td><?php echo $row['numero_calle'] ?></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <th></th>
@@ -294,6 +336,7 @@ $data2 = $gbd->query($sql2)->fetchAll();
                             <h5>Correo: </h5>
                         </th>
                         <td><?php echo $row['correo'] ?></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <th></th>
@@ -434,12 +477,9 @@ $data2 = $gbd->query($sql2)->fetchAll();
 </html>
 
 <?php 
-
 }else{
   echo "NO ENTRES INTRUSO";
   
   Header("refresh:5; url=../index.php");
 }
-
-
 ?>

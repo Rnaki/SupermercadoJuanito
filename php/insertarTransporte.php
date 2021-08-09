@@ -25,7 +25,7 @@ foreach ($data as $row){
 }
 
 if(isset($columnas) == 1){
-    Header("Location: transporte.php?error=2");
+    Header("Location: transporte.php?pagina=1&error=2");
 }else{
 
 

@@ -18,10 +18,8 @@ foreach ($data as $row){
 }
 
 if(isset($columnas) == 1){
-    Header("Location: proveedor.php?error=2");
+    Header("Location: proveedor.php?pagina=1&error=2");
 }else{
-
-}
 
 //en $sql se guarda el insert
 $sql="SELECT insertarProveedor('$rutProovedor','$rutPersona', '$fonoProveedor','$marcaProveedor','$tipoProveedor','$nombreProveedor')";
@@ -34,4 +32,5 @@ if($conn){
     Header("Location: proveedor.php");
 }
 
+}
 ?>

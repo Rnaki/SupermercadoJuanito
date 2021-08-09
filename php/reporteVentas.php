@@ -3,6 +3,9 @@
 /*session_start();
 $sucursal=$_SESSION["sucursal"];*/
 
+session_start();
+if (isset($_SESSION["rut_persona"])) {
+
 include("conexion.php");
 $gbd = conectar();
 
@@ -35,7 +38,10 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 } 
 
 */
-
+$sql0 = "SELECT * FROM trabajador where rut_persona = '".$_SESSION["rut_persona"]."'";
+$gsent0 = $gbd->prepare($sql0);
+$gsent0->execute();
+$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
 //$sql ="SELECT id_sucursal, nombre_sucursal from sucursal";
 
 $sql="SELECT extract(year from fecha_venta) as yyyy
@@ -197,6 +203,38 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             background-color: rgb(163, 182, 241);
             border-top: 1px solid black;
         }
+        /*Header*/
+		header {
+			background: #f5f5f5;
+		}
+
+		header .juan {
+			width: 240px;
+			height: 60px;
+			color: #566787;
+		}
+
+		header .row .col-md-3,
+		header .row .col-md-8 {
+			padding: 0px 0px;
+		}
+
+		header .row .card-body {
+			padding: 3px 0px;
+		}
+
+		header .row .card-body .card-title {
+			margin-bottom: 0px;
+		}
+
+		header .dropdown .dropdown-menu {
+			width: 100%;
+			background: #ececec;
+		}
+
+		header .dropdown .dropdown-menu li {
+			color: #2196F3;
+		}
     </style>
         <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -238,7 +276,34 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
             <a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
             <h2 class="letrah2">INFO REPORTE DE VENTAS</h2>
-            <a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
+            <div class="dropdown">
+				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
+					<div class="row juan">
+						<div class="col-md-3 text-center">
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<img src="../imagenes/'.$row0["foto"].'" width="40px" height="50px" class="rounded-circle">';
+                                }
+                                ?>
+						</div>
+						<div class="col-md-8 text-start">
+							<div class="card-body">
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<h5 class="card-title">'.$row0["nombre_persona"].' '.$row0["apellidop_persona"].'</h5>';
+									echo '<p class="card-text">'.$row0["cargo"].'</p>';
+                                }
+                                ?>
+							</div>
+						</div>
+					</div>
+				</button>
+				<div class="dropdown-menu" aria-labelledby="bd-version">
+					<li><a class="dropdown-item" aria-current="true" href="perfilTrabajador.php">Ver perfil</a></li>
+					<div class="dropdown-divider"></div>
+					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
+				</div>
+			</div>
         </nav>
     </header>
     <!doctype html>
@@ -391,3 +456,10 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 </body>
 
 </html>
+<?php
+} else {
+    echo "NO ENTRES INTRUSO";
+
+    Header("refresh:5; url=../index.php");
+}
+?>

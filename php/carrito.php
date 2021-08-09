@@ -40,6 +40,13 @@ session_start();
     //$data = $gbd->query($sql)->fetchAll();
     $resultado3 = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
+     //CUPONES DISPONIBLES MODIFICADO POR CRISTIAN **************************************************+++
+     $sql9 = "SELECT distinct(rut_persona), ven_id_venta, id_cupon from cupon where rut_persona = '".$_SESSION["rut_persona"]."' ";
+     $cupon=["cupon.ven_id_venta"];
+     $gsent = $gbd->prepare($sql9);
+     $gsent->execute();
+     $resultado9 = $gsent->fetchAll(PDO::FETCH_ASSOC);
+
  }
 
 
@@ -87,6 +94,15 @@ session_start();
       echo "<h5><strong>Telefono:</strong></h5><h6>".$row["fono"]."</h6>";
       echo "<h5><strong>Dirección de despacho:</strong></h5><h6>".$row["region"]." ".$row["comuna"].", ".$row["direccion_despacho"]."</h6>";
       echo "</div>"; 
+       //CRISTIAN, MOSTRAR CUPONES
+       foreach ($resultado9 as $row){
+         
+        if($row["ven_id_venta"] == NULL){
+          echo "<h5><strong>Tienes un cupon disponible-ID CUPON: </strong></h5><h6>".$row["id_cupon"]."</h6>";
+        }else
+          echo "<h5><strong>No tienes cupones disponibles para usar</strong></h5>'";
+      }
+      //*****/
       }
     ?>
 
@@ -167,6 +183,21 @@ session_start();
         <section class="registro">
           <h3><strong>Resumen del pedido</strong></h3>
           <br>
+                  <!--  MOSTRAR LA OPCION DE USAR CUPON, SI SE TIENE UNO DISPONIBLE  -->
+        <?php
+          foreach ($resultado9 as $row){
+         
+            if($row["ven_id_venta"] == NULL){
+          echo  "<div class='row'>
+              <div class='col'>
+                <h5>Usar cupón</h5>
+                <input id='checkBoxCupon' type='checkbox' checked>
+              </div>
+            </div>";
+          }  
+        }
+        ?>
+           
         <div class="row">
           <div class="col">
             <h5>Id de venta ------ </h5>
@@ -292,6 +323,18 @@ $('#checkBoxTienda').on('change', function() {
     totalCompra = parseInt($('#subtotalCompra').text())+parseInt(0);
     $('.totalCompra').val(totalCompra);
     
+
+});
+
+$('#subtotalCompra').on('change', function() {
+  subtotalCompra = parseInt( $('#subtotalCompra').text()); 
+  console.log(subtotalCompra);
+  if (subtotalCompra > 10000){
+    $('#checkBoxCupon').prop('disabled', false);
+  }else if (subtotalCompra < 10000){
+    $('#checkBoxCupon').prop('disabled', true);
+
+  }
 
 });
 

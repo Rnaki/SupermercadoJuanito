@@ -33,7 +33,7 @@ foreach ($data as $row){
 }
 
 if(isset($columnas) == 1){
-    Header("Location: infoBodega.php?error=2");
+    Header("Location: infoBodega.php?pagina=1&error=1");
 }else{
 
 

@@ -173,10 +173,10 @@ if($tamanoImagen <= 1000000){
             Header("Location: Interfaz RRHH.php");
         }
     }else{
-        Header("Location: Interfaz RRHH.php?error1=2");
+        Header("Location: Interfaz RRHH.php?pagina=1&error2=2");
     }
 }else{
-    Header("Location: Interfaz RRHH.php?error=2");
+    Header("Location: Interfaz RRHH.php?pagina=1&error3=2");
  }
 
 

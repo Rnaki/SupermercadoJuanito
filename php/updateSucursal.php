@@ -10,10 +10,9 @@ $conn=conectar();
  $updateNumeroCalleSucursal=$_POST["updateNumeroCalleSucursal"];
  $updateFonoSucursal=$_POST["updateFonoSucursal"];
  $updateNombreSucursal=$_POST["updateNombreSucursal"];
- $updateCantidadTrabajadores=$_POST["updateCantidadTrabajadores"];
 
 
-$sql = "SELECT updateSucursal('".$updateIdSucursal."', '".$updateIdBodega."', '".$updateRegionSucursal."', '".$updateComunaSucursal."', '".$updateCalleSucursal."', '".$updateNumeroCalleSucursal."', '".$updateFonoSucursal."', '".$updateNombreSucursal."', '".$updateCantidadTrabajadores."')";
+$sql = "SELECT updateSucursal('".$updateIdSucursal."', '".$updateIdBodega."', '".$updateRegionSucursal."', '".$updateComunaSucursal."', '".$updateCalleSucursal."', '".$updateNumeroCalleSucursal."', '".$updateFonoSucursal."', '".$updateNombreSucursal."')";
 echo $conn->exec($sql);
 
 if($conn){

@@ -1,10 +1,24 @@
 <?php
+session_start();
+if (isset($_SESSION["rut_persona"])) {
+
+    $_SESSION["sucursal"];
+    $_SESSION["rut_persona"];
+    if (isset($_GET["error"])) {
+        $error = $_GET["error"];
+        echo '<script>alert("La id bodega ya existe")</script>';
+    }
 
 include("conexion.php");
 $gbd = conectar();
 
+$sql0 = "SELECT * FROM trabajador where rut_persona = '".$_SESSION["rut_persona"]."'";
+$gsent0 = $gbd->prepare($sql0);
+$gsent0->execute();
+$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
+
 //$sql = "SELECT my_function();";
-$sql = "SELECT * FROM bodega";
+$sql = "SELECT * FROM bodega ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
@@ -13,21 +27,18 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 } else if (isset($_POST["regionBuscar"])) {
 	$regionBuscar = $_POST["regionBuscar"];
 	if ($_POST["regionBuscar"] == '') {       
-        $sql = "SELECT * FROM bodega";
+        $sql = "SELECT * FROM bodega ";
 	} else {
-        $sql = "SELECT * FROM bodega WHERE region_bodega = '$regionBuscar'";
+        $sql = "SELECT * FROM bodega WHERE upper(region_bodega) like upper('".$regionBuscar."%') ";
 	}
 } else if (isset($_POST["comunaBuscar"])) {
 	$comunaBuscar = $_POST["comunaBuscar"];
 	if ($_POST["comunaBuscar"] == '') {       
-        $sql = "SELECT * FROM bodega";
+        $sql = "SELECT * FROM bodega ";
 	} else {
-        $sql = "SELECT * FROM bodega WHERE comuna_bodega = '$comunaBuscar'";
+        $sql = "SELECT * FROM bodega WHERE upper(comuna_bodega) like upper('".$comunaBuscar."%') ";
     }
 }
-
-
-
 
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
@@ -36,7 +47,41 @@ $gsent->execute();
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
-//var_dump($resultado);
+//paginador
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+$paginas = $gsent->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+	if($paginas*$xpaginas == $totalquery){
+		$encontrado = $xpaginas;
+	}else{
+		$encontrado = $totalquery-($paginas*$xpaginas);
+	}
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
+
+if(!$_GET){
+	header('Location: bodegaGerente.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: bodegaGerente.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql.' LIMIT :nArticulos OFFSET :iniciar;';
+$gsent7 = $gbd->prepare($sqlGuardar);
+$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+$gsent7->execute();
+$resultado = $gsent7->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 ?>
 
@@ -51,9 +96,9 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../css/estilosDaniel.css">
     <!-- JS BOOTSTRAP -->
+    <script src="../popper/popper.min.js"></script>
     <script src="../jquery/jquery.min.v3.6.0.js"></script>
     <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
-    <script src="../popper/popper.min.js"></script>
     <script src="../js/funciones.js"></script>
     <style>
         .table-title .col .form-control {
@@ -69,8 +114,8 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             margin-top: 1%;
         }
 
-        div .col-sm-6 .b1 {
-            margin-left: 73%;
+        div .primero .col {
+            text-align: right;
         }
 
         /*Cambio*/
@@ -167,6 +212,39 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             background-color: rgb(163, 182, 241);
             border-top: 1px solid black;
         }
+
+        /*Header*/
+		header {
+			background: #f5f5f5;
+		}
+
+		header .juan {
+			width: 240px;
+			height: 60px;
+			color: #566787;
+		}
+
+		header .row .col-md-3,
+		header .row .col-md-8 {
+			padding: 0px 0px;
+		}
+
+		header .row .card-body {
+			padding: 3px 0px;
+		}
+
+		header .row .card-body .card-title {
+			margin-bottom: 0px;
+		}
+
+		header .dropdown .dropdown-menu {
+			width: 100%;
+			background: #ececec;
+		}
+
+		header .dropdown .dropdown-menu li {
+			color: #2196F3;
+		}
     </style>
 
 </head>
@@ -176,7 +254,34 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
             <a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
             <h2 class="letrah2">INFORMACIÓN DE BODEGAS</h2>
-            <a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
+            <div class="dropdown">
+				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
+					<div class="row juan">
+						<div class="col-md-3 text-center">
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<img src="../imagenes/'.$row0["foto"].'" width="40px" height="50px" class="rounded-circle">';
+                                }
+                                ?>
+						</div>
+						<div class="col-md-8 text-start">
+							<div class="card-body">
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<h5 class="card-title">'.$row0["nombre_persona"].' '.$row0["apellidop_persona"].'</h5>';
+									echo '<p class="card-text">'.$row0["cargo"].'</p>';
+                                }
+                                ?>
+							</div>
+						</div>
+					</div>
+				</button>
+				<div class="dropdown-menu" aria-labelledby="bd-version">
+					<li><a class="dropdown-item" aria-current="true" href="perfilTrabajador.php">Ver perfil</a></li>
+					<div class="dropdown-divider"></div>
+					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
+				</div>
+			</div>
         </nav>
     </header>
     <div style="height:50px"></div>
@@ -219,13 +324,13 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="bodegaGerente.php" method="POST" class="d-flex">
+                                                <form action="bodegaGerente.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Bodega" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                             <div class="col-sm-6">
-                                                <form action="bodegaGerente.php" method="POST" class="d-flex">
+                                                <form action="bodegaGerente.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="regionBuscar" placeholder="Regón" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -238,7 +343,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="bodegaGerente.php" method="POST" class="d-flex">
+                                                <form action="bodegaGerente.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="comunaBuscar" placeholder="Comuna" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -251,7 +356,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                 </div>
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" style="text-align: center;">
                     <thead>
                         <tr>
                             
@@ -261,6 +366,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                             <th>Comuna</th>
                             <th>Calle</th>
                             <th>N° calle</th>
+                            <th>Acciones</th>
                             <!--Que productos tiene cada, la cantidad, almacenamiento-->
                         </tr>
                     </thead>
@@ -291,120 +397,23 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                 </svg></a>
 
                             </td>";
-                            echo "<tr>";
+                            echo "</tr>";
                             }
                         ?>  
                     </tbody>
                 </table>
                 <div class="clearfix">
-                    <div class="hint-text">Mostrando <b>5</b> de <b>25</b> entradas</div>
-                    <ul class="pagination">
-                        <li class="page-item"><a href="#" class="page-link">Anterior</a></li>
-                        <li class="page-item"><a href="#" class="page-link">1</a></li>
-                        <li class="page-item"><a href="#" class="page-link">2</a></li>
-                        <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                        <li class="page-item"><a href="#" class="page-link">4</a></li>
-                        <li class="page-item"><a href="#" class="page-link">5</a></li>
-                        <li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de InfoDespacho-->
-    <div class="modal fade" id="infoDespachoEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog infodespacho">
-            <div class="modal-content">
-                <div class="modal-header info">
-                    <h5 class="modal-title" id="exampleModalLabel">Información del Cliente</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-sm-7">
-                                <label><strong>Nombre: </strong> Maria Colque</label>
-                            </div>
-                            <div class="col-sm-5">
-                                <label><strong>Metodo de pago: </strong> Efectivo</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label><strong>Rut: </strong> 20503968-6</label>
-                    </div>
-                    <div class="form-group">
-                        <label><strong>Domicilio: </strong> Salvador 13</label>
-                    </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-sm-7">
-                                <label><strong>Región: </strong> Tarapaca</label>
-                            </div>
-                            <div class="col-sm-5">
-                                <label><strong>Comuna: </strong> Iquique</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-sm-7">
-                                <label><strong>Telefono: </strong> (+56) 9 12312312</label>
-                            </div>
-                            <div class="col-sm-5">
-                                <label><strong>Correo: </strong> maria12@gmail.com</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Cantidad</th>
-                                <th class="text-center">Detalles</th>
-                                <th>P. Unitario</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td></td>
-                                <td>10</td>
-                                <td>Smartphone Xiaomi Redmi 9A 32GB Azul Claro</td>
-                                <td>$79.990</td>
-                                <td>$799.900</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td>18</td>
-                                <td>Néctar Andina del Valle durazno</td>
-                                <td>$1.499</td>
-                                <td>$26.982</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td>21</td>
-                                <td>Huevo Gallina Libre 6un</td>
-                                <td>$1.690</td>
-                                <td>$35.490</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td>13</td>
-                                <td>Soprole, Yoghurt Batifrut con trozos de Frutilla Pote 165 g</td>
-                                <td>$510</td>
-                                <td>$6.630</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Salir</button>
-                </div>
+				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
+					<ul class="pagination">
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="bodegaGerente.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="bodegaGerente.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="bodegaGerente.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
+					</ul>
+				</div>
             </div>
         </div>
     </div>
@@ -417,15 +426,11 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                     <h5 class="modal-title" id="exampleModalLabel">Añadir Despacho</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="InsertarBodega.php">
+                <form method="POST" action="insertarBodega.php">
                     <div class="modal-body">
                         <div class="form-group">
                             <label>ID Bodega: </label>
                             <input type="text" class="form-control" id="id_bodega" name="id_bodega" required>
-                            <div class="form-group">
-                                <label>Almacenamiento: </label>
-                                <input type="text" class="form-control" id="almacenamiento" name="almacenamiento" required>
-                            </div>
                             <div class="form-group">
                                 <label>Región: </label>
                                 <input type="text" class="form-control" id="region_bodega" name="region_bodega" required>
@@ -467,11 +472,6 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                             <label>ID Bodega: </label>
                             <input type="text" id="updateIdBodega" class="form-control" disabled>
                             <input id="updateIdBodega2" class="updateIdBodega" name="updateIdBodega" type="hidden">
-                            <div class="form-group">
-                                <label>Almacenamiento: </label>
-                                <input name="updateAlmacenamiento" type="text" id="updateAlmacenamiento" class="form-control" required>
-                                <!--<input name="updateIdBodega" type="hidden" id="updateIdBodega" value=""> -->
-                            </div>
                             <div class="form-group">
                                 <label>Región: </label>
                                 <input name="updateRegionBodega" type="text" id="updateRegionBodega" class="form-control" disabled>
@@ -526,3 +526,10 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 </body>
 
 </html>
+<?php
+} else {
+    echo "NO ENTRES INTRUSO";
+
+    Header("refresh:5; url=../index.php");
+}
+?>

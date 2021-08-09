@@ -72,7 +72,7 @@ if($tamanoImagen <= 1000000){
         move_uploaded_file($_FILES['foto']['tmp_name'],$carpetaDestino.$nombreImagen);
 
         if(isset($columnas) == 1 && $columnas == 1){
-            Header("Location: Interfaz RRHH.php?error=2");
+            Header("Location: Interfaz RRHH.php?pagina=1&error=2");
         }elseif(isset($columnas2) == 1 && $columnas2 == 0){
             $sql1="SELECT insertarpersona('".$rut."',
             '".$nombre."',
@@ -130,6 +130,19 @@ if($tamanoImagen <= 1000000){
             $sql3 = "INSERT INTO trabaja (rut_persona, id_sucursal) values ('".$rut."', '".$_SESSION["sucursal"]."')";
             echo $conn->exec($sql3);
 
+            $sqlTrab = "SELECT sucursal.nombre_sucursal, count(trabaja.rut_persona)as cantidad from sucursal 
+                        left join trabaja on trabaja.id_sucursal = sucursal.id_sucursal 
+                        join trabajador on trabajador.rut_persona = trabaja.rut_persona where sucursal.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true group by nombre_sucursal order by count(trabaja.rut_persona);";
+            $conn->exec($sqlTrab);
+            $resulta = $conn->query($sqlTrab)->fetchAll();
+            foreach ($resulta as $row){
+                echo $cantidad = $row["cantidad"];
+                echo "cantidad";
+            }
+
+            $sql27 = "UPDATE sucursal SET cantidad_trabajadores = '$cantidad' where id_sucursal = '".$_SESSION["sucursal"]."';";
+            echo $conn->exec($sql27);
+
             if(isset($_POST["RRHH"])){
                 $sql7 = "INSERT INTO controla (rut_persona, id_acceso) values ('".$rut."', 1)";
                 echo $conn->exec($sql7);
@@ -179,6 +192,18 @@ if($tamanoImagen <= 1000000){
             $sql5 = "INSERT INTO trabaja (rut_persona, id_sucursal) values ('".$rut."', '".$_SESSION["sucursal"]."')";
             echo $conn->exec($sql5);
 
+            $sqlTrab1 = "SELECT sucursal.nombre_sucursal, count(trabaja.rut_persona)as cantidad from sucursal 
+                        left join trabaja on trabaja.id_sucursal = sucursal.id_sucursal 
+                        join trabajador on trabajador.rut_persona = trabaja.rut_persona where sucursal.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true group by nombre_sucursal order by count(trabaja.rut_persona);";
+            $conn->exec($sqlTrab1);
+            $resulta1 = $conn->query($sqlTrab1)->fetchAll();
+            foreach ($resulta1 as $row){
+                $cantidad1 = $row["cantidad"];
+            }
+
+            $sql28 = "UPDATE sucursal SET cantidad_trabajadores = '$cantidad1' where id_sucursal = '".$_SESSION["sucursal"]."';";
+            echo $conn->exec($sql28);
+
             if(isset($_POST["RRHH"])){
                 $sql7 = "INSERT INTO controla (rut_persona, id_acceso) values ('".$rut."', 1)";
                 echo $conn->exec($sql7);
@@ -207,10 +232,10 @@ if($tamanoImagen <= 1000000){
             Header("Location: Interfaz RRHH.php");
         }
      }else{
-        Header("Location: Interfaz RRHH.php?error1=2");
+        Header("Location: Interfaz RRHH.php?pagina=1&error2=2");
      }
 }else{
-    Header("Location: Interfaz RRHH.php?error=2");
+    Header("Location: Interfaz RRHH.php?pagina=1&error3=2");
 }
 
 

@@ -1,38 +1,55 @@
 <?php
 
 session_start();
+if(isset($_SESSION["rut_persona"])){
+
 $_SESSION["sucursal"];
 $_SESSION["rut_persona"];
 
 if(isset($_GET["error"]) && $_GET["error"] == 2){
 	echo "<script>alert('El rut ya se encuentra registrado')</script>";
 }
+
+if(isset($_GET["error2"])) {
+    $error = $_GET["error2"];
+    echo '<script>alert("Imagen muy grande")</script>';
+}
+
+if (isset($_GET["error3"])) {
+    $error = $_GET["error3"];
+    echo '<script>alert("Tipo de imagen no permitida")</script>';
+}
+
+
 include("conexion.php");
 $gbd = conectar();
 
 $sql0 = "SELECT * FROM trabajador where rut_persona = '".$_SESSION["rut_persona"]."'";
 $gsent0 = $gbd->prepare($sql0);
 $gsent0->execute();
-$resultado0 = $gsent0->fetchAll(PDO::FETCH_ASSOC);
+$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
 
+$sql = "SELECT * FROM trabajador
+		join trabaja on trabaja.rut_persona = trabajador.rut_persona
+		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true ";
 
 if (isset($_POST["rutBuscar"])) {
 	$rutBuscar = $_POST["rutBuscar"];
 	$sql = "SELECT * from trabajador
 	join trabaja on trabaja.rut_persona = trabajador.rut_persona 
 	where trabajador.rut_persona like '$rutBuscar%'
-	and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+	and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true ";
 } else if (isset($_POST["apellidoPBuscar"])) {
 	$apellidoPBuscar = $_POST["apellidoPBuscar"];
 	if ($_POST["apellidoPBuscar"] == "") {
 		$sql = "SELECT * FROM trabajador
 		join trabaja on trabaja.rut_persona = trabajador.rut_persona
-		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+		where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true ";
 	} else {
 		$sql = "SELECT * from trabajador 
 		join trabaja on trabaja.rut_persona = trabajador.rut_persona 
 		where apellidop_persona like '$apellidoPBuscar%' 
-		and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+		and trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true ";
 	}
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
 	$desde = $_POST["desde"];
@@ -40,23 +57,59 @@ if (isset($_POST["rutBuscar"])) {
 	$sql = "SELECT * from trabajador
 			join trabaja on trabaja.rut_persona = trabajador.rut_persona 
 			where fecha_nacimiento_persona Between '$desde' and '$hasta' and (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' 
-			and trabajador.estado_persona = true)";
+			and trabajador.estado_persona = true) ";
 } else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["desde"] == "" || $_POST["hasta"] == "") {
 	$sql = "SELECT * FROM trabajador
 			join trabaja on trabaja.rut_persona = trabajador.rut_persona
-			where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true";
+			where trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true ";
 }
 
 
 //$data = $conn->query($sql)->fetchAll();
+
 $gsent = $gbd->prepare($sql);
-$cuenta_col = $gsent->columnCount();
-$data = $gbd->query($sql)->fetchAll();
+$gsent->execute();
+$data = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
 
 $sql1 = "SELECT sucursal.nombre_sucursal from sucursal where id_sucursal = '".$_SESSION["sucursal"]."'";
-$gsent = $gbd->prepare($sql1);
+$gsent1 = $gbd->prepare($sql1);
 $resultado1 = $gbd->query($sql1)->fetchAll();
+
+//paginador
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+$paginas = $gsent->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+	if($paginas*$xpaginas == $totalquery){
+		$encontrado = $xpaginas;
+	}else{
+		$encontrado = $totalquery-($paginas*$xpaginas);
+	}
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
+
+if(!$_GET){
+	header('Location: Interfaz RRHH.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: Interfaz RRHH.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
+$gsent7 = $gbd->prepare($sqlGuardar);
+$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+$gsent7->execute();
+$data = $gsent7->fetchAll(PDO::FETCH_ASSOC);
+
 
 ?>
 <!DOCTYPE html>
@@ -154,6 +207,11 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 			font-size: 19px;
 		}
 
+		table.table tr th,
+		table.table tr td {
+			vertical-align: middle;
+		}
+
 		/*Header*/
 		header {
 			background: #f5f5f5;
@@ -161,7 +219,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 
 		header .juan {
 			width: 240px;
-			height: 50px;
+			height: 60px;
 			color: #566787;
 		}
 
@@ -192,12 +250,12 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 
 <body>
 
-	<header class="site-header sticky-top py-1">
+	<header class="site-header sticky-top py-1" style="height: 95px;">
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
 			<a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
 			<a class="py-2 d-none d-md-inline-block" href="Contratos.php">Contratos</a>
-			<h2 class="letrah2">ÁREA RECURSOS HUMANOS</h2>
+			<h2 class="letrah2" style="text-align: center;">ÁREA RECURSOS HUMANOS <p style="text-transform: uppercase;height: 0px;"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></p></h2>
 			
 			<a class="py-2 d-none d-md-inline-block" href="cliente.php">Clientes</a>
 			<div class="dropdown">
@@ -205,7 +263,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 					<div class="row juan">
 						<div class="col-md-3 text-center">
 								<?php
-                                foreach ($resultado0 as $row0) {
+                                foreach ($perfil as $row0) {
                                     echo '<img src="../imagenes/'.$row0["foto"].'" width="40px" height="50px" class="rounded-circle">';
                                 }
                                 ?>
@@ -213,7 +271,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 						<div class="col-md-8 text-start">
 							<div class="card-body">
 								<?php
-                                foreach ($resultado0 as $row0) {
+                                foreach ($perfil as $row0) {
                                     echo '<h5 class="card-title">'.$row0["nombre_persona"].' '.$row0["apellidop_persona"].'</h5>';
 									echo '<p class="card-text">'.$row0["cargo"].'</p>';
                                 }
@@ -223,14 +281,13 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 					</div>
 				</button>
 				<div class="dropdown-menu" aria-labelledby="bd-version">
-					<li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
+					<li><a class="dropdown-item" aria-current="true" href="perfilTrabajador.php">Ver perfil</a></li>
 					<div class="dropdown-divider"></div>
 					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
 				</div>
 			</div>
 
 		</nav>
-		<h2 class="text-center letrah2"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></h2>
 	</header>
 
 	<div class="container-fluid">
@@ -242,7 +299,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 							<h3>GESTIÓN DE PERSONAL: </h3>	
 						</div>
 						<div class="col-sm-6 col">
-							<a href="#addEmployeeModal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#añadirexampleModal"><i class="material-icons">&#xE147;</i> <span>Añadir nuevo empleado</span></a>
+							<a href="#addEmployeeModal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#añadirexampleModal"><i class="material-icons">&#xE147;</i> Añadir nuevo empleado</a>
 							<a class="btn btn-primary"  href="trabajadorRecuperar.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
 								<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
                                 </svg> Recuperar Empleados</a>
@@ -270,13 +327,13 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="Interfaz RRHH.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="rutBuscar" placeholder="RUT" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="Interfaz RRHH.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="apellidoPBuscar" placeholder="Apellido Paterno" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
@@ -293,7 +350,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 											</div>
 
 											<div class="col-sm-4">
-												<form action="Interfaz RRHH.php" method="POST" class="d-flex">
+												<form action="Interfaz RRHH.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
 
 											</div>
@@ -339,7 +396,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 							<th>Acciones</th>
 						</tr>
 					</thead>
-					<tbody">
+					<tbody>
 						<?php
 						foreach ($data as $row) {
 						?>
@@ -367,8 +424,6 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 						<?php 	echo "<a onclick='mostrarEliminarTrabajador(\"" . $row['rut_persona'] . "\")' href='#eliminarexampleModal' class='delete' data-bs-toggle='modal' data-bs-target='#eliminarexampleModal'><i class='material-icons' data-toggle='tooltip' title='Eliminar'>&#xE872;</i></a>" ?>
 								</td>
 							</tr>
-							<?php //include("modalEditarPersonal.php"); ?>
-							<?php //include("modalEliminarPersonal.php"); ?>
 						<?php
 						}
 						?>
@@ -376,15 +431,15 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
 
 				</table>
 				<div class="clearfix">
-					<div class="hint-text">Mostrar <b>5</b> de <b>25</b> entradas</div>
+				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
 					<ul class="pagination">
-						<li class="page-item disabled"><a href="#">Anterior</a></li>
-						<li class="page-item"><a href="#" class="page-link">1</a></li>
-						<li class="page-item"><a href="#" class="page-link">2</a></li>
-						<li class="page-item active"><a href="#" class="page-link">3</a></li>
-						<li class="page-item"><a href="#" class="page-link">4</a></li>
-						<li class="page-item"><a href="#" class="page-link">5</a></li>
-						<li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="Interfaz RRHH.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="Interfaz RRHH.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="Interfaz RRHH.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
 					</ul>
 				</div>
 			</div>
@@ -483,7 +538,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                     <label>Correo: </label>
                     <input type="email" class="form-control mb-3 c" required="required" name="Correo" placeholder="Correo" maxlength="64">
                     <label>Teléfono: </label>
-                    <input type="text" class="form-control mb-3 c" required="required" name="Telefono" placeholder="Telefono" maxlength="16">
+                    <input type="number" class="form-control mb-3 c" required="required" name="Telefono" placeholder="Telefono" maxlength="16">
 					<label>Foto: </label>
                     <input type="file" class="form-control mb-3 c" required="required" name="foto" accept="image/*">
 					<!--<label>Cargo: </label>-->
@@ -614,7 +669,7 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
                         </div>
                         <div class="form-group">
                             <label>Teléfono: </label>
-                            <input type="text" class="form-control c" id="editTelefono" name="Telefono" required value="">
+                            <input type="number" class="form-control c" id="editTelefono" name="Telefono" required value="">
                         </div>
 						<label>Foto: </label>
                     <input type="file" class="form-control mb-3 c" name="editFoto" accept="image/*">
@@ -697,3 +752,10 @@ $resultado1 = $gbd->query($sql1)->fetchAll();
     </div>
 
 </html>
+<?php 
+}else{
+  echo "NO ENTRES INTRUSO";
+  
+  Header("refresh:5; url=../index.php");
+}
+?>

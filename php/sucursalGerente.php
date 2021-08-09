@@ -1,10 +1,26 @@
 <?php
 
+session_start();
+if (isset($_SESSION["rut_persona"])) {
+
+$_SESSION["sucursal"];
+$_SESSION["rut_persona"];
+
+if (isset($_GET["error"])) {
+    $error = $_GET["error"];
+    echo '<script>alert("La id sucursal ya existe")</script>';
+}
+
 include("conexion.php");
 $gbd = conectar();
 
 //$sql = "SELECT my_function();";
-$sql = "SELECT * FROM sucursal";
+$sql0 = "SELECT * FROM trabajador where rut_persona = '".$_SESSION["rut_persona"]."'";
+$gsent0 = $gbd->prepare($sql0);
+$gsent0->execute();
+$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT * FROM sucursal ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
@@ -13,30 +29,67 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 } else if (isset($_POST["regionBuscar"])) {
 	$regionBuscar = $_POST["regionBuscar"];
 	if ($_POST["regionBuscar"] == '') {       
-        $sql = "SELECT * FROM sucursal";
+        $sql = "SELECT * FROM sucursal ";
 	} else {
-	$sql = "SELECT * FROM sucursal WHERE region_sucursal = '$regionBuscar'";
+	$sql = "SELECT * FROM sucursal WHERE upper(region_sucursal) like upper('".$regionBuscar."%') ";
 	}
 } else if (isset($_POST["comunaBuscar"])) {
 	$comunaBuscar = $_POST["comunaBuscar"];
 	if ($_POST["comunaBuscar"] == '') {       
-        $sql = "SELECT * FROM sucursal";
+        $sql = "SELECT * FROM sucursal ";
 	} else {
-        $sql = "SELECT * FROM sucursal WHERE comuna_sucursal = '$comunaBuscar'";
+        $sql = "SELECT * FROM sucursal WHERE upper(comuna_sucursal) like upper('".$comunaBuscar."%') ";
     }
 } 
-
-
 
 
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
 
+$sql2 = "SELECT bodega.id_bodega, sucursal.id_sucursal from bodega
+        left join sucursal on sucursal.id_bodega = bodega.id_bodega where id_sucursal is NULL;";
+$gsent2 = $gbd->prepare($sql2);
+$gsent2->execute();
+$resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
+
+
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
-//var_dump($resultado);
+//paginador
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+$paginas = $gsent->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+	if($paginas*$xpaginas == $totalquery){
+		$encontrado = $xpaginas;
+	}else{
+		$encontrado = $totalquery-($paginas*$xpaginas);
+	}
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
+
+if(!$_GET){
+	header('Location: sucursalGerente.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: sucursalGerente.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
+$gsent7 = $gbd->prepare($sqlGuardar);
+$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+$gsent7->execute();
+$resultado = $gsent7->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -51,9 +104,9 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../css/estilosDaniel.css">
     <!-- JS BOOTSTRAP -->
+    <script src="../popper/popper.min.js"></script>
     <script src="../jquery/jquery.min.v3.6.0.js"></script>
     <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
-    <script src="../popper/popper.min.js"></script>
     <script src="../js/funciones.js"></script>
     <style>
         .table-title .col .form-control {
@@ -69,8 +122,8 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             margin-top: 1%;
         }
 
-        div .col-sm-6 .b1 {
-            margin-left: 73%;
+        div .primero .col {
+            text-align: right;
         }
 
         /*Cambio*/
@@ -167,8 +220,40 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             background-color: rgb(163, 182, 241);
             border-top: 1px solid black;
         }
-    </style>
 
+        /*Header*/
+		header {
+			background: #f5f5f5;
+		}
+
+		header .juan {
+			width: 240px;
+			height: 60px;
+			color: #566787;
+		}
+
+		header .row .col-md-3,
+		header .row .col-md-8 {
+			padding: 0px 0px;
+		}
+
+		header .row .card-body {
+			padding: 3px 0px;
+		}
+
+		header .row .card-body .card-title {
+			margin-bottom: 0px;
+		}
+
+		header .dropdown .dropdown-menu {
+			width: 100%;
+			background: #ececec;
+		}
+
+		header .dropdown .dropdown-menu li {
+			color: #2196F3;
+		}
+    </style>
 </head>
 
 <body>
@@ -176,7 +261,35 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
             <a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
             <h2 class="letrah2">INFORMACIÓN DE SUCURSALES</h2>
-            <a class="py-2 d-none d-md-inline-block" href="../index.php">Cerrar sesión</a>
+
+            <div class="dropdown">
+				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
+					<div class="row juan">
+						<div class="col-md-3 text-center">
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<img src="../imagenes/'.$row0["foto"].'" width="40px" height="50px" class="rounded-circle">';
+                                }
+                                ?>
+						</div>
+						<div class="col-md-8 text-start">
+							<div class="card-body">
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<h5 class="card-title">'.$row0["nombre_persona"].' '.$row0["apellidop_persona"].'</h5>';
+									echo '<p class="card-text">'.$row0["cargo"].'</p>';
+                                }
+                                ?>
+							</div>
+						</div>
+					</div>
+				</button>
+				<div class="dropdown-menu" aria-labelledby="bd-version">
+					<li><a class="dropdown-item" aria-current="true" href="perfilTrabajador.php">Ver perfil</a></li>
+					<div class="dropdown-divider"></div>
+					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
+				</div>
+			</div>
         </nav>
     </header>
     <div style="height:50px"></div>
@@ -219,13 +332,13 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="sucursalGerente.php" method="POST" class="d-flex">
+                                                <form action="sucursalGerente.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Sucursal" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                             <div class="col-sm-6">
-                                                <form action="sucursalGerente.php" method="POST" class="d-flex">
+                                                <form action="sucursalGerente.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="regionBuscar" placeholder="Región" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -238,7 +351,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="sucursalGerente.php" method="POST" class="d-flex">
+                                                <form action="sucursalGerente.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="comunaBuscar" placeholder="Comuna" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -251,10 +364,9 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                     </div>
 
                 </div>
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" style="text-align: center;">
                     <thead>
                         <tr>
-                            
                             <th>ID Sucursal</th>
                             <th>ID Bodega</th>
                             <th>Región </th>
@@ -264,6 +376,7 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                             <th>Teléfono</th>
                             <th>Nombre sucursal</th>
                             <th>Trabajadores</th>
+                            <th>Acciones</th>
                             <!--Que productos tiene cada, la cantidad, almacenamiento-->
                         </tr>
                     </thead>
@@ -297,23 +410,23 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                                 </svg></a>
 
                             </td>";
-                            echo "<tr>";
+                            echo "</tr>";
                             }
                         ?>  
                     </tbody>
                 </table>
                 <div class="clearfix">
-                    <div class="hint-text">Mostrando <b>5</b> de <b>25</b> entradas</div>
-                    <ul class="pagination">
-                        <li class="page-item"><a href="#" class="page-link">Anterior</a></li>
-                        <li class="page-item"><a href="#" class="page-link">1</a></li>
-                        <li class="page-item"><a href="#" class="page-link">2</a></li>
-                        <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                        <li class="page-item"><a href="#" class="page-link">4</a></li>
-                        <li class="page-item"><a href="#" class="page-link">5</a></li>
-                        <li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
-                    </ul>
-                </div>
+				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
+					<ul class="pagination">
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="sucursalGerente.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="sucursalGerente.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="sucursalGerente.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
+					</ul>
+				</div>
             </div>
         </div>
     </div>
@@ -430,7 +543,15 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                             <input type="text" class="form-control" id="id_sucursal" name="id_sucursal" required>
                             <div class="form-group">
                                 <label>ID Bodega: </label>
-                                <input type="text" class="form-control" id="id_bodega" name="id_bodega" required>
+                                <select class="form-select" name="id_bodega" id="id_bodega" required>
+                                    <option value="">Seleccione...</option>
+									<?php
+									foreach ($resultado2 as $row2) {
+										echo "<option id=" . $row2["id_bodega"] . " value=" . $row2['id_bodega'] . ">" . $row2["id_bodega"] . "</option>";
+									}
+									?>
+								</select>
+                                <br>
                             </div>
                             <div class="form-group">
                                 <label>Región: </label>
@@ -455,10 +576,6 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                             <div class="form-group">
                                 <label>Nombre Sucursal: </label>
                                 <input type="text" class="form-control" id="nombre_sucursal" name="nombre_sucursal" required>
-                            </div>
-                            <div class="form-group">
-                                <label>N° Trabajadores: </label>
-                                <input type="text" class="form-control" id="cantidad_trabajadores" name="cantidad_trabajadores" required>
                             </div>
                         </div>
                     </div>
@@ -519,9 +636,9 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="form-group">
                                 <label>N° trabajadores: </label>
-                                <input name="updateCantidadTrabajadores" type="text" id="updateCantidadTrabajadores" class="form-control" required>
+                                <input type="text" id="updateCantidadTrabajadores" class="form-control" disabled>
+                                <input name="updateCantidadTrabajadores" type="hidden" id="updateCantidadTrabajadores" class="form-control">
                             </div>
-                            
                         </div>
                         </div>           
                         <div class="modal-footer">
@@ -558,3 +675,10 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 </body>
 
 </html>
+<?php
+} else {
+    echo "NO ENTRES INTRUSO";
+
+    Header("refresh:5; url=../index.php");
+}
+?>

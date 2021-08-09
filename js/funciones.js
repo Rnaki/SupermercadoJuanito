@@ -191,31 +191,57 @@ function eliminarProducto(idProducto){
 }
 
 function mostrarUpdateDespacho(idDespacho){
-   
+
    console.log(idDespacho);
+
    cadena= {
+
       "idDespacho": idDespacho,
+
   };
+
   $.ajax({
+
       type: "POST",
+
       url: "mostrarUpdateDespacho.php",
+
       data: cadena,
+
       success:function(info){
+
           datos = JSON.parse(info)
+
           $('#updateIdDespacho').val(datos[0])
+
           $('#idUpdateDespacho').val(datos[0])
+
           $('#updateIdSucursal').val(datos[1]);
+
           $('#updatePatente').val(datos[2]);
+
           $('#updateInformacion').val(datos[3]);
+
           $('#updateFechaLimite').val(datos[4]);
+
           $('#updateFechaEntrega').val(datos[5]);
+
           $('#IdProcesoDespacho').val(datos[6]);
+
+          $('#updatePatente option[value="'+datos[2]+'"]').attr("selected", true);
+
           $('#UpdateEstadoDespacho option[value="'+datos[6]+'"]').attr("selected", true);
-          
+
+          console.log(datos[2]);
+
           console.log(datos[6]);
 
+
+
       }
+
   }) 
+
 }
 
 function mostrarUpdateCliente(rut_persona){
@@ -293,29 +319,54 @@ function eliminarCliente(){
   }) 
 }
 
-function mostrarUpdateInfoBodega(idProducto){
+function mostrarUpdateInfoBodega(idProducto,idBodega){
+
    cadena= {
+
       "idProducto": idProducto,
+
+      "idBodega": idBodega,
+
   };
+
   $.ajax({
+
       type: "POST",
+
       url: "mostrarUpdateInfoBodega.php",
+
       data: cadena,
+
       success:function(info){
+
           datos = JSON.parse(info)
+
           $('.updateIdProducto').val(datos[0])
+
           $('#updateNombreProducto').val(datos[1]);
+
           $('#UpdateIdCategoria').val(datos[2]);
+
           $('#updateMarca').val(datos[3]);
+
           $('#updateNombreCategoria').val(datos[4]);
+
           $('#updateStock').val(datos[5]);
 
+
+
           $('#NombreProducto').val(datos[6]);
+
           $('#actualStock').val(datos[7]);
+
           console.log(datos[4]);//importante print
+
           console.log(datos[1]);
+
       }
+
   }) 
+
 }
 
 function eliminarInfoBodega(idProducto){
@@ -596,30 +647,51 @@ function eliminarSucursal(id_sucursal){
 
 function mostrarUpdateBodega(id_bodega){
 
-   console.log(id_bodega);
-   cadena= {
-      "id_bodega": id_bodega,
-  };
-  $.ajax({
-      type: "POST",
-      url: "mostrarUpdateBodega.php",
-      data: cadena,
-      success:function(info){
-         datos = JSON.parse(info)
-         $('#updateIdBodega').val(datos[0]);
-         $('#updateIdBodega2').val(datos[0])
-         $('#updateAlmacenamiento').val(datos[1]);
-         $('#updateRegionBodega').val(datos[2]);
-         $('#updateRegionBodega2').val(datos[2]);
-         $('#updateComunaBodega').val(datos[3]);
-         $('#updateComunaBodega2').val(datos[3]);
-         $('#updateCalleBodega').val(datos[4]);
-         $('#updateNumeroCalleBodega').val(datos[5]);
-         console.log(datos[0]);
-      }
-   }) 
-}
 
+
+   console.log(id_bodega);
+
+   cadena= {
+
+      "id_bodega": id_bodega,
+
+  };
+
+  $.ajax({
+
+      type: "POST",
+
+      url: "mostrarUpdateBodega.php",
+
+      data: cadena,
+
+      success:function(info){
+
+         datos = JSON.parse(info)
+
+         $('#updateIdBodega').val(datos[0]);
+
+         $('#updateIdBodega2').val(datos[0])
+
+         $('#updateRegionBodega').val(datos[1]);
+
+         $('#updateRegionBodega2').val(datos[1]);
+
+         $('#updateComunaBodega').val(datos[2]);
+
+         $('#updateComunaBodega2').val(datos[2]);
+
+         $('#updateCalleBodega').val(datos[3]);
+
+         $('#updateNumeroCalleBodega').val(datos[4]);
+
+         console.log(datos[0]);
+
+      }
+
+   }) 
+
+}
 
 function eliminarBodega(id_bodega){
    $('#eliminarexampleModal').modal('show');
@@ -1053,6 +1125,9 @@ function completarVenta(){
 
 
 //MATIAS
+
+if( $('#checkBoxLocal').prop('checked') == true ) {
+   console.log("hola");
    cadena1= {
      
       };
@@ -1064,21 +1139,22 @@ function completarVenta(){
          success:function(){
          }
       }) 
+   }
 
 //CRISTIAN
-   cadena2= {
-     
-      };
-   
-      $.ajax({
-         type: "POST",
-         url: "tablaCupon.php",
-         data: cadena2,
-         success:function(){
-         }
-      }) 
 
-
+var subtot = Number(document.getElementById('subtotalCompra').value);
+if(subtot>100000){
+   cadena2= {     
+   };
+   $.ajax({
+      type: "POST",
+      url: "crearCupon.php",
+      data: cadena2,
+      success:function(){
+      }
+   })
+}
 }
 
 

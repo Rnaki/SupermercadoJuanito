@@ -1,12 +1,19 @@
 <?php
 
 session_start();
-echo $_SESSION["sucursal"];
+if (isset($_SESSION["rut_persona"])) {
 
-
+$_SESSION["sucursal"];
+$_SESSION["rut_persona"];
 
 include("conexion.php");
 $gbd = conectar();
+
+$sql0 = "SELECT * FROM trabajador where rut_persona = '".$_SESSION["rut_persona"]."'";
+$gsent0 = $gbd->prepare($sql0);
+$gsent0->execute();
+$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
+
 
 if (isset($_POST["rutBuscar"])) {
 	$rutBuscar = $_POST["rutBuscar"];
@@ -34,18 +41,18 @@ if (isset($_POST["rutBuscar"])) {
 } else if (!isset($_POST["rutBuscar"]) && !isset($_POST["apellidoPBuscar"]) || $_POST["apellidoPBuscar"] == "" || $_POST["patenteBuscar"] == "" ) {
 	$sql = "SELECT * FROM trabajador
 			join trabaja on trabaja.rut_persona = trabajador.rut_persona
-			where (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true) and area_trabajo like '%Despacho%'";
+			where (trabaja.id_sucursal = '".$_SESSION["sucursal"]."' and trabajador.estado_persona = true) and area_trabajo like '%Despacho%' ";
 }
 
 
 //$data = $conn->query($sql)->fetchAll();
 $gsent = $gbd->prepare($sql);
-$cuenta_col = $gsent->columnCount();
-$data = $gbd->query($sql)->fetchAll();
+$gsent->execute();
+$resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
 
 $sql1 = "SELECT sucursal.nombre_sucursal from sucursal where id_sucursal = '".$_SESSION["sucursal"]."'";
-$gsent = $gbd->prepare($sql1);
+$gsent1 = $gbd->prepare($sql1);
 $resultado1 = $gbd->query($sql1)->fetchAll();
 
 
@@ -53,6 +60,42 @@ $sql2 = "SELECT * FROM transporte WHERE id_sucursal = '".$_SESSION["sucursal"]."
 $gsent2 = $gbd->prepare($sql2);
 $gsent2->execute();
 $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
+
+//paginador
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+$paginas = $gsent->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+	if($paginas*$xpaginas == $totalquery){
+		$encontrado = $xpaginas;
+	}else{
+		$encontrado = $totalquery-($paginas*$xpaginas);
+	}
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
+
+if(!$_GET){
+	header('Location: asignarTransporte.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: asignarTransporte.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql.' LIMIT :nArticulos OFFSET :iniciar;';
+$gsent7 = $gbd->prepare($sqlGuardar);
+$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+$gsent7->execute();
+$data = $gsent7->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 
 ?>
@@ -87,7 +130,7 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 
 		header .juan {
 		width: 240px;
-		height: 50px;
+		height: 60px;
 		color: #566787;
 		}
 
@@ -351,31 +394,37 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 		<nav class="container d-flex flex-column flex-md-row justify-content-between">
 
 			<a class="py-2 d-none d-md-inline-block" href="transporte.php">Volver a Transporte</a>
-			<h2>ASIGNAR TRANSPORTE A EMPLEADO</h2>
+			<h2 class="letrah2" style="text-align: center;">ASIGNAR TRANSPORTE A EMPLEADO <p style="text-transform: uppercase;height: 0px;"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></p></h2>
 			
 			<div class="dropdown">
 				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
-					<div class="row juan">
+				<div class="row juan">
 						<div class="col-md-3 text-center">
-							<img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<img src="../imagenes/'.$row0["foto"].'" width="40px" height="50px" class="rounded-circle">';
+                                }
+                                ?>
 						</div>
 						<div class="col-md-8 text-start">
 							<div class="card-body">
-								<h5 class="card-title">Juan Perez</h5>
-								<p class="card-text">Gerente General</p>
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<h5 class="card-title">'.$row0["nombre_persona"].' '.$row0["apellidop_persona"].'</h5>';
+									echo '<p class="card-text">'.$row0["cargo"].'</p>';
+                                }
+                                ?>
 							</div>
 						</div>
 					</div>
 				</button>
 				<div class="dropdown-menu" aria-labelledby="bd-version">
-					<li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
+					<li><a class="dropdown-item" aria-current="true" href="perfilTrabajador.php">Ver perfil</a></li>
 					<div class="dropdown-divider"></div>
 					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
 				</div>
 			</div>
-
 		</nav>
-		<h2 class="text-center"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></h2>
 	</header>
 
 	<div class="container-fluid">
@@ -409,13 +458,13 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 										</div>
 										<div class="row segundo">
 											<div class="col-sm-6">
-												<form action="asignarTransporte.php" method="POST" class="d-flex">
+												<form action="asignarTransporte.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="rutBuscar" placeholder="RUT" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
 											</div>
 											<div class="col-sm-6">
-												<form action="asignarTransporte.php" method="POST" class="d-flex">
+												<form action="asignarTransporte.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="apellidoPBuscar" placeholder="Apellido Paterno" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
@@ -428,7 +477,7 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 										</div>
 										<div class="row">
                                         <div class="col-sm-6">
-												<form action="asignarTransporte.php" method="POST" class="d-flex">
+												<form action="asignarTransporte.php?pagina=1" method="POST" class="d-flex">
 													<input class="form-control me-3" type="search" name="patenteBuscar" placeholder="Patente" aria-label="Search">
 													<button class="btn btn-success b" type="submit">Buscar</button>
 												</form>
@@ -488,15 +537,15 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
 
 				</table>
 				<div class="clearfix">
-					<div class="hint-text">Mostrar <b>5</b> de <b>25</b> entradas</div>
+				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
 					<ul class="pagination">
-						<li class="page-item disabled"><a href="#">Anterior</a></li>
-						<li class="page-item"><a href="#" class="page-link">1</a></li>
-						<li class="page-item"><a href="#" class="page-link">2</a></li>
-						<li class="page-item active"><a href="#" class="page-link">3</a></li>
-						<li class="page-item"><a href="#" class="page-link">4</a></li>
-						<li class="page-item"><a href="#" class="page-link">5</a></li>
-						<li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="asignarTransporte.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="asignarTransporte.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="asignarTransporte.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
 					</ul>
 				</div>
 			</div>
@@ -678,3 +727,10 @@ $resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
 </html>
+<?php
+} else {
+    echo "NO ENTRES INTRUSO";
+
+    Header("refresh:5; url=../index.php");
+}
+?>

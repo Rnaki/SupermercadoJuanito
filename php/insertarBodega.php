@@ -3,7 +3,6 @@ include("conexion.php");
 $conn=conectar();
 
 $id_bodega=$_POST["id_bodega"];
-$almacenamiento=$_POST["almacenamiento"];
 $region_bodega=$_POST["region_bodega"];
 $comuna_bodega=$_POST["comuna_bodega"];
 $calle_bodega=$_POST["calle_bodega"];
@@ -18,13 +17,11 @@ foreach ($data as $row){
 }
 
 if(isset($columnas) == 1){
-    Header("Location: bodegaGerente.php?error=2");
+    Header("Location: bodegaGerente.php?pagina=1&error=2");
 }else{
 
-}
-
 //en $sql se guarda el insert
-$sql=" SELECT insertarBodega('".$id_bodega."', '".$almacenamiento."', '".$region_bodega."', '".$comuna_bodega."', '".$calle_bodega."', '".$numero_calle_bodega."')";
+$sql=" SELECT insertarBodega('".$id_bodega."', '".$region_bodega."', '".$comuna_bodega."', '".$calle_bodega."', '".$numero_calle_bodega."')";
 //del $con quiero sacar el $sql para que sea un $query
 echo $conn->exec($sql);
 
@@ -33,5 +30,5 @@ if($conn){
 }else{
     Header("Location: bodegaGerente.php");
 }
-
+}
 ?>

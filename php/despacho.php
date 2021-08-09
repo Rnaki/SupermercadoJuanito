@@ -1,43 +1,49 @@
 <?php
 
 session_start();
-$sucursal=$_SESSION["sucursal"];
+if (isset($_SESSION["rut_persona"])) {
+
+$_SESSION["sucursal"];
+$_SESSION["rut_persona"];
 
 include("conexion.php");
 $gbd = conectar();
 
+$sql0 = "SELECT * FROM trabajador where rut_persona = '".$_SESSION["rut_persona"]."'";
+$gsent0 = $gbd->prepare($sql0);
+$gsent0->execute();
+$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
+
+
 //$sql = "SELECT my_function();";
 $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
         JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
-        where despacho.id_sucursal = '".$sucursal."' and (proceso_despacho = 'En proceso' or proceso_despacho= 'En camino') ";
+        where despacho.id_sucursal = '".$_SESSION["sucursal"]."' and (proceso_despacho = 'En proceso' or proceso_despacho= 'En camino') ";
 
 //BUSCADOR
 if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 	$idBuscar = $_POST["idBuscar"];
 	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
                 JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal 
-                where despacho.id_sucursal = '".$sucursal."' and id_despacho = '$idBuscar' ";
+                where despacho.id_sucursal = '".$_SESSION["sucursal"]."' and id_despacho = '$idBuscar' ";
 } else if (isset($_POST["estadoBuscar"])) {
 	$estadoBuscar = $_POST["estadoBuscar"];
 	if ($_POST["estadoBuscar"] == "Seleccione...") {       
         $sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
         JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal
-        where despacho.id_sucursal = '".$sucursal."' and (proceso_despacho = 'En proceso' or proceso_despacho= 'En camino') ";
+        where despacho.id_sucursal = '".$_SESSION["sucursal"]."' and (proceso_despacho = 'En proceso' or proceso_despacho= 'En camino') ";
 	} else {
     	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
                 JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal  
-                where despacho.id_sucursal = '".$sucursal."' and proceso_despacho = '$estadoBuscar'";
+                where despacho.id_sucursal = '".$_SESSION["sucursal"]."' and upper(proceso_despacho) like upper('%".$estadoBuscar."%') ";
 	}
 } else if (isset($_POST["desde"]) && isset($_POST["hasta"]) && $_POST["desde"] !== "" && $_POST["hasta"] !== "") {
 	$desde = $_POST["desde"];
 	$hasta = $_POST["hasta"];
 	$sql = "SELECT *, sucursal.nombre_sucursal as tnombre_sucursal FROM despacho 
             JOIN sucursal ON despacho.id_sucursal = sucursal.id_sucursal 
-            where (despacho.id_sucursal = '".$sucursal."' and fecha_limite Between '$desde' and '$hasta') and (proceso_despacho = 'En proceso' or proceso_despacho = 'En camino')";
+            where (despacho.id_sucursal = '".$_SESSION["sucursal"]."' and fecha_limite Between '$desde' and '$hasta') and (proceso_despacho = 'En proceso' or proceso_despacho = 'En camino') ";
 } 
-
-
-
 
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
@@ -47,6 +53,50 @@ $gsent->execute();
 $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
 //var_dump($resultado);
+
+$sql1 = "SELECT * from sucursal WHERE id_sucursal = '".$_SESSION["sucursal"]."';";
+$gsent1 = $gbd->prepare($sql1);
+$gsent1->execute();
+$resultado1 = $gsent1->fetchAll(PDO::FETCH_ASSOC);
+
+$sql2 = "SELECT patente FROM transporte where id_sucursal = '".$_SESSION["sucursal"]."';";
+$gsent2 = $gbd->prepare($sql2);
+$gsent2->execute();
+$resultado2 = $gsent2->fetchAll(PDO::FETCH_ASSOC);
+
+//paginador
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+$paginas = $gsent->rowCount()/$xpaginas;
+$paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+	if($paginas*$xpaginas == $totalquery){
+		$encontrado = $xpaginas;
+	}else{
+		$encontrado = $totalquery-($paginas*$xpaginas);
+	}
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
+
+if(!$_GET){
+	header('Location: despacho.php?pagina=1');
+}
+if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+	header('Location: despacho.php?pagina=1');
+}
+
+$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+$sqlGuardar = $sql.' LIMIT :nArticulos OFFSET :iniciar;';
+$gsent7 = $gbd->prepare($sqlGuardar);
+$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+$gsent7->execute();
+$resultado = $gsent7->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -61,9 +111,9 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../css/estilosDaniel.css">
     <!-- JS BOOTSTRAP -->
+    <script src="../popper/popper.min.js"></script>
     <script src="../jquery/jquery.min.v3.6.0.js"></script>
     <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
-    <script src="../popper/popper.min.js"></script>
     <script src="../js/funciones.js"></script>
     <style>
         .table-title .col .form-control {
@@ -177,94 +227,72 @@ $resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
             background-color: rgb(163, 182, 241);
             border-top: 1px solid black;
         }
+
         /*Header*/
+		header {
+			background: #f5f5f5;
+		}
 
-        header {
+		header .juan {
+			width: 240px;
+			height: 60px;
+			color: #566787;
+		}
 
-background: #f5f5f5;
+		header .row .col-md-3,
+		header .row .col-md-8 {
+			padding: 0px 0px;
+		}
 
-}
+		header .row .card-body {
+			padding: 3px 0px;
+		}
 
+		header .row .card-body .card-title {
+			margin-bottom: 0px;
+		}
 
+		header .dropdown .dropdown-menu {
+			width: 100%;
+			background: #ececec;
+		}
 
-header .juan {
-
-width: 240px;
-
-height: 50px;
-
-color: #566787;
-
-}
-
-
-
-header .row .col-md-3,
-
-header .row .col-md-8 {
-
-padding: 0px 0px;
-
-}
-
-
-
-header .row .card-body {
-
-padding: 3px 0px;
-
-}
-
-
-
-header .row .card-body .card-title {
-
-margin-bottom: 0px;
-
-}
-
-
-
-header .dropdown .dropdown-menu {
-
-width: 100%;
-
-background: #ececec;
-
-}
-
-
-
-header .dropdown .dropdown-menu li {
-
-color: #2196F3;
-
-}
+		header .dropdown .dropdown-menu li {
+			color: #2196F3;
+		}
     </style>
 
 </head>
 
 <body>
-    <header class="site-header sticky-top py-1">
+    <header class="site-header sticky-top py-1" style="height: 95px;">
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
             <a class="py-2 d-none d-md-inline-block" href="menu_trabajador.php">Volver</a>
-            <h2 class="letrah2">INFORMACIÓN DE DESPACHO</h2>
+            <h2 class="letrah2" style="text-align: center;">INFORMACIÓN DE DESPACHO <p style="text-transform: uppercase;height: 0px;"><?php foreach ($resultado1 as $row1){echo $row1["nombre_sucursal"];} ?></p></h2>
             <div class="dropdown">
 				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
-					<div class="row juan">
+                <div class="row juan">
 						<div class="col-md-3 text-center">
-							<img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<img src="../imagenes/'.$row0["foto"].'" width="40px" height="50px" class="rounded-circle">';
+                                }
+                                ?>
 						</div>
 						<div class="col-md-8 text-start">
 							<div class="card-body">
-								<h5 class="card-title">Juan Perez</h5>
-								<p class="card-text">Gerente General</p>
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<h5 class="card-title">'.$row0["nombre_persona"].' '.$row0["apellidop_persona"].'</h5>';
+									echo '<p class="card-text">'.$row0["cargo"].'</p>';
+                                }
+                                ?>
 							</div>
 						</div>
 					</div>
 				</button>
 				<div class="dropdown-menu" aria-labelledby="bd-version">
-					<li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
+					<li><a class="dropdown-item" aria-current="true" href="perfilTrabajador.php">Ver perfil</a></li>
 					<div class="dropdown-divider"></div>
 					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
 				</div>
@@ -284,9 +312,9 @@ color: #2196F3;
                             <a class="btn btn-success b1"  href="despachosEntregados.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
                                     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
                                 </svg> Despachos Entregados</a>
-                                <a class="btn btn-danger" href="transporte.php"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
-									<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
-								</svg></a>
+                                <a class="btn btn-primary"  href="transporte.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+								<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
+                                </svg> Transportes</a>
                         </div> 
                     </div>
 
@@ -310,17 +338,17 @@ color: #2196F3;
                                         </div>
                                         <div class="row segundo">
                                             <div class="col-sm-6">
-                                                <form action="despacho.php" method="POST" class="d-flex">
+                                                <form action="despacho.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-3" type="search" name="idBuscar" placeholder="ID Despacho" aria-label="Search">
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
                                             </div>
                                             <div class="col-sm-6">
-                                                <form action="despacho.php" method="POST" class="d-flex">
+                                                <form action="despacho.php?pagina=1" method="POST" class="d-flex">
                                                     <select class="form-select" name="estadoBuscar">
                                                         <option selected>Seleccione...</option>
-                                                        <option value="En proceso" >En proceso</option>
-                                                        <option value="En camino" >En camino</option>
+                                                        <option value="Proceso" >En proceso</option>
+                                                        <option value="Camino" >En camino</option>
                                                     </select>
                                                     <button class="btn btn-success b" type="submit">Buscar</button>
                                                 </form>
@@ -336,7 +364,7 @@ color: #2196F3;
                                                 <label> Desde: </label>
                                             </div>
                                             <div class="col-sm-4">
-                                                <form action="despacho.php" method="POST" class="d-flex">
+                                                <form action="despacho.php?pagina=1" method="POST" class="d-flex">
                                                     <input class="form-control me-2" type="date" name="desde" placeholder="Fecha" aria-label="Search">
                                             </div>
                                             <div class="col-sm-1 buscar">
@@ -357,12 +385,10 @@ color: #2196F3;
                     </div>
 
                 </div>
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover" style="text-align: center;">
                     <thead>
                         <tr>
-                            <th></th>
                             <th>ID Despacho</th>
-                            <th>Nombre Sucursal</th>
                             <th>Patente</th>
                             <th>Información de envío</th>
                             <th>Fecha Limite</th>
@@ -376,22 +402,12 @@ color: #2196F3;
                         <?php
                             foreach ($resultado as $row){
                             echo '<tr>';
-                            echo '<td>'.$row["id_despacho"].'<a href="crearDespacho.php"><svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                <path
-                                    d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                <path
-                                    d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-                            </svg></a></td>';
                             echo  '<td>'.$row["id_despacho"].'</td>';
-                            echo  '<td>'.$row["tnombre_sucursal"].'</td>';
                             echo  '<td>'.$row["patente"].'</td>';
                             echo  '<td>'.$row["informacion_envio"].'</td>';
                             echo  '<td>'.$row["fecha_limite"].'</td>';
                             echo  '<td>'.$row["fecha_entrega"].'</td>';
                             echo  '<td>'.$row["proceso_despacho"].'</td>';
-
-
                             echo "<td>
                             <a href='' onclick='mostrarUpdateDespacho(\"".$row['id_despacho']."\")' class='edit' data-bs-toggle='modal' data-bs-target='#edicionexampleModal'><svg
                                     xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor'
@@ -413,17 +429,17 @@ color: #2196F3;
                     </tbody>
                 </table>
                 <div class="clearfix">
-                    <div class="hint-text">Mostrando <b>5</b> de <b>25</b> entradas</div>
-                    <ul class="pagination">
-                        <li class="page-item"><a href="#" class="page-link">Anterior</a></li>
-                        <li class="page-item"><a href="#" class="page-link">1</a></li>
-                        <li class="page-item"><a href="#" class="page-link">2</a></li>
-                        <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                        <li class="page-item"><a href="#" class="page-link">4</a></li>
-                        <li class="page-item"><a href="#" class="page-link">5</a></li>
-                        <li class="page-item"><a href="#" class="page-link">Siguiente</a></li>
-                    </ul>
-                </div>
+				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
+					<ul class="pagination">
+						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="despacho.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
+						<?php for($i=0; $i < $paginasElevado; $i++): ?>
+						<li class="page-item <?php echo $_GET['pagina'] == $i+1 ? 'active' : ''?>">
+							<a href="despacho.php?pagina=<?php echo $i+1?>" class="page-link"><?php echo $i+1?></a>
+						</li>
+						<?php endfor?>
+						<li class="page-item <?php echo $_GET['pagina'] >= $paginasElevado ? 'disabled' : ''?>"><a href="despacho.php?pagina=<?php echo $_GET['pagina']+1?>" class="page-link">Siguiente</a></li>
+					</ul>
+				</div>
             </div>
         </div>
     </div>
@@ -592,7 +608,15 @@ color: #2196F3;
                             </div>
                             <div class="form-group">
                                 <label>Patente: </label>
-                                <input name="updatePatente" type="text" id="updatePatente" class="form-control" required>
+                                <select class="form-select" name="updatePatente" id="updatePatente" required>
+                                    <option value="">Seleccione...</option>
+                                    <?php
+                                    foreach ($resultado2 as $row2) {
+                                        echo "<option id=" . $row2["patente"] . " value=" . $row2['patente'] . ">" . $row2["patente"] . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                                <br>
                             </div>
                             <div class="form-group">
                                 <label>Información de envio: </label>
@@ -653,3 +677,10 @@ color: #2196F3;
 </body>
 
 </html>
+<?php
+} else {
+    echo "NO ENTRES INTRUSO";
+
+    Header("refresh:5; url=../index.php");
+}
+?>

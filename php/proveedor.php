@@ -1,10 +1,22 @@
 <?php
 
 session_start();
+if (isset($_SESSION["rut_persona"])) {
+$_SESSION["sucursal"];
 $_SESSION["rut_persona"];
 
+if (isset($_GET["error"])) {
+    $error = $_GET["error"];
+    echo '<script>alert("El rut ya se encuentra registrado")</script>';
+}
 include("conexion.php");
 $gbd = conectar();
+
+$sql0 = "SELECT * FROM trabajador where rut_persona = '" . $_SESSION["rut_persona"] . "'";
+$gsent0 = $gbd->prepare($sql0);
+$gsent0->execute();
+$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
+
 
 //$sql = "SELECT my_function();";
 $sql = "SELECT * FROM proveedor where estado_proveedor = true ";
@@ -60,13 +72,17 @@ $xpaginas = 5;
 $totalquery = $gsent->rowCount();
 $paginas = $gsent->rowCount()/$xpaginas;
 $paginasElevado = ceil($paginas);
-if($totalquery < $xpaginas){
-	$encontrado = $totalquery;
-}else if($paginasElevado == $_GET['pagina']){
-    $paginas= (int)$paginas;
-    $encontrado = $totalquery-($paginas*$xpaginas);
-}else if ($totalquery >= $xpaginas){
-	$encontrado = $xpaginas;
+if ($totalquery < $xpaginas) {
+    $encontrado = $totalquery;
+} else if ($paginasElevado == $_GET['pagina']) {
+    $paginas = (int)$paginas;
+    if ($paginas * $xpaginas == $totalquery) {
+        $encontrado = $xpaginas;
+    } else {
+        $encontrado = $totalquery - ($paginas * $xpaginas);
+    }
+} else if ($totalquery >= $xpaginas) {
+    $encontrado = $xpaginas;
 }
 
 if(!$_GET){
@@ -105,8 +121,6 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
     <script src="../jquery/jquery.min.v3.6.0.js"></script>
     <script src="../bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
     <script src="../js/funciones.js"></script>
-    
-    
     <style>
         .table-title .col .form-control{
             width: 33%;
@@ -219,22 +233,30 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
             <h2 class="letrah2">INFORMACIÓN DE PROVEEDORES</h2>
             <div class="dropdown">
                 <button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
-                    <div class="row juan">
-                        <div class="col-md-3 text-center">
-                            <img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
-                        </div>
-                        <div class="col-md-8 text-start">
-                            <div class="card-body">
-                                <h5 class="card-title">Juan Perez</h5>
-                                <p class="card-text">Gerente General</p>
+                <div class="row juan">
+                            <div class="col-md-3 text-center">
+                                <?php
+                                foreach ($perfil as $row0) {
+                                    echo '<img src="../imagenes/' . $row0["foto"] . '" width="40px" height="50px" class="rounded-circle">';
+                                }
+                                ?>
+                            </div>
+                            <div class="col-md-8 text-start">
+                                <div class="card-body">
+                                    <?php
+                                    foreach ($perfil as $row0) {
+                                        echo '<h5 class="card-title">' . $row0["nombre_persona"] . ' ' . $row0["apellidop_persona"] . '</h5>';
+                                        echo '<p class="card-text">' . $row0["cargo"] . '</p>';
+                                    }
+                                    ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="bd-version">
-                    <li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
+                    <li><a class="dropdown-item" aria-current="true" href="perfilTrabajador.php">Ver perfil</a></li>
                     <div class="dropdown-divider"></div>
-                    <li><a class="dropdown-item" aria-current="true" href="../index.php">Cerrar sesión</a></li>
+                    <li><a class="dropdown-item" aria-current="true" href="cerrar_sesion.php">Cerrar sesión</a></li>
                 </div>
             </div>
         </nav>
@@ -256,9 +278,9 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
                                     <path
                                         d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z" />
                                 </svg> Añadir Proveedor</a>
-                                <a class="btn btn-danger" href="proveedoresEliminados.php"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
-									<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
-								</svg></a>
+                                <a class="btn btn-primary"  href="proveedoresEliminados.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+								<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
+                                </svg> Recuperar Empleados</a>
                         </div>
                     </div>
 
@@ -350,13 +372,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
                         <?php
                             foreach ($resultado5 as $row5){
                             echo '<tr>';
-                            echo '<td>'.$row5["rut_proveedor"].'<a href="compraProv.php"><svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                                <path
-                                    d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                <path
-                                    d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-                            </svg></a></td>';
+                            echo '<td>'.$row5["rut_proveedor"].'</td>';
                             echo  '<td>'.$row5["nombre_proveedor"].'</td>';
                             echo  '<td>'.$row5["tipo_proveedor"].'</td>';
                             echo  '<td>'.$row5["marca_proveedor"].'</td>';
@@ -430,7 +446,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="form-group">
                                 <label>Fono: </label>
-                                <input name="fonoProveedor" type="text" class="form-control" required>
+                                <input name="fonoProveedor" type="number" class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -472,7 +488,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="form-group">
                                 <label>Fono: </label>
-                                <input id="updateFonoProveedor" name="updateFonoProveedor" type="text" class="form-control" required>
+                                <input id="updateFonoProveedor" name="updateFonoProveedor" type="number" class="form-control" required>
                             </div>
                         </div>
                         </div>
@@ -511,3 +527,10 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
 </body>
 
 </html>
+<?php
+} else {
+    echo "NO ENTRES INTRUSO";
+
+    Header("refresh:5; url=../index.php");
+}
+?>

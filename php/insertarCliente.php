@@ -24,7 +24,7 @@ foreach ($data as $row){
 }
 
 if(isset($columnas) == 1){
-    Header("Location: cliente.php?error=2");
+    Header("Location: cliente.php?pagina=1&error=2");
 }else{
 
 }

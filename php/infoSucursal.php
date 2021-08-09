@@ -1,12 +1,17 @@
 <?php
 session_start();
 
-$_SESSION["sucursal"];
+if (isset($_SESSION["rut_persona"])) {
+    $_SESSION["sucursal"];
+    $_SESSION["rut_persona"];
 
 include("conexion.php");
 $gbd = conectar();
 
-
+    $sql0 = "SELECT * FROM trabajador where rut_persona = '" . $_SESSION["rut_persona"] . "'";
+	$gsent0 = $gbd->prepare($sql0);
+	$gsent0->execute();
+	$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
 
 //$sql = "SELECT my_function();";
 $sql = "SELECT * FROM sucursal WHERE id_sucursal = '".$_SESSION["sucursal"]."';";
@@ -83,8 +88,21 @@ $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
 
 //paginador
 $xpaginas = 5;
+$totalquery = $gsent3->rowCount();
 $paginas = $gsent3->rowCount()/$xpaginas;
 $paginasElevado = ceil($paginas);
+if($totalquery < $xpaginas){
+	$encontrado = $totalquery;
+}else if($paginasElevado == $_GET['pagina']){
+    $paginas= (int)$paginas;
+	if($paginas*$xpaginas == $totalquery){
+		$encontrado = $xpaginas;
+	}else{
+		$encontrado = $totalquery-($paginas*$xpaginas);
+	}
+}else if ($totalquery >= $xpaginas){
+	$encontrado = $xpaginas;
+}
 
 if(!$_GET){
 	header('Location: infoSucursal.php?pagina=1');
@@ -250,17 +268,25 @@ $resultado7 = $gsent7->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="dropdown">
                 <button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
-                    <div class="row juan">
-                        <div class="col-md-3 text-center">
-                            <img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
-                        </div>
-                        <div class="col-md-8 text-start">
-                            <div class="card-body">
-                                <h5 class="card-title">Juan Perez</h5>
-                                <p class="card-text">Gerente General</p>
+                <div class="row juan">
+                            <div class="col-md-3 text-center">
+                                <?php
+                                foreach ($perfil as $row0) {
+                                    echo '<img src="../imagenes/' . $row0["foto"] . '" width="40px" height="50px" class="rounded-circle">';
+                                }
+                                ?>
+                            </div>
+                            <div class="col-md-8 text-start">
+                                <div class="card-body">
+                                    <?php
+                                    foreach ($perfil as $row0) {
+                                        echo '<h5 class="card-title">' . $row0["nombre_persona"] . ' ' . $row0["apellidop_persona"] . '</h5>';
+                                        echo '<p class="card-text">' . $row0["cargo"] . '</p>';
+                                    }
+                                    ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="bd-version">
                     <li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
@@ -512,7 +538,7 @@ $resultado7 = $gsent7->fetchAll(PDO::FETCH_ASSOC);
                     </tbody>
                 </table>
                 <div class="clearfix">
-					<div class="hint-text">Mostrando <b><?php echo $xpaginas?></b> de <b><?php echo $paginasElevado?></b> entradas</div>
+                <div class="hint-text">Mostrando <b><?php echo $encontrado ?></b> de <b><?php echo $totalquery ?></b> entradas</div>
 					<ul class="pagination">
 						<li class="page-item <?php echo $_GET['pagina'] <= 1 ? 'disabled' : ''?>"><a href="infoSucursal.php?pagina=<?php echo $_GET['pagina']-1?>" class="page-link">Anterior</a></li>
 						<?php for($i=0; $i < $paginasElevado; $i++): ?>
@@ -547,7 +573,7 @@ $resultado7 = $gsent7->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="form-group">
                                 <label>Stock a devolver a Bodega: </label>
-                                <input type="text" class="form-control" name="envioStock" id="stock" required>
+                                <input type="number" class="form-control" name="envioStock" id="stock" required>
                                 <input class="form-control" name="envioStockSucursal" id="envioStockSucursal" type="hidden">
                                 <?php
                                 foreach ($resultado as $row) {
@@ -565,8 +591,13 @@ $resultado7 = $gsent7->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
-    
-
 </body>
 
 </html>
+<?php
+} else {
+	echo "NO ENTRES INTRUSO";
+
+	Header("refresh:5; url=../index.php");
+}
+?>
