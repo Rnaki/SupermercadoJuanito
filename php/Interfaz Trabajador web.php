@@ -42,6 +42,11 @@ if(isset($_GET["error"])){
 }
 */
 //$sql = "SELECT my_function();";
+session_start();
+$sql0 = "SELECT * FROM trabajador where rut_persona = '".$_SESSION["rut_persona"]."'";
+$gsent0 = $gbd->prepare($sql0);
+$gsent0->execute();
+$perfil = $gsent0->fetchAll(PDO::FETCH_ASSOC);
 
 $sql = "SELECT *, categoria.nombre_categoria as tnombre_categoria FROM producto 
 		JOIN categoria ON producto.id_categoria = categoria.id_categoria
@@ -295,18 +300,26 @@ if($totalquery == 0){
 				<button class="btn" id="bd-version" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
 					<div class="row juan">
 						<div class="col-md-3 text-center">
-							<img src="../imagenes/foto.jpg" width="40px" height="50px" class="rounded-circle">
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<img src="../imagenes/'.$row0["foto"].'" width="40px" height="50px" class="rounded-circle">';
+                                }
+                                ?>
 						</div>
 						<div class="col-md-8 text-start">
 							<div class="card-body">
-								<h5 class="card-title">Juan Perez</h5>
-								<p class="card-text">Gerente General</p>
+								<?php
+                                foreach ($perfil as $row0) {
+                                    echo '<h5 class="card-title">'.$row0["nombre_persona"].' '.$row0["apellidop_persona"].'</h5>';
+									echo '<p class="card-text">'.$row0["cargo"].'</p>';
+                                }
+                                ?>
 							</div>
 						</div>
 					</div>
 				</button>
 				<div class="dropdown-menu" aria-labelledby="bd-version">
-					<li><a class="dropdown-item" aria-current="true" href="#">Ver perfil</a></li>
+					<li><a class="dropdown-item" aria-current="true" href="perfilTrabajador.php">Ver perfil</a></li>
 					<div class="dropdown-divider"></div>
 					<li><a class="dropdown-item" aria-current="true" href="cerrar_session.php">Cerrar sesión</a></li>
 				</div>

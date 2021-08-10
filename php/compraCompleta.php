@@ -44,7 +44,7 @@
     <main class="form-signin">
     
         <h1 class="h3 mb-3 fw-normal">¡Gracias por comprar en Super Mercado Juanito!</h1>
-        <img class="mb-4" src="../../imagenes/logo manzana.jfif" alt="" width="300" height="300">
+        <img class="mb-4" src="../imagenes/logo manzana.jfif" alt="" width="300" height="300">
         <h1 class="h3 mb-3 fw-normal">REDIRIGIENDO A LA TIENDA</h1>
     <div class="row inline-block">
     </div>

@@ -1155,43 +1155,23 @@ function completarVenta(){
          data: cadena0,
          success:function(respuesta){
             if(respuesta ==1){
-               alert("Tabla Venta actualizada");
-            }
-         }
-      }) 
+               window.location.replace("compraCompleta.php");
+
+                                    }
+                                 }
+                              }) 
 
 
 //MATIAS
 
-if( $('#checkBoxDespacho').prop('checked') == true ) {
-   console.log("hola");
-   cadena1= {
-     
-      };
-   
-      $.ajax({
-         type: "POST",
-         url: "tablaDespacho.php",
-         data: cadena1,
-         success:function(){
-         }
-      }) 
-   }
+
 
 //CRISTIAN
 
-var subtot = Number(document.getElementById('subtotalCompra').value);
-if(subtot>100000){
-   cadena2= {     
-   };
-   $.ajax({
-      type: "POST",
-      url: "crearCupon.php",
-      data: cadena2,
-      success:function(){
-      }
-   })
-}
+
+
+
+
 }
 
 

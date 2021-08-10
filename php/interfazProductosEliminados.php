@@ -249,7 +249,7 @@ if($totalquery == 0){
     <header class="site-header sticky-top py-1">
         <nav class="container d-flex flex-column flex-md-row justify-content-between">
 
-            <a class="py-2 d-none d-md-inline-block" href="Interfaz Trabajador Web.php">Interfaz Trabajador</a>
+            <a class="py-2 d-none d-md-inline-block" href="Interfaz Trabajador web.php">Interfaz Trabajador</a>
             <h2 class="letrah2">PRODUCTOS ELIMINADOS</h2>
 
             <div class="dropdown">

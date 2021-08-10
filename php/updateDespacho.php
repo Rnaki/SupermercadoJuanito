@@ -6,7 +6,11 @@ $conn=conectar();
  $updatePatente=$_POST["updatePatente"];
  $updateInformacion=$_POST["updateInformacion"];
  $updateFechaLimite=$_POST["updateFechaLimite"];
+ if($_POST["updateFechaEntrega"] == ""){
+    $updateFechaEntrega = '2050-01-01';
+ }else{
  $updateFechaEntrega=$_POST["updateFechaEntrega"];
+ }
  $updateProcesoDespacho=$_POST["updateProcesoDespacho"];
 
 /*$sql="UPDATE cliente SET rut='$rut', nombre='$nombre', apellidoP='$apellidoP',

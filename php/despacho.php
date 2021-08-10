@@ -638,11 +638,11 @@ if($totalquery == 0){
                             </div>
                             <div class="form-group">
                                 <label>Fecha limite: </label>
-                                <input name="updateFechaLimite" type="text" id="updateFechaLimite" class="form-control" required>
+                                <input name="updateFechaLimite" type="date" id="updateFechaLimite" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label>Fecha entrega: </label>
-                                <input name="updateFechaEntrega" type="text" id="updateFechaEntrega" class="form-control" required>
+                                <input name="updateFechaEntrega" type="date" id="updateFechaEntrega" class="form-control" >
                             </div>
                             <div class="form-group">
                                 <label>Proceso despacho: </label>
