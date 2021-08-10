@@ -52,7 +52,7 @@ if (isset($_POST["idBuscar"]) && ($_POST["idBuscar"] != '')) {
 
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
-$resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
+$resultado4 = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
@@ -70,36 +70,50 @@ $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 //paginador
 $xpaginas = 5;
 $totalquery = $gsent->rowCount();
-$paginas = $gsent->rowCount()/$xpaginas;
-$paginasElevado = ceil($paginas);
-if($totalquery < $xpaginas){
-	$encontrado = $totalquery;
-}else if($paginasElevado == $_GET['pagina']){
-    $paginas= (int)$paginas;
-	if($paginas*$xpaginas == $totalquery){
-		$encontrado = $xpaginas;
-	}else{
-		$encontrado = $totalquery-($paginas*$xpaginas);
+if($totalquery == 0){
+	$totalquery = 1;
+	$paginas = $totalquery/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	$totalquery = 0;
+	if(!$_GET){
+		header('Location: interfazProductosEliminados.php?pagina=1');
 	}
-}else if ($totalquery >= $xpaginas){
-	$encontrado = $xpaginas;
-}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: interfazProductosEliminados.php?pagina=1');
+	}
+	$encontrado = 0;
+}else{
+	$paginas = $gsent->rowCount()/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	if($totalquery < $xpaginas){
+		$encontrado = $totalquery;
+	}else if($paginasElevado == $_GET['pagina']){
+		$paginas= (int)$paginas;
+		if($paginas*$xpaginas == $totalquery){
+			$encontrado = $xpaginas;
+		}else{
+			$encontrado = $totalquery-($paginas*$xpaginas);
+		}
+	}else if ($totalquery >= $xpaginas){
+		$encontrado = $xpaginas;
+	}
 
-if(!$_GET){
-	header('Location: interfazProductosEliminados.php?pagina=1');
-}
-if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
-	header('Location: interfazProductosEliminados.php?pagina=1');
-}
+	if(!$_GET){
+		header('Location: interfazProductosEliminados.php?pagina=1');
+	}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: interfazProductosEliminados.php?pagina=1');
+	}
 
-$iniciar = ($_GET['pagina']-1)*$xpaginas;
+	$iniciar = ($_GET['pagina']-1)*$xpaginas;
 
-$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
-$gsent4 = $gbd->prepare($sqlGuardar);
-$gsent4->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
-$gsent4->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
-$gsent4->execute();
-$resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
+	$sqlGuardar = $sql.' LIMIT :nArticulos OFFSET :iniciar;';
+	$gsent = $gbd->prepare($sqlGuardar);
+	$gsent->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+	$gsent->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+	$gsent->execute();
+	$resultado4 = $gsent->fetchAll(PDO::FETCH_ASSOC);
+}
 
 
 ?>

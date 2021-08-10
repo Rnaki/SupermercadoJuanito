@@ -63,38 +63,52 @@ if (isset($_SESSION["rut_persona"])) {
 	$resultado1 = $gbd->query($sql1)->fetchAll();
 
 	//paginador
-	$xpaginas = 5;
-	$totalquery = $gsent->rowCount();
-	$paginas = $gsent->rowCount() / $xpaginas;
+$xpaginas = 5;
+$totalquery = $gsent->rowCount();
+if($totalquery == 0){
+	$totalquery = 1;
+	$paginas = $totalquery/$xpaginas;
 	$paginasElevado = ceil($paginas);
-	if ($totalquery < $xpaginas) {
+	$totalquery = 0;
+	if(!$_GET){
+		header('Location: trabajadorRecuperar.php?pagina=1');
+	}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: trabajadorRecuperar.php?pagina=1');
+	}
+	$encontrado = 0;
+}else{
+	$paginas = $gsent->rowCount()/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	if($totalquery < $xpaginas){
 		$encontrado = $totalquery;
-	} else if ($paginasElevado == $_GET['pagina']) {
-		$paginas = (int)$paginas;
-		if ($paginas * $xpaginas == $totalquery) {
+	}else if($paginasElevado == $_GET['pagina']){
+		$paginas= (int)$paginas;
+		if($paginas*$xpaginas == $totalquery){
 			$encontrado = $xpaginas;
-		} else {
-			$encontrado = $totalquery - ($paginas * $xpaginas);
+		}else{
+			$encontrado = $totalquery-($paginas*$xpaginas);
 		}
-	} else if ($totalquery >= $xpaginas) {
+	}else if ($totalquery >= $xpaginas){
 		$encontrado = $xpaginas;
 	}
 
-	if (!$_GET) {
+	if(!$_GET){
 		header('Location: trabajadorRecuperar.php?pagina=1');
 	}
-	if ($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0) {
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
 		header('Location: trabajadorRecuperar.php?pagina=1');
 	}
 
-	$iniciar = ($_GET['pagina'] - 1) * $xpaginas;
+	$iniciar = ($_GET['pagina']-1)*$xpaginas;
 
-	$sqlGuardar = $sql . 'LIMIT :nArticulos OFFSET :iniciar;';
+	$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
 	$gsent7 = $gbd->prepare($sqlGuardar);
 	$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
 	$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
 	$gsent7->execute();
 	$data = $gsent7->fetchAll(PDO::FETCH_ASSOC);
+}
 
 
 ?>
@@ -556,7 +570,7 @@ if (isset($_SESSION["rut_persona"])) {
 									<td><?php echo $row['cargo'] ?></td>
 									<td><?php echo $row['area_trabajo'] ?></td>
 									<td>
-										<?php echo "<a href='' onclick='recuperarTrabajador(\"" . $row['rut_persona'] . "\")' class='btn btn-success b2' data-bs-toggle='modal' ><svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-plus-circle-fill' viewBox='0 0 16 16'>
+										<?php echo "<a href='' onclick='recuperarTrabajador(\"" . $row['rut_persona'] . "\",\"" . $row['id_sucursal'] . "\")' class='btn btn-success b2' data-bs-toggle='modal' ><svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-plus-circle-fill' viewBox='0 0 16 16'>
 								<path d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z' />
                                 </svg></a>" ?>
 									</td>

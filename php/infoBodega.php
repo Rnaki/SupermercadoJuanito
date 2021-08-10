@@ -87,7 +87,7 @@ if (isset($_SESSION["rut_persona"])) {
 
     $gsent3 = $gbd->prepare($sql3);
     $gsent3->execute();
-    $resultado3 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
+    $resultado7 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
 
     $sql4 = "SELECT sum(stock) FROM contiene where id_bodega = '" . $idBodega . "';";
     //$data = $conn->query($sql)->fetchAll();
@@ -108,38 +108,52 @@ if (isset($_SESSION["rut_persona"])) {
     $resultado6 = $gsent6->fetchAll(PDO::FETCH_ASSOC);
 
     //paginador
-    $xpaginas = 5;
-    $totalquery = $gsent3->rowCount();
-    $paginas = $gsent3->rowCount() / $xpaginas;
-    $paginasElevado = ceil($paginas);
-    if ($totalquery < $xpaginas) {
-        $encontrado = $totalquery;
-    } else if ($paginasElevado == $_GET['pagina']) {
-        $paginas = (int)$paginas;
-        if ($paginas * $xpaginas == $totalquery) {
-            $encontrado = $xpaginas;
-        } else {
-            $encontrado = $totalquery - ($paginas * $xpaginas);
-        }
-    } else if ($totalquery >= $xpaginas) {
-        $encontrado = $xpaginas;
-    }
+$xpaginas = 5;
+$totalquery = $gsent3->rowCount();
+if($totalquery == 0){
+	$totalquery = 1;
+	$paginas = $totalquery/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	$totalquery = 0;
+	if(!$_GET){
+		header('Location: infoBodega.php?pagina=1');
+	}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: infoBodega.php?pagina=1');
+	}
+	$encontrado = 0;
+}else{
+	$paginas = $gsent->rowCount()/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	if($totalquery < $xpaginas){
+		$encontrado = $totalquery;
+	}else if($paginasElevado == $_GET['pagina']){
+		$paginas= (int)$paginas;
+		if($paginas*$xpaginas == $totalquery){
+			$encontrado = $xpaginas;
+		}else{
+			$encontrado = $totalquery-($paginas*$xpaginas);
+		}
+	}else if ($totalquery >= $xpaginas){
+		$encontrado = $xpaginas;
+	}
 
-    if (!$_GET) {
-        header('Location: infoBodega.php?pagina=1');
-    }
-    if ($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0) {
-        header('Location: infoBodega.php?pagina=1');
-    }
+	if(!$_GET){
+		header('Location: infoBodega.php?pagina=1');
+	}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: infoBodega.php?pagina=1');
+	}
 
-    $iniciar = ($_GET['pagina'] - 1) * $xpaginas;
+	$iniciar = ($_GET['pagina']-1)*$xpaginas;
 
-    $sqlGuardar = $sql3 . 'LIMIT :nArticulos OFFSET :iniciar;';
-    $gsent7 = $gbd->prepare($sqlGuardar);
-    $gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
-    $gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
-    $gsent7->execute();
-    $resultado7 = $gsent7->fetchAll(PDO::FETCH_ASSOC);
+	$sqlGuardar = $sql3.' LIMIT :nArticulos OFFSET :iniciar;';
+	$gsent3 = $gbd->prepare($sqlGuardar);
+	$gsent3->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+	$gsent3->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+	$gsent3->execute();
+	$resultado7 = $gsent3->fetchAll(PDO::FETCH_ASSOC);
+}
 
 
 

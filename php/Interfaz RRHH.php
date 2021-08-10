@@ -71,45 +71,57 @@ $gsent = $gbd->prepare($sql);
 $gsent->execute();
 $data = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
-
-$sql1 = "SELECT sucursal.nombre_sucursal from sucursal where id_sucursal = '".$_SESSION["sucursal"]."'";
+$sql1 = "SELECT sucursal.nombre_sucursal, id_sucursal from sucursal where id_sucursal = '".$_SESSION["sucursal"]."'";
 $gsent1 = $gbd->prepare($sql1);
 $resultado1 = $gbd->query($sql1)->fetchAll();
 
 //paginador
 $xpaginas = 5;
 $totalquery = $gsent->rowCount();
-$paginas = $gsent->rowCount()/$xpaginas;
-$paginasElevado = ceil($paginas);
-if($totalquery < $xpaginas){
-	$encontrado = $totalquery;
-}else if($paginasElevado == $_GET['pagina']){
-    $paginas= (int)$paginas;
-	if($paginas*$xpaginas == $totalquery){
-		$encontrado = $xpaginas;
-	}else{
-		$encontrado = $totalquery-($paginas*$xpaginas);
+if($totalquery == 0){
+	$totalquery = 1;
+	$paginas = $totalquery/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	$totalquery = 0;
+	if(!$_GET){
+		header('Location: Interfaz RRHH.php?pagina=1');
 	}
-}else if ($totalquery >= $xpaginas){
-	$encontrado = $xpaginas;
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: Interfaz RRHH.php?pagina=1');
+	}
+	$encontrado = 0;
+}else{
+	$paginas = $gsent->rowCount()/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	if($totalquery < $xpaginas){
+		$encontrado = $totalquery;
+	}else if($paginasElevado == $_GET['pagina']){
+		$paginas= (int)$paginas;
+		if($paginas*$xpaginas == $totalquery){
+			$encontrado = $xpaginas;
+		}else{
+			$encontrado = $totalquery-($paginas*$xpaginas);
+		}
+	}else if ($totalquery >= $xpaginas){
+		$encontrado = $xpaginas;
+	}
+
+	if(!$_GET){
+		header('Location: Interfaz RRHH.php?pagina=1');
+	}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: Interfaz RRHH.php?pagina=1');
+	}
+
+	$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+	$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
+	$gsent7 = $gbd->prepare($sqlGuardar);
+	$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+	$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+	$gsent7->execute();
+	$data = $gsent7->fetchAll(PDO::FETCH_ASSOC);
 }
-
-if(!$_GET){
-	header('Location: Interfaz RRHH.php?pagina=1');
-}
-if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
-	header('Location: Interfaz RRHH.php?pagina=1');
-}
-
-$iniciar = ($_GET['pagina']-1)*$xpaginas;
-
-$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
-$gsent7 = $gbd->prepare($sqlGuardar);
-$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
-$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
-$gsent7->execute();
-$data = $gsent7->fetchAll(PDO::FETCH_ASSOC);
-
 
 ?>
 <!DOCTYPE html>
@@ -428,7 +440,6 @@ $data = $gsent7->fetchAll(PDO::FETCH_ASSOC);
 						}
 						?>
 					</tbody>
-
 				</table>
 				<div class="clearfix">
 				<div class="hint-text">Mostrando <b><?php echo $encontrado?></b> de <b><?php echo $totalquery?></b> entradas</div>
@@ -739,6 +750,11 @@ $data = $gsent7->fetchAll(PDO::FETCH_ASSOC);
                     <div class="form-group fuente">
                         <label>¿Estas seguro que quieres eliminar al Trabajador <b></b>?</label>
 						<input type="hidden" id="eliminarRutTrabajador" value="">
+						<?php
+                            foreach ($resultado1 as $row1) {
+                                echo '<input type="hidden" name="idSucursal" id="idSucursal" class="form-control" value="' . $row1["id_sucursal"] . '">';
+                            }
+                        ?>
 						<h5 id="EliminarNombreTrabajador"></h5>
                         <div style="height:16px"></div>
                     </div>

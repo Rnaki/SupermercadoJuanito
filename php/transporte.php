@@ -54,36 +54,50 @@ $resultado1 = $gsent1->fetchAll(PDO::FETCH_ASSOC);
 //paginador
 $xpaginas = 5;
 $totalquery = $gsent->rowCount();
-$paginas = $gsent->rowCount()/$xpaginas;
-$paginasElevado = ceil($paginas);
-if($totalquery < $xpaginas){
-	$encontrado = $totalquery;
-}else if($paginasElevado == $_GET['pagina']){
-    $paginas= (int)$paginas;
-	if($paginas*$xpaginas == $totalquery){
-		$encontrado = $xpaginas;
-	}else{
-		$encontrado = $totalquery-($paginas*$xpaginas);
+if($totalquery == 0){
+	$totalquery = 1;
+	$paginas = $totalquery/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	$totalquery = 0;
+	if(!$_GET){
+		header('Location: transporte.php?pagina=1');
 	}
-}else if ($totalquery >= $xpaginas){
-	$encontrado = $xpaginas;
-}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: transporte.php?pagina=1');
+	}
+	$encontrado = 0;
+}else{
+	$paginas = $gsent->rowCount()/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	if($totalquery < $xpaginas){
+		$encontrado = $totalquery;
+	}else if($paginasElevado == $_GET['pagina']){
+		$paginas= (int)$paginas;
+		if($paginas*$xpaginas == $totalquery){
+			$encontrado = $xpaginas;
+		}else{
+			$encontrado = $totalquery-($paginas*$xpaginas);
+		}
+	}else if ($totalquery >= $xpaginas){
+		$encontrado = $xpaginas;
+	}
 
-if(!$_GET){
-	header('Location: transporte.php?pagina=1');
-}
-if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
-	header('Location: transporte.php?pagina=1');
-}
+	if(!$_GET){
+		header('Location: transporte.php?pagina=1');
+	}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: transporte.php?pagina=1');
+	}
 
-$iniciar = ($_GET['pagina']-1)*$xpaginas;
+	$iniciar = ($_GET['pagina']-1)*$xpaginas;
 
-$sqlGuardar = $sql.' LIMIT :nArticulos OFFSET :iniciar;';
-$gsent7 = $gbd->prepare($sqlGuardar);
-$gsent7->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
-$gsent7->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
-$gsent7->execute();
-$resultado = $gsent7->fetchAll(PDO::FETCH_ASSOC);
+	$sqlGuardar = $sql.' LIMIT :nArticulos OFFSET :iniciar;';
+	$gsent = $gbd->prepare($sqlGuardar);
+	$gsent->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+	$gsent->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+	$gsent->execute();
+	$resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
+}
 
 ?>
 
@@ -312,7 +326,6 @@ $resultado = $gsent7->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <table class="table table-striped table-hover" style="text-align: center;">
                     <thead>

@@ -844,20 +844,39 @@ function mostrarEliminarTrabajador(rut_persona){
 }
 
 function eliminarTrabajador(){
+
    rut_persona = $('#eliminarRutTrabajador').val();
+
+   id_sucursal = $('#idSucursal').val();
+
    console.log(rut_persona);
+
    cadena= {
+
       "rut_persona": rut_persona,
+
+      "id_sucursal": id_sucursal,
+
   };
+
   $.ajax({
+
       type: "POST",
+
       url: "eliminarTrabajador.php",
+
       data: cadena,
+
       success:function(){
+
         location.reload();
+
           
+
       }
+
   }) 
+
 }
 
 function decrementar(id_producto){
@@ -1053,22 +1072,40 @@ function TransbankPost(){
       }) 
 }
 
-function recuperarTrabajador(rutPersona){
+function recuperarTrabajador(rutPersona,idSucursal){
+
    $('#eliminarexampleModal').modal('show');
+
    cadena= {
+
       "rutPersona": rutPersona,
+
+      "idSucursal": idSucursal,
+
       };
+
    $('#recuperarTrabajador').click(function() {
+
       $.ajax({
+
          type: "POST",
+
          url: "recuperarTrabajador.php",
+
          data: cadena,
+
          success:function(){
+
             location.reload();
+
             $('#eliminarexampleModal').modal('hide');
+
          }
+
       }) 
+
    } );
+
 }
 
 
@@ -1126,7 +1163,7 @@ function completarVenta(){
 
 //MATIAS
 
-if( $('#checkBoxLocal').prop('checked') == true ) {
+if( $('#checkBoxDespacho').prop('checked') == true ) {
    console.log("hola");
    cadena1= {
      

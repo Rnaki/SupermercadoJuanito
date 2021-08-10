@@ -23,11 +23,11 @@ function generarDatos(){
     
       $.ajax({
           type: "POST",
-          url: "tablaReporte.php",
+          url: "datosGrafico.php?añoseleccionado="+añoseleccionado,
           data: cadena,
           success:function(respuesta){
-            
-              grafico(respuesta);
+            datos = JSON.parse(respuesta)
+              grafico(datos[0], datos[1]);
             
           }
       }) 
@@ -36,7 +36,10 @@ function generarDatos(){
 
 
 
-function grafico(test000) {
+function grafico(meses, cantidad) {
+  console.log(meses, cantidad)
+  veces = meses.length;
+  console.log (veces);
   'use strict'
 
   feather.replace({ 'aria-hidden': 'true' })
@@ -48,28 +51,35 @@ function grafico(test000) {
     type: 'line',
     data: {
       labels: [
-        'Enero',
-        'Febrero',
-        'Marzo',
-        'Abril',
-        'Mayo',
-        'Junio',
-        'Julio',
-        'Agosto',
-        'Septiembre',
-        'Octubre',
-        'Noviembre',
-        'Diciembre'
+        meses[0],
+        meses[1],
+        meses[2],
+        meses[3],
+        meses[4],
+        meses[5],
+        meses[6],
+        meses[7],
+        meses[8],
+        meses[9],
+        meses[10],
+        meses[11]
+              
       ],
       datasets: [{
         data: [
-          0,
-          test000,
-          18483,
-          24003,
-          23489,
-          24092,
-          12034
+        cantidad[0],
+        cantidad[1],
+        cantidad[2],
+        cantidad[3],
+        cantidad[4],
+        cantidad[5],
+        cantidad[6],
+        cantidad[7],
+        cantidad[8],
+        cantidad[9],
+        cantidad[10],
+        cantidad[11],
+        
         ],
         lineTension: 0,
         backgroundColor: 'transparent',

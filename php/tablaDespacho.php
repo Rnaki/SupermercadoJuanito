@@ -8,7 +8,7 @@ if(isset($_POST["sucursal"])){
   }
 
 $sucursal = $_SESSION["sucursal"];
-
+$id_venta = $_SESSION["id_venta"];
 include("conexion.php");
 $conn=conectar();
 /*$sql2 = "SELECT * FROM tranporte where id_sucursal= $sucursal ";
@@ -33,8 +33,11 @@ $resultado3 = $conn->query($sql3)->fetchAll();
 $sql="INSERT INTO despacho(id_sucursal, patente, informacion_envio, fecha_limite, fecha_entrega, proceso_despacho) VALUES ('".$sucursal."',NULL,'".$direccion_despacho."','".$fecha_limite."',NULL,'En proceso')";
 
 echo $conn->exec($sql);
-$_SESSION["id_despacho"] = $conn->lastInsertId();
-echo $_SESSION["id_despacho"];
+$id_despacho = $conn->lastInsertId();
+
+
+$sql0 = "UPDATE venta set id_despacho = $id_despacho where id_venta = '".$id_venta."'";
+echo $conn->exec($sql0);
 
     }
 

@@ -47,6 +47,7 @@ if (isset($_POST["rutBuscar"]) && ($_POST["rutBuscar"] != '')) {
 //$data = $conn->query($sql)->fetchAll();
 $gsent = $gbd->prepare($sql);
 $gsent->execute();
+$resultado5 = $gsent->fetchAll(PDO::FETCH_ASSOC);
 
 $sql2 = "SELECT distinct marca_proveedor FROM proveedor WHERE estado_proveedor = true order by marca_proveedor;";
 $gsent2 = $gbd->prepare($sql2);
@@ -65,44 +66,55 @@ $resultado4 = $gsent4->fetchAll(PDO::FETCH_ASSOC);
 
 /* Obtener todas las filas restantes del conjunto de resultados */
 //print("Obtener todas las filas restantes del conjunto de resultados:\n");
-$resultado = $gsent->fetchAll(PDO::FETCH_ASSOC);
+
 
 //paginador
 $xpaginas = 5;
 $totalquery = $gsent->rowCount();
-$paginas = $gsent->rowCount()/$xpaginas;
-$paginasElevado = ceil($paginas);
-if ($totalquery < $xpaginas) {
-    $encontrado = $totalquery;
-} else if ($paginasElevado == $_GET['pagina']) {
-    $paginas = (int)$paginas;
-    if ($paginas * $xpaginas == $totalquery) {
-        $encontrado = $xpaginas;
-    } else {
-        $encontrado = $totalquery - ($paginas * $xpaginas);
-    }
-} else if ($totalquery >= $xpaginas) {
-    $encontrado = $xpaginas;
+if($totalquery == 0){
+	$totalquery = 1;
+	$paginas = $totalquery/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	$totalquery = 0;
+	if(!$_GET){
+		header('Location: proveedor.php?pagina=1');
+	}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: proveedor.php?pagina=1');
+	}
+	$encontrado = 0;
+}else{
+	$paginas = $gsent->rowCount()/$xpaginas;
+	$paginasElevado = ceil($paginas);
+	if($totalquery < $xpaginas){
+		$encontrado = $totalquery;
+	}else if($paginasElevado == $_GET['pagina']){
+		$paginas= (int)$paginas;
+		if($paginas*$xpaginas == $totalquery){
+			$encontrado = $xpaginas;
+		}else{
+			$encontrado = $totalquery-($paginas*$xpaginas);
+		}
+	}else if ($totalquery >= $xpaginas){
+		$encontrado = $xpaginas;
+	}
+
+	if(!$_GET){
+		header('Location: proveedor.php?pagina=1');
+	}
+	if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
+		header('Location: proveedor.php?pagina=1');
+	}
+
+	$iniciar = ($_GET['pagina']-1)*$xpaginas;
+
+	$sqlGuardar = $sql.' LIMIT :nArticulos OFFSET :iniciar;';
+	$gsent = $gbd->prepare($sqlGuardar);
+	$gsent->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
+	$gsent->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
+	$gsent->execute();
+	$resultado5 = $gsent->fetchAll(PDO::FETCH_ASSOC);
 }
-
-if(!$_GET){
-	header('Location: proveedor.php?pagina=1');
-}
-if($_GET['pagina'] > $paginasElevado || $_GET['pagina'] <= 0){
-	header('Location: proveedor.php?pagina=1');
-}
-
-$iniciar = ($_GET['pagina']-1)*$xpaginas;
-
-$sqlGuardar = $sql.'LIMIT :nArticulos OFFSET :iniciar;';
-$gsent5 = $gbd->prepare($sqlGuardar);
-$gsent5->bindParam(':iniciar', $iniciar, PDO::PARAM_INT);
-$gsent5->bindParam(':nArticulos', $xpaginas, PDO::PARAM_INT);
-$gsent5->execute();
-$resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
-
-
-
 
 ?>
 
@@ -280,7 +292,7 @@ $resultado5 = $gsent5->fetchAll(PDO::FETCH_ASSOC);
                                 </svg> Añadir Proveedor</a>
                                 <a class="btn btn-primary"  href="proveedoresEliminados.php" ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
 								<path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />
-                                </svg> Recuperar Empleados</a>
+                                </svg> Recuperar Proveedores</a>
                         </div>
                     </div>
 
