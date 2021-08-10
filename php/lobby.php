@@ -1,7 +1,7 @@
 <?php 
 
 session_start();
-echo $_SESSION["id_venta"];
+$_SESSION["id_venta"];
 
 if(isset($_POST["sucursal"])){
   $_SESSION["sucursal"] = $_POST["sucursal"];

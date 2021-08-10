@@ -6,7 +6,7 @@
     $sql10 = "INSERT INTO VENTA (rut_persona) values ('".$rut."')";
     $gbd->exec($sql10);
     $_SESSION["id_venta"] = $gbd->lastInsertId();
-    echo $_SESSION["id_venta"];
+    $_SESSION["id_venta"];
 
     try{
 

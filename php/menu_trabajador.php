@@ -47,7 +47,7 @@
 	};
 
 	if (isset($_SESSION["sucursal"])){
-		echo $_SESSION["sucursal"];
+		
 	};
 
 	$sql4 = "SELECT sucursal.nombre_sucursal, sucursal.id_sucursal from sucursal 
